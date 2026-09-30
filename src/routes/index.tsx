@@ -47,6 +47,8 @@ import stretch from "@/assets/sample-stretch.jpg";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8787").replace(/\/$/, "");
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -168,7 +170,7 @@ function Index() {
     multiclips.forEach((clip) => payload.append("clips", clip));
     payload.append("music", music);
     try {
-      const response = await fetch("http://127.0.0.1:8787/render", { method: "POST", body: payload, headers: { Authorization: `Bearer ${token}` } });
+      const response = await fetch(`${API_BASE_URL}/render`, { method: "POST", body: payload, headers: { Authorization: `Bearer ${token}` } });
       const result = await response.json() as { url?: string; credits?: number; detail?: string };
       if (!response.ok || !result.url) throw new Error(result.detail || "Không thể dựng video.");
       setRenderUrl(result.url);
@@ -183,7 +185,7 @@ function Index() {
 
   async function authenticate(action: "login" | "register") {
     try {
-      const response = await fetch(`http://127.0.0.1:8787/auth/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: authEmail, password: authPassword }) });
+      const response = await fetch(`${API_BASE_URL}/auth/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: authEmail, password: authPassword }) });
       const result = await response.json() as { token?: string; user?: { email: string; credits: number }; detail?: string };
       if (!response.ok || !result.token || !result.user) throw new Error(result.detail || "Không thể đăng nhập.");
       setToken(result.token);
@@ -197,7 +199,7 @@ function Index() {
     if (!token) { setPaymentOpen(false); setAuthOpen(true); setNotice("Đăng nhập trước khi mua gói."); return; }
     setPaymentLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:8787/orders/${plan}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      const response = await fetch(`${API_BASE_URL}/orders/${plan}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       const result = await response.json() as typeof order & { detail?: string };
       if (!response.ok || !result) throw new Error(result.detail || "Không tạo được đơn hàng.");
       setOrder(result);

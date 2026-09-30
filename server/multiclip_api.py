@@ -36,10 +36,15 @@ PLANS = {
     "studio": {"name": "Studio", "amount": 349000, "credits": 120},
 }
 
-app = FastAPI(title="Master Clip local renderer")
+app = FastAPI(title="Master Clip renderer")
+allowed_origins = [
+    origin.strip()
+    for origin in os.getenv("CORS_ORIGINS", "http://127.0.0.1:5173,http://127.0.0.1:5174").split(",")
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173", "http://127.0.0.1:5174"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -247,7 +252,12 @@ def health() -> dict[str, bool]:
 
 
 @app.post("/render")
-async def render_multiclip(clips: list[UploadFile] = File(...), music: UploadFile = File(...), user: sqlite3.Row = Depends(current_user)) -> dict[str, object]:
+async def render_multiclip(
+    request: Request,
+    clips: list[UploadFile] = File(...),
+    music: UploadFile = File(...),
+    user: sqlite3.Row = Depends(current_user),
+) -> dict[str, object]:
     if not clips or not music.filename:
         raise HTTPException(status_code=400, detail="Cần ít nhất một clip và một file nhạc.")
     if user["credits"] < 1:
@@ -268,7 +278,7 @@ async def render_multiclip(clips: list[UploadFile] = File(...), music: UploadFil
     with connection() as database:
         database.execute("UPDATE users SET credits=credits-1 WHERE id=?", (user["id"],))
         credits = database.execute("SELECT credits FROM users WHERE id=?", (user["id"],)).fetchone()["credits"]
-    return {"url": f"http://127.0.0.1:8787/exports/{filename}", "credits": credits}
+    return {"url": f"{str(request.base_url).rstrip('/')}/exports/{filename}", "credits": credits}
 
 
 if __name__ == "__main__":

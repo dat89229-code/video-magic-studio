@@ -236,7 +236,7 @@ def render(clips: list[Path], music: Path) -> str:
             )
             segments.append(segment)
         manifest = workspace / "concat.txt"
-        manifest.write_text("".join(f"file '{segment.as_posix()}'\\n" for segment in segments), encoding="utf-8")
+        manifest.write_text("".join(f"file '{segment.as_posix()}'\n" for segment in segments), encoding="utf-8")
         video_only = workspace / "video-only.mp4"
         run("ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(manifest), "-c", "copy", str(video_only))
         filename = f"multiclip-{uuid.uuid4().hex[:8]}.mp4"

@@ -218,7 +218,19 @@ def music_duration(path: Path) -> float:
     return float(completed.stdout.strip())
 
 
+def has_audio_stream(path: Path) -> bool:
+    completed = subprocess.run(
+        ["ffprobe", "-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", str(path)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return bool(completed.stdout.strip())
+
+
 def render(clips: list[Path], music: Path) -> str:
+    if not has_audio_stream(music):
+        raise ValueError("File nhạc không có âm thanh. Hãy chọn MP3, WAV hoặc M4A có tiếng.")
     with tempfile.TemporaryDirectory(prefix="master-clip-") as directory:
         workspace = Path(directory)
         duration = min(max(music_duration(music), 8), 60)

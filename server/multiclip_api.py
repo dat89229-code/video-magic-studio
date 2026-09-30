@@ -228,8 +228,11 @@ def render(clips: list[Path], music: Path) -> str:
             segment = workspace / f"segment-{index:02d}.mp4"
             run(
                 "ffmpeg", "-y", "-stream_loop", "-1", "-i", str(clip), "-t", f"{segment_duration:.3f}",
-                "-vf", "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=30,eq=contrast=1.08:saturation=1.08",
-                "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "veryfast", str(segment),
+                # Staging runs on Render's small free instance. Keep this output
+                # vertical and pleasant while avoiding a memory spike from 1080p
+                # encoding. Production workers can raise this to 1080x1920.
+                "-vf", "scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,fps=24,eq=contrast=1.08:saturation=1.08",
+                "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-preset", "ultrafast", "-crf", "28", "-threads", "1", str(segment),
             )
             segments.append(segment)
         manifest = workspace / "concat.txt"

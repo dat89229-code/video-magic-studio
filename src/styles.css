@@ -71,32 +71,33 @@
 }
 
 :root {
-  --radius: 0.45rem;
-  --background: oklch(0.115 0.005 95);
-  --foreground: oklch(0.965 0.006 96);
-  --card: oklch(0.16 0.006 95);
-  --card-foreground: oklch(0.965 0.006 96);
-  --popover: oklch(0.18 0.006 95);
-  --popover-foreground: oklch(0.965 0.006 96);
-  --primary: oklch(0.84 0.17 91);
-  --primary-foreground: oklch(0.14 0.02 91);
-  --secondary: oklch(0.205 0.006 95);
-  --secondary-foreground: oklch(0.9 0.008 96);
-  --muted: oklch(0.19 0.006 95);
-  --muted-foreground: oklch(0.68 0.012 95);
-  --accent: oklch(0.23 0.01 91);
-  --accent-foreground: oklch(0.97 0.005 96);
+  --radius: 0.55rem;
+  /* Hỏa hiện đại: nền graphite trung tính, nhấn đỏ gạch/cam hổ phách. */
+  --background: oklch(0.145 0.012 25);
+  --foreground: oklch(0.955 0.008 75);
+  --card: oklch(0.185 0.014 25);
+  --card-foreground: oklch(0.955 0.008 75);
+  --popover: oklch(0.205 0.016 25);
+  --popover-foreground: oklch(0.955 0.008 75);
+  --primary: oklch(0.66 0.19 35);
+  --primary-foreground: oklch(0.985 0.004 75);
+  --secondary: oklch(0.235 0.016 25);
+  --secondary-foreground: oklch(0.91 0.01 75);
+  --muted: oklch(0.215 0.014 25);
+  --muted-foreground: oklch(0.73 0.014 65);
+  --accent: oklch(0.265 0.025 30);
+  --accent-foreground: oklch(0.975 0.006 75);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.28 0.009 95);
-  --input: oklch(0.25 0.008 95);
-  --ring: oklch(0.84 0.17 91);
-  --brand: oklch(0.86 0.18 95);
-  --brand-strong: oklch(0.78 0.18 88);
-  --brand-foreground: oklch(0.14 0.02 91);
-  --panel: oklch(0.155 0.005 95);
-  --panel-raised: oklch(0.19 0.006 95);
-  --subtle: oklch(0.23 0.007 95);
+  --border: oklch(0.32 0.02 30);
+  --input: oklch(0.255 0.018 28);
+  --ring: oklch(0.68 0.19 35);
+  --brand: oklch(0.68 0.19 35);
+  --brand-strong: oklch(0.59 0.18 32);
+  --brand-foreground: oklch(0.985 0.004 75);
+  --panel: oklch(0.17 0.014 25);
+  --panel-raised: oklch(0.215 0.018 25);
+  --subtle: oklch(0.27 0.018 28);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -157,6 +158,9 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     min-width: 320px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   button, a, input, label { -webkit-tap-highlight-color: transparent; }
@@ -164,7 +168,7 @@
 
 @utility gold-text {
   color: var(--brand);
-  text-shadow: 0 0 18px color-mix(in oklab, var(--brand) 32%, transparent);
+  text-shadow: none;
 }
 
 @utility app-grid {

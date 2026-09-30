@@ -248,7 +248,7 @@ function Index() {
               <Button variant="gold" size="sm" className="h-10" onClick={handleUrl}>Lấy video</Button>
             </div>
 
-            <div className="my-2 flex items-center gap-3 text-[10px] uppercase text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">hoặc</div>
+            <div className="my-2 flex items-center gap-3 text-xs uppercase text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">hoặc</div>
 
             <button
               type="button"
@@ -260,13 +260,13 @@ function Index() {
               <span className="grid size-8 place-items-center rounded-md bg-brand/10 text-brand"><CloudUpload className="size-4" /></span>
               <span>
                 <strong className="block text-xs">{fileName || "Kéo thả file video dài vào đây"}</strong>
-                <span className="mt-1 block text-[10px] text-muted-foreground">hoặc bấm để chọn file từ máy</span>
+                <span className="mt-1 block text-xs text-muted-foreground">hoặc bấm để chọn file từ máy</span>
               </span>
             </button>
             <input ref={inputRef} type="file" accept="video/*" className="hidden" onChange={(event) => chooseFile(event.target.files?.[0])} />
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-1 text-[11px]">
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-1 text-xs">
             <span className="mr-2 text-muted-foreground">Chế độ tạo:</span>
             {["Talking-head", "Nhiều clip + Nhạc", "Video dài → Short"].map((item) => (
               <Button key={item} variant="ghost" size="sm" onClick={() => setMode(item)} className={cn("h-7 px-2", mode === item && "border-b border-brand text-brand")}>{item}</Button>
@@ -276,15 +276,15 @@ function Index() {
           {mode === "Nhiều clip + Nhạc" && (
             <div className="mt-4 rounded-lg border border-brand/35 bg-panel-raised p-4 text-left shadow-lg">
               <div className="flex items-center gap-2 text-xs font-bold text-foreground"><Music2 className="size-4 text-brand" /> Ghép clip theo nhịp nhạc</div>
-              <p className="mt-1 text-[10px] text-muted-foreground">Chọn các clip rời và một bài nhạc bạn có quyền sử dụng. App sẽ cắt và ghép thành video dọc 9:16.</p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">Chọn các clip rời và một bài nhạc bạn có quyền sử dụng. App sẽ cắt và ghép thành video dọc 9:16.</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 <Button type="button" variant="outline" className="h-auto min-h-16 justify-start px-3 py-3 text-left" onClick={() => multiclipInputRef.current?.click()}>
                   <Upload className="size-4 text-brand" />
-                  <span><strong className="block text-xs">Chọn clip</strong><small className="block text-[10px] text-muted-foreground">{multiclips.length ? `${multiclips.length} clip đã chọn` : "Chọn nhiều file video"}</small></span>
+                  <span><strong className="block text-sm">Chọn clip</strong><small className="block text-xs text-muted-foreground">{multiclips.length ? `${multiclips.length} clip đã chọn` : "Chọn nhiều file video"}</small></span>
                 </Button>
                 <Button type="button" variant="outline" className="h-auto min-h-16 justify-start px-3 py-3 text-left" onClick={() => musicInputRef.current?.click()}>
                   <Headphones className="size-4 text-brand" />
-                  <span><strong className="block text-xs">Chọn nhạc</strong><small className="block max-w-40 truncate text-[10px] text-muted-foreground">{music?.name || "MP3, WAV, M4A…"}</small></span>
+                  <span><strong className="block text-sm">Chọn nhạc</strong><small className="block max-w-40 truncate text-xs text-muted-foreground">{music?.name || "MP3, WAV, M4A…"}</small></span>
                 </Button>
               </div>
               <input ref={multiclipInputRef} type="file" accept="video/*" multiple className="hidden" onChange={(event) => setMulticlips(Array.from(event.target.files || []))} />
@@ -299,16 +299,16 @@ function Index() {
 
         <section className="relative z-10 mt-8" aria-label="Các công năng của studio">
           <div className="mb-4 flex items-end justify-between gap-3">
-            <div><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Studio công năng</p><h2 className="mt-1 text-lg font-bold">Chọn dịch vụ để bắt đầu</h2></div>
-            <span className="rounded-full border border-brand/30 bg-brand/10 px-2 py-1 text-[9px] font-bold text-brand">Sẵn sàng bán theo gói</span>
+            <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Studio công năng</p><h2 className="mt-1 text-lg font-bold">Chọn dịch vụ để bắt đầu</h2></div>
+            <span className="rounded-full border border-brand/35 bg-brand/10 px-2.5 py-1 text-[10px] font-bold text-brand">Sẵn sàng bán theo gói</span>
           </div>
           <div className="grid gap-3 md:grid-cols-3">
             {studioProducts.map(({ icon: Icon, title, description, mode: productMode, badge }) => (
               <button key={title} type="button" onClick={() => { setMode(productMode); setNotice(productMode === "Nhiều clip + Nhạc" ? "Đã mở bộ dựng video theo nhạc." : `${title} cần kết nối nhà cung cấp AI trước khi xuất thành phẩm.`); }} className={cn("rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:border-brand/70 hover:shadow-brand", mode === productMode ? "border-brand bg-brand/5" : "border-border bg-card")}>
                 <span className="grid size-10 place-items-center rounded-lg bg-brand/10 text-brand"><Icon className="size-5" /></span>
                 <h3 className="mt-4 text-sm font-bold">{title}</h3>
-                <p className="mt-1 min-h-10 text-[11px] leading-4 text-muted-foreground">{description}</p>
-                <span className="mt-4 inline-block text-[9px] font-bold text-brand">{badge} →</span>
+                <p className="mt-1 min-h-10 text-xs leading-5 text-muted-foreground">{description}</p>
+                <span className="mt-4 inline-block text-[11px] font-bold text-brand">{badge} →</span>
               </button>
             ))}
           </div>

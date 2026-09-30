@@ -47,7 +47,13 @@ import stretch from "@/assets/sample-stretch.jpg";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8787").replace(/\/$/, "");
+// Render supplies VITE_API_URL during production builds. The cloud fallback keeps
+// the staging app functional if a Docker build environment omits build-time vars.
+const DEFAULT_API_BASE_URL =
+  typeof window !== "undefined" && window.location.hostname.endsWith(".onrender.com")
+    ? "https://video-magic-api-fp7a.onrender.com"
+    : "http://127.0.0.1:8787";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
 
 export const Route = createFileRoute("/")({
   head: () => ({

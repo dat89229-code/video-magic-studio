@@ -176,6 +176,18 @@
   background-size: 42px 42px;
 }
 
+/* Titanium đen–bạc: lớp phản sáng trầm để có chiều sâu 3D, không chói mắt. */
+.metallic-shell {
+  background-color: oklch(0.13 0.01 25);
+  background-image:
+    radial-gradient(ellipse 68% 34% at 50% -10%, oklch(0.52 0.025 255 / .30), transparent 72%),
+    radial-gradient(ellipse 44% 26% at 82% 36%, oklch(0.46 0.018 250 / .16), transparent 72%),
+    radial-gradient(ellipse 38% 22% at 12% 68%, oklch(0.4 0.015 248 / .12), transparent 72%),
+    linear-gradient(118deg, transparent 0%, oklch(0.62 0.02 250 / .075) 28%, transparent 48%, oklch(0.68 0.018 250 / .055) 70%, transparent 100%),
+    linear-gradient(160deg, oklch(0.105 0.008 25), oklch(0.18 0.014 28) 46%, oklch(0.11 0.009 24));
+  background-attachment: fixed;
+}
+
 @keyframes soft-pulse { 50% { opacity: .62; } }
 
 /* Cánh hoa Hỏa: điểm nhấn nhẹ, luôn nằm phía sau nội dung thao tác. */

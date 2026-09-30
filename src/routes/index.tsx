@@ -222,7 +222,7 @@ function Index() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="metallic-shell min-h-screen overflow-x-hidden text-foreground">
       <FallingPetals />
       <Header onNotice={setNotice} account={account} onAuth={() => setAuthOpen(true)} onPricing={() => { setOrder(null); setPaymentOpen(true); }} />
 

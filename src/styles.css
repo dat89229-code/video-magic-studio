@@ -178,6 +178,37 @@
 
 @keyframes soft-pulse { 50% { opacity: .62; } }
 
+/* Cánh hoa Hỏa: điểm nhấn nhẹ, luôn nằm phía sau nội dung thao tác. */
+@keyframes fire-petal-fall {
+  0% { transform: translate3d(0, -12vh, 0) rotate(0deg); opacity: 0; }
+  10% { opacity: .34; }
+  100% { transform: translate3d(var(--petal-drift), 112vh, 0) rotate(420deg); opacity: 0; }
+}
+
+.fire-petal {
+  position: absolute;
+  top: -12vh;
+  width: 10px;
+  height: 15px;
+  border-radius: 80% 18% 80% 18%;
+  background: linear-gradient(145deg, oklch(0.78 0.18 48 / .8), oklch(0.56 0.19 28 / .7));
+  box-shadow: 0 0 10px oklch(0.66 0.18 35 / .16);
+  animation: fire-petal-fall var(--petal-duration) linear var(--petal-delay) infinite;
+}
+
+.fire-petal-1 { left: 5%; --petal-drift: 52px; --petal-duration: 17s; --petal-delay: -10s; }
+.fire-petal-2 { left: 14%; --petal-drift: -36px; --petal-duration: 21s; --petal-delay: -4s; }
+.fire-petal-3 { left: 25%; --petal-drift: 30px; --petal-duration: 18s; --petal-delay: -14s; }
+.fire-petal-4 { left: 34%; --petal-drift: -48px; --petal-duration: 24s; --petal-delay: -7s; }
+.fire-petal-5 { left: 44%; --petal-drift: 45px; --petal-duration: 20s; --petal-delay: -17s; }
+.fire-petal-6 { left: 54%; --petal-drift: -28px; --petal-duration: 23s; --petal-delay: -3s; }
+.fire-petal-7 { left: 64%; --petal-drift: 55px; --petal-duration: 19s; --petal-delay: -12s; }
+.fire-petal-8 { left: 73%; --petal-drift: -42px; --petal-duration: 25s; --petal-delay: -8s; }
+.fire-petal-9 { left: 82%; --petal-drift: 34px; --petal-duration: 18s; --petal-delay: -15s; }
+.fire-petal-10 { left: 91%; --petal-drift: -52px; --petal-duration: 22s; --petal-delay: -5s; }
+.fire-petal-11 { left: 11%; --petal-drift: 62px; --petal-duration: 26s; --petal-delay: -19s; }
+.fire-petal-12 { left: 70%; --petal-drift: -62px; --petal-duration: 27s; --petal-delay: -21s; }
+
 /* Băng truyền (marquee) — chạy liền mạch từ phải sang trái, dừng khi rê chuột */
 @keyframes marquee-x { to { transform: translateX(-50%); } }
 
@@ -188,4 +219,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
+  .fire-petal { animation: none; display: none; }
 }

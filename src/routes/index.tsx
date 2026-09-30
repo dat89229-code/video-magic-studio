@@ -109,6 +109,14 @@ const projects = [
   { title: "video-nhiều-clip-nhạc", meta: "28.09.2026 · 1:49", image: stretch },
 ];
 
+function FallingPetals() {
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+      {Array.from({ length: 12 }, (_, index) => <span key={index} className={`fire-petal fire-petal-${index + 1}`} />)}
+    </div>
+  );
+}
+
 function Index() {
   const inputRef = useRef<HTMLInputElement>(null);
   const multiclipInputRef = useRef<HTMLInputElement>(null);
@@ -215,6 +223,7 @@ function Index() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <FallingPetals />
       <Header onNotice={setNotice} account={account} onAuth={() => setAuthOpen(true)} onPricing={() => { setOrder(null); setPaymentOpen(true); }} />
 
       <aside className="fixed left-0 top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-44 border-r border-border/60 bg-background/95 p-3 xl:block">

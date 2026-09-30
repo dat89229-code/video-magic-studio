@@ -182,7 +182,8 @@ def create_order(plan_key: str, user: sqlite3.Row = Depends(current_user)) -> di
 @app.post("/payments/sepay/webhook")
 async def receive_sepay_webhook(request: Request, authorization: str | None = Header(default=None), x_api_key: str | None = Header(default=None)) -> dict[str, bool]:
     webhook_key = os.getenv("SEPAY_WEBHOOK_API_KEY", "")
-    if not webhook_key or (authorization != f"Bearer {webhook_key}" and x_api_key != webhook_key):
+    accepted_authorization = {f"Bearer {webhook_key}", f"Apikey {webhook_key}"}
+    if not webhook_key or (authorization not in accepted_authorization and x_api_key != webhook_key):
         raise HTTPException(status_code=401, detail="Webhook không hợp lệ.")
     payload = await request.json()
     provider_id = str(payload.get("id") or payload.get("transaction_id") or "")

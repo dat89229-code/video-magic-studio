@@ -801,17 +801,20 @@ em {
   z-index: 2;
   left: 14px;
   bottom: 15px;
-  max-width: 62%;
-  color: #61213b;
+  max-width: calc(100% - 28px);
+  color: #551b34;
   font:
-    800 19px/1.04 Inter,
-    ui-sans-serif,
+    900 clamp(16px, 1.8vw, 22px)/1 Arial,
+    "Helvetica Neue",
     sans-serif;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
+  white-space: nowrap;
   text-shadow: 0 1px 0 #fff;
-  background: #fff9f3e8;
-  padding: 7px 9px;
-  border-radius: 7px;
+  background: rgba(255, 250, 246, 0.96);
+  border: 1px solid rgba(119, 47, 77, 0.16);
+  box-shadow: 0 8px 20px rgba(92, 38, 62, 0.16);
+  padding: 10px 12px;
+  border-radius: 9px;
 }
 .cover-mark {
   position: absolute;
@@ -1001,7 +1004,7 @@ em {
   padding: 6px 9px;
   border-radius: 20px;
 }
-.detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: 75%; color: #61213b; background: #fff9f3e8; padding: 10px 12px; border-radius: 9px; font: 900 27px/1.05 Inter, ui-sans-serif, sans-serif; text-shadow: 0 1px 0 #fff; }
+.detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: calc(100% - 44px); color: #551b34; background: rgba(255, 250, 246, .96); border: 1px solid rgba(119, 47, 77, .16); box-shadow: 0 10px 24px rgba(92, 38, 62, .18); padding: 12px 16px; border-radius: 10px; font: 900 clamp(21px, 2.2vw, 32px)/1 Arial, "Helvetica Neue", sans-serif; letter-spacing: 0; white-space: nowrap; text-shadow: 0 1px 0 #fff; }
 .detail-tags {
   display: flex;
   gap: 8px;
@@ -1590,5 +1593,12 @@ footer {
   }
   .skill-cover {
     height: 128px;
+  }
+  .cover-title,
+  .detail-cover strong {
+    white-space: normal;
+  }
+  .detail-cover strong {
+    font-size: 21px;
   }
 }

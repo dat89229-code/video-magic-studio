@@ -3,7 +3,6 @@ import {
   ArrowRight,
   Check,
   ChevronLeft,
-  CircleDollarSign,
   Clapperboard,
   Film,
   Gem,
@@ -391,12 +390,19 @@ function Index() {
       setNotice(error instanceof Error ? error.message : "Không thể tạo đơn Skill.");
     }
   }
+  async function paymentCompleted() {
+    await loadOwned();
+    if (!token) return;
+    const response = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+    if (response.ok) setAccount(await response.json());
+  }
   return (
     <div className="skill-world">
       <Header
         page={page}
         setPage={setPage}
         openSkills={() => jump()}
+        openTools={() => jump("Edit Video")}
         account={account}
         auth={() => setAuth(true)}
         credit={() => {
@@ -459,7 +465,24 @@ function Index() {
           login={login}
         />
       )}{" "}
-      {pay && <Payment close={() => setPay(false)} order={order} checkout={checkout} />}{" "}
+      {pay && (
+        <Payment
+          close={() => setPay(false)}
+          order={order}
+          checkout={checkout}
+          token={token}
+          account={account}
+          onPaid={paymentCompleted}
+          openMine={() => {
+            setPay(false);
+            setPage("mine");
+          }}
+          useNow={() => {
+            setPay(false);
+            setPage(selected.legacy ? "studio" : "detail");
+          }}
+        />
+      )}{" "}
       {notice && (
         <div className="notice">
           <Check size={17} />
@@ -490,7 +513,10 @@ function Header(p: any) {
             Trang chủ
           </button>
           <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>
-            Kho Skill
+            Sảnh Skill
+          </button>
+          <button className={p.page === "studio" ? "active" : ""} onClick={p.openTools}>
+            Công cụ AI
           </button>
           <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}>
             Skill của tôi
@@ -501,8 +527,8 @@ function Header(p: any) {
         </nav>
         <div className="nav-actions">
           <button className="credit-button" onClick={p.credit}>
-            <CircleDollarSign size={17} />
-            <span>{p.account ? `${p.account.credits} credit` : "Nạp credit"}</span>
+            <Gem size={17} />
+            <span>{p.account ? `${p.account.credits} Credit` : "Nạp Credit"}</span>
           </button>
           <button className="account-button" onClick={p.auth}>
             <User size={17} />
@@ -1093,6 +1119,33 @@ function Payment(p: any) {
     { key: "pro", name: "Pro", price: "129.000đ", credits: 35 },
     { key: "studio", name: "Studio", price: "349.000đ", credits: 120 },
   ] as const;
+  const [paid, setPaid] = useState<any>(null);
+  useEffect(() => {
+    if (!p.order?.code || !p.token || paid) return;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const response = await fetch(`${API}/orders/${p.order.code}`, {
+          headers: { Authorization: `Bearer ${p.token}` },
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.status === "paid" && !cancelled) {
+          setPaid(data);
+          void p.onPaid();
+        }
+      } catch {
+        // Payment polling is best-effort. The order remains available after refresh.
+      }
+    };
+    void check();
+    const interval = window.setInterval(check, 3000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [p.order?.code, p.token, paid]);
+  const isSkill = p.order?.kind === "skill" || paid?.order_type === "SKILL_PURCHASE";
   return (
     <div className="modal-wrap">
       <div className="modal payment">
@@ -1100,7 +1153,7 @@ function Payment(p: any) {
           <X />
         </button>
         <p className="eyebrow">THANH TOÁN VIETQR</p>
-        <h2>Nạp credit Master Clip</h2>
+        <h2>{isSkill ? "Mua Skill Master Clip" : "Nạp Credit Master Clip"}</h2>
         {!p.order ? (
           <div className="plans">
             {plans.map((x) => (
@@ -1111,11 +1164,30 @@ function Payment(p: any) {
               </button>
             ))}
           </div>
+        ) : paid ? (
+          <div className="payment-ready">
+            <div>
+              <p className="eyebrow">✓ XÁC NHẬN TỪ SEPAY</p>
+              <h3>{isSkill ? "Thanh toán thành công" : "Nạp credit thành công"}</h3>
+              <p>
+                {isSkill ? "Skill đã được mở khóa. Quyền sở hữu được lưu trong Skill của tôi." : `+${paid.credits} credit đã được cộng vào số dư của bạn.`}
+              </p>
+              {!isSkill && <p><b>Số dư hiện tại: {p.account?.credits ?? "…"} Credit</b></p>}
+              <div className="modal-actions">
+                <button className="btn-quiet" onClick={isSkill ? p.openMine : p.useNow}>
+                  {isSkill ? "Skill của tôi" : "Dùng công cụ ngay"}
+                </button>
+                <button className="btn-primary" onClick={p.useNow}>
+                  {isSkill ? "Sử dụng ngay" : "Đóng"}
+                </button>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="payment-ready">
             <div>
               <p>
-                {p.order.kind === "skill" ? <>Chuyển khoản đúng số tiền để mở khóa <b>{p.order.skill.title}</b>.</> : <>Chuyển khoản đúng số tiền để nhận <b>{p.order.plan.credits} credit</b>.</>}
+                {isSkill ? <>Mua Skill – <b>{p.order.skill.price.toLocaleString("vi-VN")}đ</b>. Chuyển khoản đúng số tiền để mở khóa <b>{p.order.skill.title}</b>.</> : <>Nạp Credit. Chuyển khoản đúng số tiền để nhận <b>{p.order.plan.credits} credit</b>.</>}
               </p>
               <dl>
                 <dt>Ngân hàng</dt>
@@ -1127,9 +1199,9 @@ function Payment(p: any) {
                 <dt>Nội dung</dt>
                 <dd className="payment-code">{p.order.code}</dd>
                 <dt>Số tiền</dt>
-                <dd>{(p.order.kind === "skill" ? p.order.skill.price : p.order.plan.amount).toLocaleString("vi-VN")}đ</dd>
+                <dd>{(isSkill ? p.order.skill.price : p.order.plan.amount).toLocaleString("vi-VN")}đ</dd>
               </dl>
-              <small>{p.order.kind === "skill" ? "SePay sẽ tự xác nhận và mở khóa Skill." : "SePay sẽ tự xác nhận và cộng credit sau khi thanh toán."}</small>
+              <small>{isSkill ? "SePay sẽ tự xác nhận và mở khóa Skill. Giao dịch này không cộng credit." : "SePay sẽ tự xác nhận và cộng credit. Giao dịch này không mở khóa Skill."}</small>
             </div>
             <img src={p.order.qr_url} alt="QR thanh toán VietQR" />
           </div>

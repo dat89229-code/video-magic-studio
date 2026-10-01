@@ -71,6 +71,7 @@ def initialize_database() -> None:
             );
             CREATE TABLE IF NOT EXISTS payment_orders (
                 id INTEGER PRIMARY KEY, code TEXT UNIQUE NOT NULL, user_id INTEGER NOT NULL,
+                order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP' CHECK(order_type IN ('SKILL_PURCHASE','CREDIT_TOPUP')),
                 plan_key TEXT, skill_slug TEXT, amount INTEGER NOT NULL, credits INTEGER NOT NULL DEFAULT 0,
                 status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 paid_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id)
@@ -105,6 +106,22 @@ def initialize_database() -> None:
         if is_postgres():
             schema = schema.replace("id INTEGER PRIMARY KEY", "id BIGSERIAL PRIMARY KEY")
         database.executescript(schema)
+        # This is deliberately additive: an already-running staging database can
+        # gain the explicit order type without losing any existing test data.
+        if is_postgres():
+            database.execute(
+                "ALTER TABLE payment_orders ADD COLUMN IF NOT EXISTS order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
+            )
+        else:
+            columns = database.execute("PRAGMA table_info(payment_orders)").fetchall()
+            if "order_type" not in {column["name"] for column in columns}:
+                database.execute(
+                    "ALTER TABLE payment_orders ADD COLUMN order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
+                )
+        database.execute(
+            "UPDATE payment_orders SET order_type='SKILL_PURCHASE' "
+            "WHERE skill_slug IS NOT NULL AND order_type != 'SKILL_PURCHASE'"
+        )
         seed_skills(database)
 
 
@@ -278,7 +295,7 @@ def create_skill_order(slug: str, user=Depends(current_user)) -> dict[str, objec
             raise HTTPException(status_code=409, detail="Bạn đã sở hữu Skill này.")
         code = f"MCS{uuid.uuid4().hex[:8].upper()}"
         database.execute(
-            "INSERT INTO payment_orders(code,user_id,skill_slug,amount,credits) VALUES (?,?,?,?,0)",
+            "INSERT INTO payment_orders(code,user_id,order_type,skill_slug,amount,credits) VALUES (?,?,'SKILL_PURCHASE',?,?,0)",
             (code, user["id"], slug, skill["price"]),
         )
     query = urlencode({"amount": skill["price"], "addInfo": code, "accountName": bank["name"]})
@@ -294,7 +311,10 @@ def create_order(plan_key: str, user=Depends(current_user)) -> dict[str, object]
     bank = bank_configuration()
     code = f"VMS{uuid.uuid4().hex[:8].upper()}"
     with connection() as database:
-        database.execute("INSERT INTO payment_orders(code, user_id, plan_key, amount, credits) VALUES (?, ?, ?, ?, ?)", (code, user["id"], plan_key, plan["amount"], plan["credits"]))
+        database.execute(
+            "INSERT INTO payment_orders(code,user_id,order_type,plan_key,amount,credits) VALUES (?,?,'CREDIT_TOPUP',?,?,?)",
+            (code, user["id"], plan_key, plan["amount"], plan["credits"]),
+        )
     query = urlencode({"amount": plan["amount"], "addInfo": code, "accountName": bank["name"]})
     qr_url = f"https://img.vietqr.io/image/{bank['bank']}-{bank['account']}-compact2.jpg?{query}"
     return {"code": code, "plan": plan, "bank": bank, "qr_url": qr_url}
@@ -318,9 +338,13 @@ async def receive_sepay_webhook(request: Request, authorization: str | None = He
         order = database.execute("SELECT * FROM payment_orders WHERE status='pending' AND ? LIKE '%' || code || '%'", (content,)).fetchone()
         if order is None or amount < order["amount"]:
             return {"ok": True}
+        if order["order_type"] not in {"SKILL_PURCHASE", "CREDIT_TOPUP"}:
+            raise HTTPException(status_code=409, detail="Loại đơn thanh toán không hợp lệ.")
         database.execute("INSERT INTO payment_transactions(provider_id, order_code, amount) VALUES (?, ?, ?)", (provider_id, order["code"], amount))
         database.execute("UPDATE payment_orders SET status='paid', paid_at=CURRENT_TIMESTAMP WHERE id=?", (order["id"],))
-        if order["skill_slug"]:
+        if order["order_type"] == "SKILL_PURCHASE":
+            if not order["skill_slug"]:
+                raise HTTPException(status_code=409, detail="Đơn mua Skill thiếu Skill cần mở khóa.")
             skill = database.execute("SELECT id FROM skills WHERE slug=?", (order["skill_slug"],)).fetchone()
             if skill is None:
                 raise HTTPException(status_code=409, detail="Skill trong đơn không còn tồn tại.")
@@ -328,10 +352,22 @@ async def receive_sepay_webhook(request: Request, authorization: str | None = He
                 "INSERT INTO skill_purchases(user_id,skill_id,order_code) VALUES (?,?,?) ON CONFLICT(user_id,skill_id) DO NOTHING",
                 (order["user_id"], skill["id"], order["code"]),
             )
-        else:
+        elif order["order_type"] == "CREDIT_TOPUP":
             database.execute("UPDATE users SET credits=credits+? WHERE id=?", (order["credits"], order["user_id"]))
             database.execute("INSERT INTO credit_transactions(user_id, delta, reason, order_code) VALUES (?, ?, ?, ?)", (order["user_id"], order["credits"], "credit_purchase", order["code"]))
     return {"ok": True}
+
+
+@app.get("/orders/{code}")
+def order_status(code: str, user=Depends(current_user)) -> dict[str, object]:
+    with connection() as database:
+        order = database.execute(
+            "SELECT code,order_type,skill_slug,amount,credits,status,paid_at FROM payment_orders WHERE code=? AND user_id=?",
+            (code, user["id"]),
+        ).fetchone()
+    if order is None:
+        raise HTTPException(status_code=404, detail="Không tìm thấy đơn thanh toán.")
+    return dict(order)
 
 
 def run(*command: str) -> None:
@@ -428,7 +464,13 @@ async def render_multiclip(
         except Exception as error:
             raise HTTPException(status_code=422, detail=f"Không thể dựng video: {error}") from error
     with connection() as database:
-        database.execute("UPDATE users SET credits=credits-1 WHERE id=?", (user["id"],))
+        debited = database.execute("UPDATE users SET credits=credits-1 WHERE id=? AND credits>=1", (user["id"],))
+        if debited.rowcount != 1:
+            raise HTTPException(status_code=402, detail="Bạn không đủ credit. Hãy nạp credit để tiếp tục.")
+        database.execute(
+            "INSERT INTO credit_transactions(user_id,delta,reason) VALUES (?,?,'multiclip_render')",
+            (user["id"], -1),
+        )
         credits = database.execute("SELECT credits FROM users WHERE id=?", (user["id"],)).fetchone()["credits"]
     return {"url": f"{str(request.base_url).rstrip('/')}/exports/{filename}", "credits": credits}
 

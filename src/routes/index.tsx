@@ -1,462 +1,1140 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  AudioLines,
-  Brush,
-  Captions,
+  ArrowRight,
   Check,
-  ChevronDown,
+  ChevronLeft,
   CircleDollarSign,
   Clapperboard,
-  Clock3,
-  CloudUpload,
-  Download,
-  FileAudio,
   Film,
-  FolderOpen,
-  Gauge,
-  Headphones,
-  Home,
+  Gem,
   ImageIcon,
-  ImagePlus,
-  Link2,
   Menu,
-  MessageSquareText,
   Music2,
-  Pause,
   Play,
-  Plus,
-  Scissors,
+  Search,
   Sparkles,
-  Star,
-  Upload,
   User,
-  Video,
-  WandSparkles,
+  Upload,
+  Wand2,
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
-import sampleGolfMan from "@/assets/sample-golf-man.mp4.asset.json";
-import sampleGolfSwing from "@/assets/sample-golf-swing.mp4.asset.json";
-import sampleLake from "@/assets/sample-lake.mp4.asset.json";
-import sampleTravel from "@/assets/sample-travel.mp4.asset.json";
-import presenter from "@/assets/sample-presenter.jpg";
-import runner from "@/assets/sample-runner.jpg";
-import stretch from "@/assets/sample-stretch.jpg";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-
-// Render supplies VITE_API_URL during production builds. The cloud fallback keeps
-// the staging app functional if a Docker build environment omits build-time vars.
-const DEFAULT_API_BASE_URL =
-  typeof window !== "undefined" && window.location.hostname.endsWith(".onrender.com")
-    ? "https://video-magic-api-fp7a.onrender.com"
-    : "http://127.0.0.1:8787";
-const API_BASE_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, "");
-
+const API = (
+  (import.meta.env.VITE_API_URL ||
+    (typeof window !== "undefined"
+      ? window.location.hostname.endsWith(".workers.dev")
+        ? "/api"
+        : window.location.hostname.endsWith(".onrender.com")
+          ? "https://video-magic-api-fp7a.onrender.com"
+          : "http://127.0.0.1:8787"
+      : "http://127.0.0.1:8787")) as string
+).replace(/\/$/, "");
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Master Clip — Video dài thành nhiều Short" },
-      { name: "description", content: "Biến video thô thành nội dung viral tự động bằng AI." },
-      { property: "og:title", content: "Master Clip — Video dài thành nhiều Short" },
-      { property: "og:description", content: "Biến video thô thành nội dung viral tự động bằng AI." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Master Clip — AI Skill World" }] }),
   component: Index,
 });
-
-type AiTool = { icon: LucideIcon; label: string; sublabel?: string };
-
-const tools: AiTool[] = [
-  { icon: Film, label: "Sửa Đổi Video AI" },
-  { icon: Music2, label: "Đồng Bộ Nhạc", sublabel: "Thông minh" },
-  { icon: AudioLines, label: "Lọc Mức Điểm", sublabel: "Âm" },
-  { icon: Sparkles, label: "AI Chấm Điểm", sublabel: "Cảnh Quay" },
-  { icon: Clapperboard, label: "Video Dài →", sublabel: "Short" },
-  { icon: Download, label: "Nhập Từ", sublabel: "YouTube/Drive" },
-  { icon: WandSparkles, label: "Hook Mở Đầu" },
-  { icon: Captions, label: "Caption Đồng", sublabel: "Bộ" },
-  { icon: Scissors, label: "Cắt Khoảng", sublabel: "Lặng Tự Động" },
-  { icon: ImageIcon, label: "Slide Đồ Họa AI" },
-  { icon: FileAudio, label: "Đồng Bộ Nhịp", sublabel: "Nhạc" },
-  { icon: Gauge, label: "Lọc Mức Ồn", sublabel: "Âm" },
+type Hall =
+  | "Tất cả"
+  | "Sửa ảnh AI"
+  | "Tạo ảnh AI"
+  | "Edit Video"
+  | "Video AI/Viral"
+  | "Marketing & Social Media";
+type Skill = {
+  slug: string;
+  title: string;
+  hall: Exclude<Hall, "Tất cả">;
+  description: string;
+  tag: string;
+  status?: string;
+  legacy?: boolean;
+};
+const halls: {
+  name: Exclude<Hall, "Tất cả">;
+  description: string;
+  icon: LucideIcon;
+  accent: string;
+}[] = [
+  {
+    name: "Sửa ảnh AI",
+    description: "Biến ảnh sản phẩm và chân dung chỉ trong vài bước.",
+    icon: ImageIcon,
+    accent: "#e487a3",
+  },
+  {
+    name: "Tạo ảnh AI",
+    description: "Tạo visual đẹp, đồng nhất với thương hiệu.",
+    icon: Sparkles,
+    accent: "#d886a5",
+  },
+  {
+    name: "Edit Video",
+    description: "Cắt, dựng và đóng gói video bán hàng.",
+    icon: Clapperboard,
+    accent: "#ad6f9c",
+  },
+  {
+    name: "Video AI/Viral",
+    description: "Thiết kế nội dung ngắn có khả năng lan tỏa.",
+    icon: Film,
+    accent: "#ba7590",
+  },
+  {
+    name: "Marketing & Social Media",
+    description: "Xây kênh và vận hành nội dung thông minh.",
+    icon: Wand2,
+    accent: "#c78ca5",
+  },
 ];
+const skills: Skill[] = [
+  [
+    "thuong-hieu-ca-nhan",
+    "Thương hiệu cá nhân & Text Overlay",
+    "Sửa ảnh AI",
+    "Tạo lớp chữ và hình ảnh nhất quán cho thương hiệu.",
+    "Ảnh",
+  ],
+  [
+    "poster-san-pham",
+    "Poster sản phẩm",
+    "Sửa ảnh AI",
+    "Thiết kế poster sản phẩm thu hút cho chiến dịch.",
+    "Ảnh",
+  ],
+  [
+    "xoa-nen-anh",
+    "Xóa nền ảnh",
+    "Sửa ảnh AI",
+    "Tách chủ thể sạch sẽ, sẵn sàng cho mọi bối cảnh.",
+    "Ảnh",
+  ],
+  [
+    "xoa-logo-anh",
+    "Xóa logo, vật thể",
+    "Sửa ảnh AI",
+    "Làm sạch chi tiết thừa trong ảnh sản phẩm.",
+    "Ảnh",
+  ],
+  [
+    "chinh-sua-anh",
+    "Chỉnh sửa ảnh",
+    "Sửa ảnh AI",
+    "Làm nét, cân sáng và nâng chất lượng ảnh.",
+    "Ảnh",
+  ],
+  [
+    "tang-chat-luong-4k",
+    "Tăng chất lượng 4K",
+    "Sửa ảnh AI",
+    "Nâng độ phân giải ảnh một cách tự nhiên.",
+    "Ảnh",
+  ],
+  [
+    "multishot",
+    "Multishot",
+    "Tạo ảnh AI",
+    "Tạo nhiều góc hình đồng bộ cho một ý tưởng.",
+    "AI Image",
+  ],
+  [
+    "hoan-doi-nhan-vat",
+    "Hoán đổi nhân vật",
+    "Tạo ảnh AI",
+    "Thay đổi nhân vật trong bố cục hình ảnh.",
+    "AI Image",
+  ],
+  [
+    "dang-1-thoai-thumbnail",
+    "Talking-head cơ bản",
+    "Edit Video",
+    "Cắt gọn video nói chuyện và tạo thumbnail mở đầu.",
+    "Video",
+    undefined,
+    true,
+  ],
+  [
+    "dang-2-hieu-ung-cao-cap",
+    "Talking-head hiệu ứng cao cấp",
+    "Edit Video",
+    "Nâng cấp nhịp dựng, zoom, overlay và caption.",
+    "Video",
+  ],
+  [
+    "dang-3-huong-dan-toi-gian",
+    "Video hướng dẫn tối giản",
+    "Edit Video",
+    "Định dạng guide tinh gọn, tập trung vào nội dung.",
+    "Video",
+    "Sắp mở",
+  ],
+  [
+    "dang-4-infographic-trang",
+    "Talking-head infographic",
+    "Edit Video",
+    "Video nói chuyện cùng các lớp infographic sáng.",
+    "Video",
+  ],
+  [
+    "cap-do-1-khung-don",
+    "Video dài → Short",
+    "Edit Video",
+    "Tìm và cắt các đoạn hay từ video dài thành short.",
+    "Đang phát triển",
+    undefined,
+    true,
+  ],
+  [
+    "cap-do-2-postcard-2-nguoi",
+    "Podcast 2 người → Short",
+    "Edit Video",
+    "Khung postcard linh hoạt cho podcast hai người.",
+    "Video",
+  ],
+  [
+    "multiclip-ghep-nhac-trend",
+    "Nhiều clip + Nhạc trend",
+    "Edit Video",
+    "Ghép nhiều clip thành video dọc theo nhịp nhạc.",
+    "Đang hoạt động",
+    undefined,
+    true,
+  ],
+  [
+    "multiclip-1-video-highlight",
+    "AI cắt highlight theo nhạc",
+    "Edit Video",
+    "Tự chọn highlight đẹp và đồng bộ nhịp nhạc.",
+    "Video",
+  ],
+  [
+    "edit-video-zoom",
+    "Edit video Zoom tự động",
+    "Edit Video",
+    "Đóng gói buổi Zoom dài thành series rõ ràng.",
+    "Video",
+  ],
+  [
+    "video-tu-dong-google-flow",
+    "Tạo video AI với Flow",
+    "Video AI/Viral",
+    "Biến ý tưởng và tư liệu thành video AI.",
+    "AI Video",
+  ],
+  [
+    "tao-video-viral",
+    "Tạo video viral",
+    "Video AI/Viral",
+    "Tạo video dọc viral cho quảng cáo và kênh bán hàng.",
+    "AI Video",
+  ],
+  [
+    "reel-facebook-viral",
+    "Xây kênh Facebook Reels",
+    "Video AI/Viral",
+    "Quy trình tạo Reels có chiến lược cho thương hiệu.",
+    "Viral",
+  ],
+  [
+    "subagent-cham-soc",
+    "Subagent chăm sóc khách hàng",
+    "Marketing & Social Media",
+    "Trợ lý AI hỗ trợ vận hành và chăm sóc khách.",
+    "Agent",
+  ],
+  [
+    "subagent-nghien-cuu",
+    "Subagent nghiên cứu",
+    "Marketing & Social Media",
+    "Thu thập insight để chuẩn bị nội dung nhanh hơn.",
+    "Agent",
+  ],
+  [
+    "seo-video-youtube",
+    "SEO video YouTube",
+    "Marketing & Social Media",
+    "Tối ưu tiêu đề, mô tả và cơ hội tìm kiếm.",
+    "SEO",
+  ],
+  [
+    "dang-bai-tu-dong-da-kenh",
+    "Viết & đăng bài đa kênh",
+    "Marketing & Social Media",
+    "Viết đúng giọng và chuẩn bị nội dung đa nền tảng.",
+    "Social",
+  ],
+].map(([slug, title, hall, description, tag, status, legacy]) => ({
+  slug,
+  title,
+  hall: hall as Skill["hall"],
+  description,
+  tag,
+  status,
+  legacy: Boolean(legacy),
+}));
+const coverByHall: Record<Exclude<Hall, "Tất cả">, string> = {
+  "Sửa ảnh AI": "/cover-photo-edit.png",
+  "Tạo ảnh AI": "/cover-image-ai.png",
+  "Edit Video": "/cover-video-edit.png",
+  "Video AI/Viral": "/cover-video-viral.png",
+  "Marketing & Social Media": "/cover-marketing.png",
+};
+const coverBySkill: Record<string, string> = Object.fromEntries(
+  skills.map((skill) => [skill.slug, `/skill-${skill.slug}.webp`]),
+);
+const shirtBrandPosition: Record<string, CSSProperties> = {
+  "thuong-hieu-ca-nhan": { "--shirt-brand-x": "69%", "--shirt-brand-y": "63%" } as CSSProperties,
+  "poster-san-pham": { "--shirt-brand-x": "64%", "--shirt-brand-y": "63%" } as CSSProperties,
+  "xoa-nen-anh": { "--shirt-brand-x": "58%", "--shirt-brand-y": "62%" } as CSSProperties,
+  "xoa-logo-anh": { "--shirt-brand-x": "72%", "--shirt-brand-y": "62%" } as CSSProperties,
+};
 
-const studioProducts = [
-  { icon: Video, title: "Edit video AI", description: "Cắt short, talking-head, ghép clip theo nhạc và xuất video dọc.", mode: "Nhiều clip + Nhạc", badge: "Đang hoạt động" },
-  { icon: Brush, title: "Chỉnh ảnh", description: "Làm sáng, chỉnh màu, làm nét và chuẩn bị ảnh sản phẩm để đăng bán.", mode: "Chỉnh ảnh", badge: "Sắp kết nối AI" },
-  { icon: ImagePlus, title: "Tạo ảnh AI", description: "Tạo ảnh quảng cáo, thumbnail và hình sản phẩm theo prompt thương hiệu.", mode: "Tạo ảnh AI", badge: "Cần API AI" },
-];
-
-const samples = [
-  { video: "/samples/handbag-sample-1.mp4", name: "Video mẫu 1" },
-  { video: "/samples/handbag-sample-2.mp4", name: "Video mẫu 2" },
-  { video: sampleGolfSwing.url, name: "Video mẫu 3" },
-  { video: sampleGolfMan.url, name: "Video mẫu 4" },
-  { video: sampleTravel.url, name: "Video mẫu 5" },
-  { video: sampleLake.url, name: "Video mẫu 6" },
-];
-
-const projects = [
-  { title: "cải phân tích xương — bản đề xuất 8 cảnh", meta: "Bản dự án · 2:44", image: null, active: true },
-  { title: "cải phân tích xương — bản đề xuất 8 cảnh", meta: "Bản dự án · 2:15", image: null, active: true },
-  { title: "video-nhiều-clip-nhạc", meta: "30.09.2026 · 1:39", image: runner },
-  { title: "2026-09-30_ai_sub-agent-edit-video", meta: "30.09.2026 · 0:48", image: presenter },
-  { title: "video-nhiều-clip-nhạc", meta: "28.09.2026 · 1:49", image: stretch },
-];
-
-function FallingPetals() {
+function Index() {
+  const [page, setPage] = useState<"home" | "skills" | "detail" | "mine" | "combo" | "studio">(
+      "home",
+    ),
+    [hall, setHall] = useState<Hall>("Tất cả"),
+    [query, setQuery] = useState(""),
+    [selected, setSelected] = useState<Skill>(skills[14]),
+    [menu, setMenu] = useState(false),
+    [auth, setAuth] = useState(false),
+    [pay, setPay] = useState(false),
+    [notice, setNotice] = useState(""),
+    [email, setEmail] = useState(""),
+    [password, setPassword] = useState(""),
+    [token, setToken] = useState(""),
+    [account, setAccount] = useState<{ email: string; credits: number } | null>(null),
+    [ownedSkills, setOwnedSkills] = useState<Skill[]>([]),
+    [order, setOrder] = useState<any>(null);
+  async function loadOwned(activeToken = token) {
+    if (!activeToken) return setOwnedSkills([]);
+    const response = await fetch(`${API}/skills/mine`, { headers: { Authorization: `Bearer ${activeToken}` } });
+    if (response.ok) {
+      const data = await response.json();
+      setOwnedSkills((data.skills || []).map((skill: Skill & { legacy_tool?: string }) => ({ ...skill, legacy: Boolean(skill.legacy_tool) })));
+    }
+  }
+  useEffect(() => { void loadOwned(); }, [token]);
+  const listed = useMemo(
+    () =>
+      skills.filter(
+        (s) =>
+          (hall === "Tất cả" || s.hall === hall) &&
+          `${s.title} ${s.description}`.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [hall, query],
+  );
+  const jump = (next: Hall = "Tất cả") => {
+    setHall(next);
+    setPage("skills");
+    scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const select = (s: Skill) => {
+    setSelected(s);
+    setPage("detail");
+    scrollTo({ top: 0, behavior: "smooth" });
+  };
+  async function login(action: "login" | "register") {
+    try {
+      const r = await fetch(`${API}/auth/${action}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        }),
+        x = await r.json();
+      if (!r.ok || !x.token) throw Error(x.detail || "Không thể đăng nhập.");
+      setToken(x.token);
+      setAccount(x.user);
+      void loadOwned(x.token);
+      setAuth(false);
+      setNotice(`Chào ${x.user.email}. Tài khoản đã sẵn sàng.`);
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Không thể kết nối tài khoản.");
+    }
+  }
+  async function checkout(plan: "starter" | "pro" | "studio") {
+    if (!token) {
+      setPay(false);
+      setAuth(true);
+      setNotice("Đăng nhập trước khi nạp credit.");
+      return;
+    }
+    try {
+      const r = await fetch(`${API}/orders/${plan}`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        x = await r.json();
+      if (!r.ok) throw Error(x.detail || "Không tạo được đơn hàng.");
+      setOrder(x);
+    } catch (e) {
+      setNotice(e instanceof Error ? e.message : "Không thể tạo đơn hàng.");
+    }
+  }
+  async function checkoutSkill(skill: Skill) {
+    if (!token) {
+      setAuth(true);
+      setNotice("Đăng nhập trước khi mua Skill.");
+      return;
+    }
+    try {
+      const response = await fetch(`${API}/skills/${skill.slug}/orders`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "Không tạo được đơn Skill.");
+      setOrder({ ...data, kind: "skill" });
+      setPay(true);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể tạo đơn Skill.");
+    }
+  }
   return (
-    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-      {Array.from({ length: 12 }, (_, index) => <span key={index} className={`fire-petal fire-petal-${index + 1}`} />)}
+    <div className="skill-world">
+      <Header
+        page={page}
+        setPage={setPage}
+        openSkills={() => jump()}
+        account={account}
+        auth={() => setAuth(true)}
+        credit={() => {
+          setOrder(null);
+          setPay(true);
+        }}
+        menu={menu}
+        setMenu={setMenu}
+      />
+      {page === "home" && <Home jump={jump} select={select} />}{" "}
+      {page === "skills" && (
+        <Skills
+          hall={hall}
+          setHall={setHall}
+          query={query}
+          setQuery={setQuery}
+          skills={listed}
+          select={select}
+        />
+      )}{" "}
+      {page === "detail" && (
+        <Detail
+          skill={selected}
+          back={() => jump(selected.hall)}
+          use={() =>
+            selected.legacy
+              ? setPage("studio")
+              : void checkoutSkill(selected)
+          }
+        />
+      )}{" "}
+      {page === "studio" && (
+        <VideoStudio
+          skill={selected}
+          token={token}
+          account={account}
+          back={() => setPage("detail")}
+          askAuth={() => setAuth(true)}
+          setNotice={setNotice}
+          setAccount={setAccount}
+        />
+      )}
+      {page === "mine" && <MySkills skills={ownedSkills} browse={() => jump()} select={select} />}{" "}
+      {page === "combo" && (
+        <Combo
+          credit={() => {
+            setOrder(null);
+            setPay(true);
+          }}
+        />
+      )}
+      <Footer />
+      {auth && (
+        <Auth
+          close={() => setAuth(false)}
+          email={email}
+          password={password}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          login={login}
+        />
+      )}{" "}
+      {pay && <Payment close={() => setPay(false)} order={order} checkout={checkout} />}{" "}
+      {notice && (
+        <div className="notice">
+          <Check size={17} />
+          {notice}
+          <button onClick={() => setNotice("")}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
-
-function Index() {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const multiclipInputRef = useRef<HTMLInputElement>(null);
-  const musicInputRef = useRef<HTMLInputElement>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const [mode, setMode] = useState("Video dài → Short");
-  const [tab, setTab] = useState("Tất cả các dự án");
-  const [url, setUrl] = useState("");
-  const [fileName, setFileName] = useState("");
-  const [selectedSample, setSelectedSample] = useState<number | null>(null);
-  const [playingSample, setPlayingSample] = useState<number | null>(null);
-  const [favorite, setFavorite] = useState<number[]>([3]);
-  const [notice, setNotice] = useState("");
-  const [multiclips, setMulticlips] = useState<File[]>([]);
+function Header(p: any) {
+  const go = (x: "home" | "mine" | "combo") => {
+    p.setPage(x);
+    p.setMenu(false);
+    scrollTo({ top: 0, behavior: "smooth" });
+  };
+  return (
+    <header className="topbar">
+      <div className="shell nav-shell">
+        <button className="brand" onClick={() => go("home")}>
+          <span>MC</span>
+          <b>Master Clip</b>
+        </button>
+        <nav className={p.menu ? "nav-links open" : "nav-links"}>
+          <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}>
+            Trang chủ
+          </button>
+          <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>
+            Kho Skill
+          </button>
+          <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}>
+            Skill của tôi
+          </button>
+          <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}>
+            Combo
+          </button>
+        </nav>
+        <div className="nav-actions">
+          <button className="credit-button" onClick={p.credit}>
+            <CircleDollarSign size={17} />
+            <span>{p.account ? `${p.account.credits} credit` : "Nạp credit"}</span>
+          </button>
+          <button className="account-button" onClick={p.auth}>
+            <User size={17} />
+            <span>{p.account ? "Tài khoản" : "Đăng nhập"}</span>
+          </button>
+          <button className="mobile-menu" onClick={() => p.setMenu(!p.menu)}>
+            {p.menu ? <X /> : <Menu />}
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+function Home({ jump, select }: { jump: (x?: Hall) => void; select: (s: Skill) => void }) {
+  const photoSkills = skills.filter((skill) => skill.hall === "Sửa ảnh AI");
+  const videoSkills = skills.filter((skill) => skill.hall === "Edit Video");
+  return (
+    <main>
+      <section className="showcase-hero">
+        <video
+          className="showcase-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/master-clip-hero.jpg"
+        >
+          <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
+        </video>
+        <div className="showcase-shade" />
+        <div className="shell showcase-copy">
+          <div>
+            <p className="eyebrow">
+              <Sparkles size={15} /> MASTER CLIP
+            </p>
+            <h1>AI Skill Studio cho người làm nội dung & bán hàng</h1>
+            <p className="hero-lead">Từ một ý tưởng → ảnh đẹp → video bán hàng → nội dung viral.</p>
+            <div className="hero-actions">
+              <button className="btn-primary" onClick={() => jump()}>
+                Khám phá Skill <ArrowRight size={18} />
+              </button>
+              <button className="btn-quiet" onClick={() => jump("Edit Video")}>
+                <Play size={17} fill="currentColor" /> Xem Skill video
+              </button>
+            </div>
+            <div className="hero-proof">
+              <span>
+                <b>24</b> Skill đã sẵn sàng
+              </span>
+              <span>
+                <b>5</b> Sảnh chuyên biệt
+              </span>
+              <span>
+                <b>AI</b> hỗ trợ sáng tạo
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="quick-intro shell">
+        <span>AI Skill</span>
+        <i>+</i>
+        <span>Chỉnh ảnh</span>
+        <i>+</i>
+        <span>Edit Video</span>
+        <i>+</i>
+        <span>Video AI</span>
+        <i>+</i>
+        <span>Marketing</span>
+      </section>
+      <section className="section shell hall-feature photo-feature">
+        <Section
+          eyebrow="SẢNH SKILL 01 · SỬA ẢNH AI"
+          title="Biến một bức ảnh thành nội dung bán hàng"
+          text="Từ ảnh gốc đến visual sạch, đẹp và sẵn sàng để quảng cáo."
+        />
+        <div className="skill-grid photo-cards">
+          {photoSkills.slice(0, 4).map((skill, index) => (
+            <Card skill={skill} index={index} select={select} key={skill.slug} />
+          ))}
+        </div>
+        <button className="text-link" onClick={() => jump("Sửa ảnh AI")}>
+          Xem tất cả Skill Chỉnh ảnh <ArrowRight size={17} />
+        </button>
+      </section>
+      <section className="section video-feature">
+        <div className="shell">
+          <Section
+            eyebrow="SẢNH SKILL 02 · EDIT VIDEO"
+            title="Dựng video nhanh, rõ ràng và bán hàng tốt hơn"
+            text="Nơi các Tool thực thi Master Clip gặp Skill hướng dẫn workflow chuyên sâu."
+          />
+          <div className="video-showcase">
+            <div className="video-demo">
+              <video autoPlay muted loop playsInline poster="/master-clip-hero.jpg">
+                <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
+              </video>
+              <span>
+                <Play size={18} fill="currentColor" /> Demo dựng video
+              </span>
+            </div>
+            <div className="tool-list">
+              <b>Tool thực thi Master Clip</b>
+              {["Video dài → Short", "Talking-head", "Nhiều clip + Nhạc", "Cắt / Ghép Video"].map(
+                (tool) => (
+                  <button key={tool} onClick={() => jump("Edit Video")}>
+                    {tool}
+                    <ArrowRight size={16} />
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
+          <div className="skill-grid video-cards">
+            {videoSkills.slice(0, 4).map((s, i) => (
+              <Card skill={s} index={i} select={select} key={s.slug} />
+            ))}
+          </div>
+          <button className="text-link" onClick={() => jump("Edit Video")}>
+            Khám phá toàn bộ Sảnh Edit Video <ArrowRight size={17} />
+          </button>
+        </div>
+      </section>
+      <section className="section shell hall-feature">
+        <div>
+          <p className="eyebrow">CÒN NHIỀU HƠN THẾ</p>
+          <h2 className="next-halls-title">Mở rộng cả hệ sinh thái nội dung.</h2>
+        </div>
+        <div className="hall-grid">
+          {halls
+            .filter((hall) => hall.name !== "Sửa ảnh AI" && hall.name !== "Edit Video")
+            .map(({ name, description, icon: Icon, accent }) => (
+              <button
+                key={name}
+                className="hall-card"
+                style={{ "--hall": accent } as React.CSSProperties}
+                onClick={() => jump(name)}
+              >
+                <span className="hall-icon">
+                  <Icon size={25} />
+                </span>
+                <span>
+                  <b>{name}</b>
+                  <small>{description}</small>
+                </span>
+                <ArrowRight size={18} />
+              </button>
+            ))}
+          <button className="hall-card combo-hall" onClick={() => jump()}>
+            <span className="hall-icon">
+              <Gem size={25} />
+            </span>
+            <span>
+              <b>Combo Skill</b>
+              <small>Kết hợp Skill theo mục tiêu kinh doanh.</small>
+            </span>
+            <ArrowRight size={18} />
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+function Skills(p: any) {
+  return (
+    <main className="page shell">
+      <p className="eyebrow">MASTER CLIP / KHO SKILL</p>
+      <h1 className="page-title">
+        Tìm Skill phù hợp <em>với bạn.</em>
+      </h1>
+      <p className="page-lead">
+        Khám phá bộ công cụ AI được phân loại để bạn bắt đầu đúng việc, nhanh hơn.
+      </p>
+      <div className="filter-row">
+        <div className="searchbox">
+          <Search size={18} />
+          <input
+            value={p.query}
+            onChange={(e) => p.setQuery(e.target.value)}
+            placeholder="Tìm kiếm Skill..."
+          />
+        </div>
+      </div>
+      <div className="hall-tabs">
+        {(["Tất cả", ...halls.map((x) => x.name)] as Hall[]).map((x) => (
+          <button key={x} className={p.hall === x ? "selected" : ""} onClick={() => p.setHall(x)}>
+            {x}
+          </button>
+        ))}
+      </div>
+      <p className="results">{p.skills.length} Skill trong kho</p>
+      <div className="skill-grid large">
+        {p.skills.map((s: Skill, i: number) => (
+          <Card key={s.slug} skill={s} index={i} select={p.select} />
+        ))}
+      </div>
+    </main>
+  );
+}
+function Card({
+  skill,
+  index,
+  select,
+}: {
+  skill: Skill;
+  index: number;
+  select: (s: Skill) => void;
+}) {
+  const colors = ["#f5dbe3", "#f0cbd7", "#ead8ef", "#f4e2d4", "#ebd4db"];
+  return (
+    <article className="skill-card">
+      <div
+        className={`skill-cover ${coverBySkill[skill.slug] ? "with-shirt-brand" : ""}`}
+        style={{ background: `linear-gradient(135deg,${colors[index % 5]},#fffaf6)` }}
+      >
+        <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
+        <div className="skill-cover-shade" />
+        {coverBySkill[skill.slug] ? (
+          <span className="shirt-brand" style={shirtBrandPosition[skill.slug]}>
+            MASTER CLIP
+          </span>
+        ) : null}
+        <span>{skill.hall}</span>
+        <strong className="cover-title">{skill.title}</strong>
+        <div className="cover-mark">
+          {skill.hall === "Edit Video" || skill.hall === "Video AI/Viral" ? (
+            <Film size={32} />
+          ) : skill.hall === "Marketing & Social Media" ? (
+            <Wand2 size={32} />
+          ) : (
+            <Sparkles size={32} />
+          )}
+        </div>
+      </div>
+      <div className="skill-content">
+        <div className="skill-meta">
+          <small>{skill.tag}</small>
+          {skill.status && <small className="status">{skill.status}</small>}
+        </div>
+        <h3>{skill.title}</h3>
+        <p>{skill.description}</p>
+        <div className="card-bottom">
+          <b>50.000đ</b>
+          <span>Truy cập lâu dài</span>
+        </div>
+        <button onClick={() => select(skill)}>
+          Xem chi tiết <ArrowRight size={16} />
+        </button>
+      </div>
+    </article>
+  );
+}
+function Detail({ skill, back, use }: { skill: Skill; back: () => void; use: () => void }) {
+  return (
+    <main className="page shell">
+      <button className="back" onClick={back}>
+        <ChevronLeft size={18} /> Quay về Kho Skill
+      </button>
+      <section className="detail-hero sales-hero">
+        <div className="detail-cover">
+          <span>{skill.hall}</span>
+          <Sparkles size={52} />
+        </div>
+        <div>
+          <p className="eyebrow">{skill.hall}</p>
+          <h1 className="page-title">{skill.title}</h1>
+          <p className="page-lead">{skill.description}</p>
+          <div className="detail-tags">
+            <span>{skill.tag}</span>
+            <span>{skill.status || "Sẵn sàng"}</span>
+          </div>
+          <div className="detail-price">
+            <b>50.000đ</b>
+            <span>Quyền sở hữu Skill lâu dài</span>
+          </div>
+          <button className="btn-primary" onClick={use}>
+            {skill.legacy ? "Mở công cụ Video" : "Mua Skill"}
+            <ArrowRight size={18} />
+          </button>
+        </div>
+      </section>
+      <section className="benefits-section">
+        <p className="eyebrow">KẾT QUẢ THAY VÌ LÝ THUYẾT</p>
+        <h2>Skill này làm được gì?</h2>
+        <div className="benefit-grid">
+          {[
+            "Tạo kết quả đồng nhất với thương hiệu",
+            "Rút ngắn thao tác thủ công lặp lại",
+            "Có quy trình rõ ràng để bắt đầu",
+            "Dùng độc lập hoặc kết hợp Tool Master Clip",
+          ].map((item, index) => (
+            <article key={item}>
+              <span>0{index + 1}</span>
+              <b>{item}</b>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="detail-demo">
+        <div className="demo-input">
+          <small>INPUT</small>
+          <span>Ảnh / video / ý tưởng của bạn</span>
+        </div>
+        <ArrowRight size={25} />
+        <div className="demo-output">
+          <small>OUTPUT</small>
+          <span>Kết quả sẵn sàng để bán hàng</span>
+        </div>
+      </section>
+      <section className="tutorial-section">
+        <div className="tutorial-video">
+          <video autoPlay muted loop playsInline poster="/master-clip-hero.jpg">
+            <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
+          </video>
+          <span>
+            <Play size={16} fill="currentColor" /> Video hướng dẫn
+          </span>
+        </div>
+        <div>
+          <p className="eyebrow">HƯỚNG DẪN TỪNG BƯỚC</p>
+          <h2>Đi từ tư liệu tới kết quả</h2>
+          <ol>
+            <li>Chuẩn bị ảnh, video hoặc nội dung đầu vào.</li>
+            <li>Mở Skill và chọn workflow phù hợp.</li>
+            <li>Làm theo hướng dẫn/prompt hiển thị.</li>
+            <li>Nhận kết quả và đưa vào chiến dịch của bạn.</li>
+          </ol>
+        </div>
+      </section>
+      <section className="ownership-section">
+        <div>
+          <p className="eyebrow">SAU KHI MUA</p>
+          <h2>Bạn nhận được gì?</h2>
+          <p>
+            Quyền truy cập Skill lâu dài, hướng dẫn sử dụng và lối vào các Tool Master Clip liên
+            quan. Credit AI được quản lý riêng khi chạy tác vụ có chi phí.
+          </p>
+        </div>
+        <button className="btn-primary" onClick={use}>
+          Mua Skill · 50.000đ <ArrowRight size={18} />
+        </button>
+      </section>
+    </main>
+  );
+}
+function VideoStudio({
+  skill,
+  token,
+  account,
+  back,
+  askAuth,
+  setNotice,
+  setAccount,
+}: {
+  skill: Skill;
+  token: string;
+  account: { email: string; credits: number } | null;
+  back: () => void;
+  askAuth: () => void;
+  setNotice: (notice: string) => void;
+  setAccount: React.Dispatch<React.SetStateAction<{ email: string; credits: number } | null>>;
+}) {
+  const clipsInput = useRef<HTMLInputElement>(null);
+  const musicInput = useRef<HTMLInputElement>(null);
+  const [clips, setClips] = useState<File[]>([]);
   const [music, setMusic] = useState<File | null>(null);
-  const [isRendering, setIsRendering] = useState(false);
-  const [renderUrl, setRenderUrl] = useState("");
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [token, setToken] = useState("");
-  const [account, setAccount] = useState<{ email: string; credits: number } | null>(null);
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [order, setOrder] = useState<{ code: string; qr_url: string; plan: { name: string; amount: number; credits: number }; bank: { bank: string; account: string; name: string } } | null>(null);
-
-  function handleUrl() {
-    setNotice(url.trim() ? "Đã nhận liên kết — sẵn sàng tạo dự án." : "Hãy dán liên kết video trước.");
-  }
-
-  function toggleSample(index: number) {
-    const video = videoRefs.current[index];
-    if (!video) return;
-    if (playingSample === index) {
-      video.pause();
-      setPlayingSample(null);
-      return;
-    }
-    videoRefs.current.forEach((other, i) => { if (i !== index && other) other.pause(); });
-    video.play().catch(() => undefined);
-    setSelectedSample(index);
-    setPlayingSample(index);
-  }
-
-  function chooseFile(file?: File) {
-    if (!file) return;
-    setFileName(file.name);
-    setNotice(`Đã thêm ${file.name}`);
-  }
-
-  async function renderMulticlip() {
+  const [running, setRunning] = useState(false);
+  const [resultUrl, setResultUrl] = useState("");
+  const isMulticlip = skill.slug === "multiclip-ghep-nhac-trend";
+  async function render() {
     if (!token) {
-      setAuthOpen(true);
+      askAuth();
       setNotice("Đăng nhập để dùng credit dựng video.");
       return;
     }
-    if (!multiclips.length || !music) {
-      setNotice("Hãy chọn các clip và một file nhạc trước.");
+    if (!clips.length || !music) {
+      setNotice("Hãy chọn clip và một file nhạc trước.");
       return;
     }
-    setIsRendering(true);
-    setRenderUrl("");
-    setNotice("Đang phân tích nhịp nhạc và dựng video…");
-    const payload = new FormData();
-    multiclips.forEach((clip) => payload.append("clips", clip));
-    payload.append("music", music);
+    setRunning(true);
+    setResultUrl("");
     try {
-      const response = await fetch(`${API_BASE_URL}/render`, { method: "POST", body: payload, headers: { Authorization: `Bearer ${token}` } });
-      const result = await response.json() as { url?: string; credits?: number; detail?: string };
-      if (!response.ok || !result.url) throw new Error(result.detail || "Không thể dựng video.");
-      setRenderUrl(result.url);
-      setAccount((old) => old ? { ...old, credits: result.credits ?? old.credits } : old);
+      const form = new FormData();
+      clips.forEach((clip) => form.append("clips", clip));
+      form.append("music", music);
+      const response = await fetch(`${API}/render`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      const data = (await response.json()) as { url?: string; credits?: number; detail?: string };
+      if (!response.ok || !data.url) throw new Error(data.detail || "Không thể dựng video.");
+      setResultUrl(data.url);
+      setAccount((old) => (old ? { ...old, credits: data.credits ?? old.credits } : old));
       setNotice("Đã dựng xong video ghép theo nhạc.");
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : "Không thể kết nối bộ dựng video cục bộ.");
+      setNotice(error instanceof Error ? error.message : "Không thể kết nối bộ dựng video.");
     } finally {
-      setIsRendering(false);
+      setRunning(false);
     }
   }
-
-  async function authenticate(action: "login" | "register") {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/${action}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: authEmail, password: authPassword }) });
-      const result = await response.json() as { token?: string; user?: { email: string; credits: number }; detail?: string };
-      if (!response.ok || !result.token || !result.user) throw new Error(result.detail || "Không thể đăng nhập.");
-      setToken(result.token);
-      setAccount(result.user);
-      setAuthOpen(false);
-      setNotice(`Chào ${result.user.email}. Bạn có ${result.user.credits} credit dùng thử.`);
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Không thể kết nối tài khoản."); }
-  }
-
-  async function checkout(plan: "starter" | "pro" | "studio") {
-    if (!token) { setPaymentOpen(false); setAuthOpen(true); setNotice("Đăng nhập trước khi mua gói."); return; }
-    setPaymentLoading(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/orders/${plan}`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
-      const result = await response.json() as typeof order & { detail?: string };
-      if (!response.ok || !result) throw new Error(result.detail || "Không tạo được đơn hàng.");
-      setOrder(result);
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Không thể tạo đơn hàng."); }
-    finally { setPaymentLoading(false); }
-  }
-
   return (
-    <div className="metallic-shell min-h-screen overflow-x-hidden text-foreground">
-      <FallingPetals />
-      <Header onNotice={setNotice} account={account} onAuth={() => setAuthOpen(true)} onPricing={() => { setOrder(null); setPaymentOpen(true); }} />
-
-      <aside className="fixed left-0 top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-44 border-r border-border/60 bg-background/95 p-3 xl:block">
-        <Button variant="outline" className="h-10 w-full justify-start border-brand/65 bg-brand/5 text-brand">
-          <Home className="size-4" /> Trang chủ
-        </Button>
-        <div className="mt-auto flex h-[calc(100%-3rem)] items-end">
-          <Button variant="ghost" className="w-full justify-start"><MessageSquareText className="size-4" /> Phản hồi</Button>
-        </div>
-      </aside>
-
-      <main className="relative mx-auto max-w-[1040px] px-4 pb-14 pt-9 sm:px-6 xl:ml-[calc((100vw-1040px)/2+42px)]">
-        <div className="pointer-events-none absolute left-1/2 top-6 -z-0 h-80 w-[620px] -translate-x-1/2 app-grid opacity-20 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <section className="relative z-10 mx-auto max-w-xl text-center">
-          <p className="text-sm font-semibold text-foreground">Một studio AI để tạo nội dung, xử lý ảnh và dựng video.</p>
-          <p className="mt-3 text-xs text-muted-foreground">Dùng nội bộ hoặc đóng gói thành dịch vụ bán cho khách hàng của bạn.</p>
-
-          <div className="mt-4 rounded-lg border border-border bg-card p-2 shadow-2xl">
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Link2 className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  aria-label="Liên kết video"
-                  value={url}
-                  onChange={(event) => setUrl(event.target.value)}
-                  onKeyDown={(event) => event.key === "Enter" && handleUrl()}
-                  placeholder="Dán link YouTube, Google Drive, hoặc link file video"
-                  className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-xs outline-none placeholder:text-muted-foreground focus:border-brand"
-                />
-              </div>
-              <Button variant="gold" size="sm" className="h-10" onClick={handleUrl}>Lấy video</Button>
+    <main className="page shell">
+      <button className="back" onClick={back}>
+        <ChevronLeft size={18} /> Quay về Skill
+      </button>
+      <p className="eyebrow">MASTER CLIP / CÔNG CỤ VIDEO</p>
+      <h1 className="page-title">{skill.title}</h1>
+      <p className="page-lead">{skill.description}</p>
+      {isMulticlip ? (
+        <section className="studio-panel">
+          <div className="studio-heading">
+            <Music2 size={24} />
+            <div>
+              <h2>Ghép clip theo nhịp nhạc</h2>
+              <p>
+                Chọn nhiều clip và một bài nhạc bạn có quyền sử dụng. Video được xuất theo tỷ lệ dọc
+                9:16.
+              </p>
             </div>
-
-            <div className="my-2 flex items-center gap-3 text-xs uppercase text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">hoặc</div>
-
-            <button
-              type="button"
-              onClick={() => inputRef.current?.click()}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => { event.preventDefault(); chooseFile(event.dataTransfer.files[0]); }}
-              className="flex h-16 w-full items-center justify-center gap-3 rounded-md border border-dashed border-border bg-panel-raised text-left transition-colors hover:border-brand/60"
-            >
-              <span className="grid size-8 place-items-center rounded-md bg-brand/10 text-brand"><CloudUpload className="size-4" /></span>
-              <span>
-                <strong className="block text-xs">{fileName || "Kéo thả file video dài vào đây"}</strong>
-                <span className="mt-1 block text-xs text-muted-foreground">hoặc bấm để chọn file từ máy</span>
-              </span>
+            {account && <span>{account.credits} credit</span>}
+          </div>
+          <div className="studio-inputs">
+            <button onClick={() => clipsInput.current?.click()}>
+              <Upload size={21} />
+              <b>Chọn clip</b>
+              <small>
+                {clips.length ? `${clips.length} clip đã chọn` : "Chọn nhiều file video"}
+              </small>
             </button>
-            <input ref={inputRef} type="file" accept="video/*" className="hidden" onChange={(event) => chooseFile(event.target.files?.[0])} />
+            <button onClick={() => musicInput.current?.click()}>
+              <Music2 size={21} />
+              <b>Chọn nhạc</b>
+              <small>{music?.name || "MP3, WAV, M4A…"}</small>
+            </button>
           </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-1 text-xs">
-            <span className="mr-2 text-muted-foreground">Chế độ tạo:</span>
-            {["Talking-head", "Nhiều clip + Nhạc", "Video dài → Short"].map((item) => (
-              <Button key={item} variant="ghost" size="sm" onClick={() => setMode(item)} className={cn("h-7 px-2", mode === item && "border-b border-brand text-brand")}>{item}</Button>
-            ))}
-          </div>
-
-          {mode === "Nhiều clip + Nhạc" && (
-            <div className="mt-4 rounded-lg border border-brand/35 bg-panel-raised p-4 text-left shadow-lg">
-              <div className="flex items-center gap-2 text-xs font-bold text-foreground"><Music2 className="size-4 text-brand" /> Ghép clip theo nhịp nhạc</div>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">Chọn các clip rời và một bài nhạc bạn có quyền sử dụng. App sẽ cắt và ghép thành video dọc 9:16.</p>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <Button type="button" variant="outline" className="h-auto min-h-16 justify-start px-3 py-3 text-left" onClick={() => multiclipInputRef.current?.click()}>
-                  <Upload className="size-4 text-brand" />
-                  <span><strong className="block text-sm">Chọn clip</strong><small className="block text-xs text-muted-foreground">{multiclips.length ? `${multiclips.length} clip đã chọn` : "Chọn nhiều file video"}</small></span>
-                </Button>
-                <Button type="button" variant="outline" className="h-auto min-h-16 justify-start px-3 py-3 text-left" onClick={() => musicInputRef.current?.click()}>
-                  <Headphones className="size-4 text-brand" />
-                  <span><strong className="block text-sm">Chọn nhạc</strong><small className="block max-w-40 truncate text-xs text-muted-foreground">{music?.name || "MP3, WAV, M4A…"}</small></span>
-                </Button>
-              </div>
-              <input ref={multiclipInputRef} type="file" accept="video/*" multiple className="hidden" onChange={(event) => setMulticlips(Array.from(event.target.files || []))} />
-              <input ref={musicInputRef} type="file" accept="audio/*" className="hidden" onChange={(event) => setMusic(event.target.files?.[0] || null)} />
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <Button type="button" variant="gold" size="sm" disabled={isRendering} onClick={renderMulticlip}>{isRendering ? "Đang dựng…" : "Ghép theo nhạc"}</Button>
-                {renderUrl && <a href={renderUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-brand underline">Mở video đã dựng</a>}
-              </div>
-            </div>
+          <input
+            ref={clipsInput}
+            className="hidden-input"
+            type="file"
+            multiple
+            accept="video/*"
+            onChange={(event) => setClips(Array.from(event.target.files || []))}
+          />
+          <input
+            ref={musicInput}
+            className="hidden-input"
+            type="file"
+            accept="audio/*"
+            onChange={(event) => setMusic(event.target.files?.[0] || null)}
+          />
+          <button className="btn-primary" disabled={running} onClick={render}>
+            {running ? "Đang dựng video…" : "Ghép theo nhạc"}
+            <ArrowRight size={18} />
+          </button>
+          {resultUrl && (
+            <a className="result-link" href={resultUrl} target="_blank" rel="noreferrer">
+              Mở video đã dựng <ArrowRight size={16} />
+            </a>
           )}
         </section>
-
-        <section className="relative z-10 mt-8" aria-label="Các công năng của studio">
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground">Studio công năng</p><h2 className="mt-1 text-lg font-bold">Chọn dịch vụ để bắt đầu</h2></div>
-            <span className="rounded-full border border-brand/35 bg-brand/10 px-2.5 py-1 text-[10px] font-bold text-brand">Sẵn sàng bán theo gói</span>
-          </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            {studioProducts.map(({ icon: Icon, title, description, mode: productMode, badge }) => (
-              <button key={title} type="button" onClick={() => { setMode(productMode); setNotice(productMode === "Nhiều clip + Nhạc" ? "Đã mở bộ dựng video theo nhạc." : `${title} cần kết nối nhà cung cấp AI trước khi xuất thành phẩm.`); }} className={cn("rounded-xl border p-4 text-left transition hover:-translate-y-0.5 hover:border-brand/70 hover:shadow-brand", mode === productMode ? "border-brand bg-brand/5" : "border-border bg-card")}>
-                <span className="grid size-10 place-items-center rounded-lg bg-brand/10 text-brand"><Icon className="size-5" /></span>
-                <h3 className="mt-4 text-sm font-bold">{title}</h3>
-                <p className="mt-1 min-h-10 text-xs leading-5 text-muted-foreground">{description}</p>
-                <span className="mt-4 inline-block text-[11px] font-bold text-brand">{badge} →</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="relative z-10 mt-8" aria-labelledby="ai-tools-title">
-          <h2 id="ai-tools-title" className="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Được hỗ trợ bởi AI</h2>
-          <div className="marquee relative mt-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_7%,black_93%,transparent)]">
-            <div className="marquee-track flex w-max items-start">
-              {[0, 1].map((copy) => (
-                <div key={copy} aria-hidden={copy === 1} className="flex items-start gap-5 pr-5 sm:gap-8 sm:pr-8">
-                  {tools.map(({ icon: Icon, label, sublabel }) => (
-                    <button
-                      key={`${copy}-${label}`}
-                      type="button"
-                      tabIndex={copy === 1 ? -1 : 0}
-                      onClick={() => setNotice(`${label}${sublabel ? ` ${sublabel}` : ""} đã được chọn.`)}
-                      className="group flex w-[72px] shrink-0 flex-col items-center gap-2 text-center sm:w-[86px]"
-                    >
-                      <span className="grid size-10 place-items-center rounded-full border border-border bg-panel-raised text-brand transition-all group-hover:border-brand group-hover:bg-brand/10"><Icon className="size-[18px]" strokeWidth={1.8} /></span>
-                      <span className="text-[9px] font-semibold leading-3 text-muted-foreground group-hover:text-foreground">{label}<br />{sublabel}</span>
-                    </button>
-                  ))}
-                </div>
-              ))}
+      ) : (
+        <section className="studio-panel">
+          <div className="studio-heading">
+            <Clapperboard size={24} />
+            <div>
+              <h2>Không gian dựng Master Clip</h2>
+              <p>Đây là điểm truy cập chính thức của workflow này trong Sảnh Edit Video.</p>
             </div>
           </div>
-        </section>
-
-        <section className="relative z-10 mt-9" aria-labelledby="sample-title">
-          <h2 id="sample-title" className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Video mẫu</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {samples.map((sample, index) => (
-              <article key={sample.name} className={cn("group relative overflow-hidden rounded-lg border bg-card transition-colors", selectedSample === index ? "border-brand" : "border-border")}>
-                <button type="button" onClick={() => toggleSample(index)} className="relative block aspect-[9/14] w-full overflow-hidden bg-panel">
-                  <video ref={(el) => { videoRefs.current[index] = el; }} src={sample.video} muted loop autoPlay playsInline preload="auto" className="h-full w-full object-cover" />
-                  <span className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-background/10" />
-                  <span className="absolute right-2 top-2 grid size-6 place-items-center rounded-full border border-foreground/20 bg-background/65 text-foreground">
-                    {playingSample === index ? <Pause className="size-3" fill="currentColor" /> : <Play className="ml-0.5 size-3" fill="currentColor" />}
-                  </span>
-                  {index === 4 && <span className="absolute inset-x-2 top-1/2 text-sm font-extrabold">Follow us for</span>}
-                  {selectedSample === index && <span className="absolute left-2 top-2 grid size-5 place-items-center rounded-full bg-brand text-brand-foreground"><Check className="size-3" /></span>}
-                </button>
-                <div className="px-2 py-2 text-[10px] font-semibold">{sample.name}</div>
-              </article>
-            ))}
+          <div className="workflow-note">
+            <b>Workflow đã được giữ lại</b>
+            <p>
+              Phiên bản UI Skill đã thay thế trang chủ cũ. Tác vụ này sẽ được nối vào engine dựng
+              tương ứng ở giai đoạn tích hợp Skill, không ảnh hưởng đến bộ dựng Nhiều clip + Nhạc
+              đang hoạt động.
+            </p>
           </div>
         </section>
-
-        <section className="relative z-10 mt-9" aria-label="Danh sách dự án">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border">
-            <div className="flex items-center gap-4">
-              {["Tất cả các dự án", "Dự án đã lưu", "Nháp"].map((item, index) => (
-                <Button key={item} variant="ghost" size="sm" onClick={() => setTab(item)} className={cn("h-9 rounded-none px-0 text-[11px]", tab === item && "border-b-2 border-brand text-foreground")}>
-                  {item} <span className="text-muted-foreground">({index === 0 ? 6 : 0})</span>
-                </Button>
-              ))}
-            </div>
-            <div className="flex gap-3 text-[10px]">
-              <Button variant="ghost" size="sm" className="px-1">Chọn nhiều</Button>
-              <Button variant="ghost" size="sm" className="px-1">Xem tất cả</Button>
-            </div>
-          </div>
-
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            {projects.map((project, index) => (
-              <article key={`${project.title}-${index}`} className={cn("overflow-hidden rounded-lg border bg-card", project.active ? "border-brand/65" : "border-border")}>
-                <div className="relative aspect-[16/9] overflow-hidden bg-panel-raised">
-                  {project.image ? (
-                    <img src={project.image} alt="" loading="lazy" width={768} height={1376} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-2 px-3 text-center">
-                      <span className="grid size-8 place-items-center rounded-full bg-brand text-brand-foreground"><Play className="ml-0.5 size-4" fill="currentColor" /></span>
-                      <span className="text-[9px] font-semibold">cải phân tích xương — bản đề xuất 8 cảnh</span>
-                    </div>
-                  )}
-                  {project.image && <span className="absolute bottom-2 left-2 rounded bg-background/80 px-1.5 py-1 text-[8px] font-bold">Còn 15 ngày</span>}
-                  <Button variant="ghost" size="icon" aria-label="Yêu thích dự án" onClick={() => setFavorite((old) => old.includes(index) ? old.filter((item) => item !== index) : [...old, index])} className="absolute right-1 top-1 size-7 bg-background/65">
-                    <Star className={cn("size-3", favorite.includes(index) && "fill-brand text-brand")} />
-                  </Button>
-                </div>
-                <div className="p-2">
-                  <h3 className="truncate text-[10px] font-bold">{project.title}</h3>
-                  <p className="mt-1 text-[8px] text-muted-foreground">{project.meta}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+      )}
+    </main>
+  );
+}
+function MySkills({ skills, browse, select }: { skills: Skill[]; browse: () => void; select: (skill: Skill) => void }) {
+  if (skills.length) {
+    return (
+      <main className="page shell">
+        <p className="eyebrow">THƯ VIỆN CÁ NHÂN</p>
+        <h1 className="page-title">Skill của tôi</h1>
+        <p className="page-lead">Những Skill đã mở khóa được lưu lâu dài, tách biệt với credit AI.</p>
+        <div className="skill-grid large">{skills.map((skill, index) => <Card key={skill.slug} skill={skill} index={index} select={select} />)}</div>
       </main>
-
-      {authOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-5 shadow-2xl">
-            <div className="flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-widest text-brand">Video Magic Studio</p><h2 className="mt-1 text-lg font-bold">Tài khoản khách hàng</h2></div><Button variant="ghost" size="icon" onClick={() => setAuthOpen(false)}><X className="size-4" /></Button></div>
-            <p className="mt-2 text-xs text-muted-foreground">Đăng ký nhận 3 credit dùng thử để dựng video.</p>
-            <input value={authEmail} onChange={(event) => setAuthEmail(event.target.value)} placeholder="Email" className="mt-4 h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-brand" />
-            <input value={authPassword} onChange={(event) => setAuthPassword(event.target.value)} type="password" placeholder="Mật khẩu (tối thiểu 8 ký tự)" className="mt-2 h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-brand" />
-            <div className="mt-4 grid grid-cols-2 gap-2"><Button variant="outline" onClick={() => authenticate("login")}>Đăng nhập</Button><Button variant="gold" onClick={() => authenticate("register")}>Tạo tài khoản</Button></div>
-          </div>
+    );
+  }
+  return (
+    <main className="page shell empty-page">
+      <Gem size={42} />
+      <p className="eyebrow">THƯ VIỆN CÁ NHÂN</p>
+      <h1 className="page-title">Skill của tôi</h1>
+      <p className="page-lead">
+        Đăng nhập để xem những Skill bạn đã sở hữu. Quyền sở hữu Skill được lưu riêng với credit AI.
+      </p>
+      <button className="btn-primary" onClick={browse}>
+        Khám phá Kho Skill <ArrowRight size={18} />
+      </button>
+    </main>
+  );
+}
+function Combo({ credit }: { credit: () => void }) {
+  return (
+    <main className="page shell">
+      <p className="eyebrow">COMBO MASTER CLIP</p>
+      <h1 className="page-title">
+        Làm nhiều hơn với <em>combo.</em>
+      </h1>
+      <p className="page-lead">
+        Không gian để chuẩn bị các gói Skill theo mục tiêu; giá và quyền sở hữu sẽ kết nối cùng
+        PostgreSQL ở giai đoạn tiếp theo.
+      </p>
+      <div className="combo-card">
+        <div>
+          <span>COMING SOON</span>
+          <h2>Combo Content Starter</h2>
+          <p>Kết hợp Skill ảnh, video và marketing cho một quy trình nội dung hoàn chỉnh.</p>
         </div>
-      )}
-
-      {paymentOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-xl border border-border bg-card p-5 shadow-2xl">
-            <div className="flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-widest text-brand">Thanh toán VietQR</p><h2 className="mt-1 text-lg font-bold">Mua credit cho Studio</h2></div><Button variant="ghost" size="icon" onClick={() => setPaymentOpen(false)}><X className="size-4" /></Button></div>
-            {!order ? <div className="mt-5 grid gap-3 sm:grid-cols-3">{[{ key: "starter", name: "Starter", price: "49.000đ", credits: 10 }, { key: "pro", name: "Pro", price: "129.000đ", credits: 35 }, { key: "studio", name: "Studio", price: "349.000đ", credits: 120 }].map((plan) => <button key={plan.key} disabled={paymentLoading} onClick={() => checkout(plan.key as "starter" | "pro" | "studio")} className="rounded-lg border border-border p-4 text-left transition hover:border-brand hover:bg-brand/5"><p className="font-bold">{plan.name}</p><p className="mt-2 text-xl font-bold text-brand">{plan.price}</p><p className="mt-1 text-xs text-muted-foreground">{plan.credits} credit</p></button>)}</div> : <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_210px]"><div className="text-sm"><p className="font-bold">Chuyển khoản đúng số tiền để mở gói {order.plan.name}</p><dl className="mt-4 space-y-2 text-xs"><div><dt className="text-muted-foreground">Ngân hàng</dt><dd className="font-semibold">{order.bank.bank}</dd></div><div><dt className="text-muted-foreground">Số tài khoản</dt><dd className="font-semibold">{order.bank.account}</dd></div><div><dt className="text-muted-foreground">Chủ tài khoản</dt><dd className="font-semibold">{order.bank.name}</dd></div><div><dt className="text-muted-foreground">Nội dung bắt buộc</dt><dd className="font-bold text-brand">{order.code}</dd></div><div><dt className="text-muted-foreground">Số tiền</dt><dd className="font-bold">{order.plan.amount.toLocaleString("vi-VN")}đ</dd></div></dl><p className="mt-4 text-[11px] text-muted-foreground">Sau khi SePay xác nhận giao dịch, credit sẽ tự cộng vào tài khoản.</p></div><img src={order.qr_url} alt="QR thanh toán VietQR" className="w-full rounded-lg bg-white p-2" /></div>}
-          </div>
-        </div>
-      )}
-
-      {notice && (
-        <div className="fixed bottom-5 left-1/2 z-50 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-md border border-brand/40 bg-popover px-4 py-3 text-xs shadow-2xl">
-          <Check className="size-4 text-brand" /><span>{notice}</span>
-          <Button variant="ghost" size="icon" aria-label="Đóng thông báo" onClick={() => setNotice("")} className="ml-2 size-6"><X className="size-3" /></Button>
-        </div>
-      )}
+        <button className="btn-primary" onClick={credit}>
+          Nạp credit <ArrowRight size={18} />
+        </button>
+      </div>
+    </main>
+  );
+}
+function Section({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+  return (
+    <div className="section-title">
+      <p className="eyebrow">{eyebrow}</p>
+      <h2>{title}</h2>
+      <p>{text}</p>
     </div>
   );
 }
-
-function Header({ onNotice, account, onAuth, onPricing }: { onNotice: (message: string) => void; account: { email: string; credits: number } | null; onAuth: () => void; onPricing: () => void }) {
+function Footer() {
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-brand/25 bg-background/95 shadow-[0_4px_22px_color-mix(in_oklab,var(--brand)_10%,transparent)] backdrop-blur">
-      <div className="flex h-full items-center justify-between px-3 sm:px-5">
-        <div className="flex min-w-0 items-center gap-3">
-          <Button variant="ghost" size="icon" className="xl:hidden"><Menu className="size-4" /></Button>
-          <div className="font-display text-2xl font-extrabold italic gold-text sm:text-3xl">Master Clip</div>
-          <span className="hidden text-xs font-semibold text-muted-foreground sm:inline">Video dài → Nhiều Short</span>
+    <footer>
+      <div className="shell footer-row">
+        <div className="brand">
+          <span>MC</span>
+          <b>Master Clip</b>
         </div>
-        <div className="hidden text-[10px] font-semibold text-muted-foreground lg:block">Thời Gian · Thu Nhập · Tự Do</div>
-        <nav className="flex items-center gap-1.5">
-          <Button variant="nav" size="sm" onClick={onPricing}><CircleDollarSign className="size-3.5" /><span className="hidden sm:inline">Nạp credit</span></Button>
-          <Button variant="nav" size="sm" onClick={() => onNotice("Đã mở thư viện dự án.")}><FolderOpen className="size-3.5" /><span className="hidden md:inline">Dự án</span></Button>
-          <Button variant="nav" size="sm" onClick={() => onNotice("Đã mở thư viện âm thanh.")}><Headphones className="size-3.5" /><span className="hidden md:inline">Âm thanh</span></Button>
-          <Button variant="nav" size="sm" onClick={onAuth}><User className="size-3.5 sm:hidden" /><span className="hidden sm:inline">{account ? `${account.credits} credit` : "Đăng nhập"}</span></Button>
-        </nav>
+        <p>AI Skill World cho người sáng tạo nội dung.</p>
+        <small>© 2026 Master Clip</small>
       </div>
-    </header>
+    </footer>
+  );
+}
+function Auth(p: any) {
+  return (
+    <div className="modal-wrap">
+      <div className="modal">
+        <button className="modal-close" onClick={p.close}>
+          <X />
+        </button>
+        <p className="eyebrow">MASTER CLIP</p>
+        <h2>Chào mừng bạn trở lại</h2>
+        <p>Đăng nhập để lưu Skill và sử dụng credit AI.</p>
+        <input value={p.email} onChange={(e) => p.setEmail(e.target.value)} placeholder="Email" />
+        <input
+          type="password"
+          value={p.password}
+          onChange={(e) => p.setPassword(e.target.value)}
+          placeholder="Mật khẩu"
+        />
+        <div className="modal-actions">
+          <button className="btn-quiet" onClick={() => p.login("login")}>
+            Đăng nhập
+          </button>
+          <button className="btn-primary" onClick={() => p.login("register")}>
+            Tạo tài khoản
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+function Payment(p: any) {
+  const plans = [
+    { key: "starter", name: "Starter", price: "49.000đ", credits: 10 },
+    { key: "pro", name: "Pro", price: "129.000đ", credits: 35 },
+    { key: "studio", name: "Studio", price: "349.000đ", credits: 120 },
+  ] as const;
+  return (
+    <div className="modal-wrap">
+      <div className="modal payment">
+        <button className="modal-close" onClick={p.close}>
+          <X />
+        </button>
+        <p className="eyebrow">THANH TOÁN VIETQR</p>
+        <h2>Nạp credit Master Clip</h2>
+        {!p.order ? (
+          <div className="plans">
+            {plans.map((x) => (
+              <button key={x.key} onClick={() => p.checkout(x.key)}>
+                <b>{x.name}</b>
+                <strong>{x.price}</strong>
+                <small>{x.credits} credit</small>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="payment-ready">
+            <div>
+              <p>
+                {p.order.kind === "skill" ? <>Chuyển khoản đúng số tiền để mở khóa <b>{p.order.skill.title}</b>.</> : <>Chuyển khoản đúng số tiền để nhận <b>{p.order.plan.credits} credit</b>.</>}
+              </p>
+              <dl>
+                <dt>Ngân hàng</dt>
+                <dd>{p.order.bank.bank}</dd>
+                <dt>Số tài khoản</dt>
+                <dd>{p.order.bank.account}</dd>
+                <dt>Chủ tài khoản</dt>
+                <dd>{p.order.bank.name}</dd>
+                <dt>Nội dung</dt>
+                <dd className="payment-code">{p.order.code}</dd>
+                <dt>Số tiền</dt>
+                <dd>{(p.order.kind === "skill" ? p.order.skill.price : p.order.plan.amount).toLocaleString("vi-VN")}đ</dd>
+              </dl>
+              <small>{p.order.kind === "skill" ? "SePay sẽ tự xác nhận và mở khóa Skill." : "SePay sẽ tự xác nhận và cộng credit sau khi thanh toán."}</small>
+            </div>
+            <img src={p.order.qr_url} alt="QR thanh toán VietQR" />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

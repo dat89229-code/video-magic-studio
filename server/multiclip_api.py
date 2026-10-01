@@ -22,6 +22,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from fastapi.staticfiles import StaticFiles
 
+from server.database import connection as database_connection
+from server.database import is_postgres
+
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 EXPORTS = ROOT / "output" / "multiclip"
@@ -51,15 +54,13 @@ app.add_middleware(
 app.mount("/exports", StaticFiles(directory=EXPORTS), name="exports")
 
 
-def connection() -> sqlite3.Connection:
-    database = sqlite3.connect(DATABASE)
-    database.row_factory = sqlite3.Row
-    return database
+def connection():
+    return database_connection(DATABASE)
 
 
 def initialize_database() -> None:
     with connection() as database:
-        database.executescript("""
+        schema = """
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY, email TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL, credits INTEGER NOT NULL DEFAULT 3
@@ -68,9 +69,9 @@ def initialize_database() -> None:
                 token TEXT PRIMARY KEY, user_id INTEGER NOT NULL,
                 FOREIGN KEY(user_id) REFERENCES users(id)
             );
-            CREATE TABLE IF NOT EXISTS orders (
+            CREATE TABLE IF NOT EXISTS payment_orders (
                 id INTEGER PRIMARY KEY, code TEXT UNIQUE NOT NULL, user_id INTEGER NOT NULL,
-                plan_key TEXT NOT NULL, amount INTEGER NOT NULL, credits INTEGER NOT NULL,
+                plan_key TEXT, skill_slug TEXT, amount INTEGER NOT NULL, credits INTEGER NOT NULL DEFAULT 0,
                 status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 paid_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id)
             );
@@ -78,7 +79,80 @@ def initialize_database() -> None:
                 provider_id TEXT PRIMARY KEY, order_code TEXT NOT NULL,
                 amount INTEGER NOT NULL, received_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
-        """)
+            CREATE TABLE IF NOT EXISTS skill_categories (
+                id INTEGER PRIMARY KEY, slug TEXT UNIQUE NOT NULL, name TEXT UNIQUE NOT NULL,
+                description TEXT NOT NULL, sort_order INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE TABLE IF NOT EXISTS skills (
+                id INTEGER PRIMARY KEY, category_id INTEGER NOT NULL, slug TEXT UNIQUE NOT NULL,
+                title TEXT NOT NULL, description TEXT NOT NULL, tag TEXT NOT NULL,
+                price INTEGER NOT NULL DEFAULT 50000, status TEXT NOT NULL DEFAULT 'active',
+                legacy_tool TEXT, sort_order INTEGER NOT NULL DEFAULT 0,
+                FOREIGN KEY(category_id) REFERENCES skill_categories(id)
+            );
+            CREATE TABLE IF NOT EXISTS skill_purchases (
+                id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, skill_id INTEGER NOT NULL,
+                order_code TEXT UNIQUE NOT NULL, purchased_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, skill_id), FOREIGN KEY(user_id) REFERENCES users(id),
+                FOREIGN KEY(skill_id) REFERENCES skills(id)
+            );
+            CREATE TABLE IF NOT EXISTS credit_transactions (
+                id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, delta INTEGER NOT NULL,
+                reason TEXT NOT NULL, order_code TEXT UNIQUE, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            );
+        """
+        if is_postgres():
+            schema = schema.replace("id INTEGER PRIMARY KEY", "id BIGSERIAL PRIMARY KEY")
+        database.executescript(schema)
+        seed_skills(database)
+
+
+def seed_skills(database) -> None:
+    categories = [
+        ("photo-ai", "Sửa ảnh AI", "Biến ảnh sản phẩm và chân dung chỉ trong vài bước."),
+        ("image-ai", "Tạo ảnh AI", "Tạo visual đẹp, đồng nhất với thương hiệu."),
+        ("video-edit", "Edit Video", "Cắt, dựng và đóng gói video bán hàng."),
+        ("video-viral", "Video AI/Viral", "Thiết kế nội dung ngắn có khả năng lan tỏa."),
+        ("marketing", "Marketing & Social Media", "Xây kênh và vận hành nội dung thông minh."),
+    ]
+    for index, (slug, name, description) in enumerate(categories):
+        database.execute(
+            "INSERT INTO skill_categories(slug,name,description,sort_order) VALUES (?,?,?,?) ON CONFLICT(slug) DO NOTHING",
+            (slug, name, description, index),
+        )
+    skills = [
+        ("thuong-hieu-ca-nhan","photo-ai","Thương hiệu cá nhân & Text Overlay","Tạo lớp chữ và hình ảnh nhất quán cho thương hiệu.","Ảnh",None),
+        ("poster-san-pham","photo-ai","Poster sản phẩm","Thiết kế poster sản phẩm thu hút cho chiến dịch.","Ảnh",None),
+        ("xoa-nen-anh","photo-ai","Xóa nền ảnh","Tách chủ thể sạch sẽ, sẵn sàng cho mọi bối cảnh.","Ảnh",None),
+        ("xoa-logo-anh","photo-ai","Xóa logo, vật thể","Làm sạch chi tiết thừa trong ảnh sản phẩm.","Ảnh",None),
+        ("chinh-sua-anh","photo-ai","Chỉnh sửa ảnh","Làm nét, cân sáng và nâng chất lượng ảnh.","Ảnh",None),
+        ("tang-chat-luong-4k","photo-ai","Tăng chất lượng 4K","Nâng độ phân giải ảnh một cách tự nhiên.","Ảnh",None),
+        ("multishot","image-ai","Multishot","Tạo nhiều góc hình đồng bộ cho một ý tưởng.","AI Image",None),
+        ("hoan-doi-nhan-vat","image-ai","Hoán đổi nhân vật","Thay đổi nhân vật trong bố cục hình ảnh.","AI Image",None),
+        ("dang-1-thoai-thumbnail","video-edit","Talking-head cơ bản","Cắt gọn video nói chuyện và tạo thumbnail mở đầu.","Video","talking-head"),
+        ("dang-2-hieu-ung-cao-cap","video-edit","Talking-head hiệu ứng cao cấp","Nâng cấp nhịp dựng, zoom, overlay và caption.","Video",None),
+        ("dang-3-huong-dan-toi-gian","video-edit","Video hướng dẫn tối giản","Định dạng guide tinh gọn, tập trung vào nội dung.","Video",None),
+        ("dang-4-infographic-trang","video-edit","Talking-head infographic","Video nói chuyện cùng các lớp infographic sáng.","Video",None),
+        ("cap-do-1-khung-don","video-edit","Video dài → Short","Tìm và cắt các đoạn hay từ video dài thành short.","Video","long-to-short"),
+        ("cap-do-2-postcard-2-nguoi","video-edit","Podcast 2 người → Short","Khung postcard linh hoạt cho podcast hai người.","Video",None),
+        ("multiclip-ghep-nhac-trend","video-edit","Nhiều clip + Nhạc trend","Ghép nhiều clip thành video dọc theo nhịp nhạc.","Video","multiclip"),
+        ("multiclip-1-video-highlight","video-edit","AI cắt highlight theo nhạc","Tự chọn highlight đẹp và đồng bộ nhịp nhạc.","Video",None),
+        ("edit-video-zoom","video-edit","Edit video Zoom tự động","Đóng gói buổi Zoom dài thành series rõ ràng.","Video",None),
+        ("video-tu-dong-google-flow","video-viral","Tạo video AI với Flow","Biến ý tưởng và tư liệu thành video AI.","AI Video",None),
+        ("tao-video-viral","video-viral","Tạo video viral","Tạo video dọc viral cho quảng cáo và kênh bán hàng.","AI Video",None),
+        ("reel-facebook-viral","video-viral","Xây kênh Facebook Reels","Quy trình tạo Reels có chiến lược cho thương hiệu.","Viral",None),
+        ("subagent-cham-soc","marketing","Subagent chăm sóc khách hàng","Trợ lý AI hỗ trợ vận hành và chăm sóc khách.","Agent",None),
+        ("subagent-nghien-cuu","marketing","Subagent nghiên cứu","Thu thập insight để chuẩn bị nội dung nhanh hơn.","Agent",None),
+        ("seo-video-youtube","marketing","SEO video YouTube","Tối ưu tiêu đề, mô tả và cơ hội tìm kiếm.","SEO",None),
+        ("dang-bai-tu-dong-da-kenh","marketing","Viết & đăng bài đa kênh","Viết đúng giọng và chuẩn bị nội dung đa nền tảng.","Social",None),
+    ]
+    for index, (slug, category, title, description, tag, legacy) in enumerate(skills):
+        category_id = database.execute("SELECT id FROM skill_categories WHERE slug=?", (category,)).fetchone()["id"]
+        database.execute(
+            "INSERT INTO skills(category_id,slug,title,description,tag,legacy_tool,sort_order) VALUES (?,?,?,?,?,?,?) ON CONFLICT(slug) DO NOTHING",
+            (category_id, slug, title, description, tag, legacy, index),
+        )
 
 
 initialize_database()
@@ -101,7 +175,7 @@ class Credentials(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
-def serialize_user(row: sqlite3.Row) -> dict[str, object]:
+def serialize_user(row) -> dict[str, object]:
     return {"id": row["id"], "email": row["email"], "credits": row["credits"]}
 
 
@@ -112,7 +186,7 @@ def create_session(user_id: int) -> str:
     return token
 
 
-def current_user(authorization: str | None = Header(default=None)) -> sqlite3.Row:
+def current_user(authorization: str | None = Header(default=None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Hãy đăng nhập để dùng công năng này.")
     with connection() as database:
@@ -129,12 +203,13 @@ def current_user(authorization: str | None = Header(default=None)) -> sqlite3.Ro
 def register(credentials: Credentials) -> dict[str, object]:
     try:
         with connection() as database:
-            cursor = database.execute(
-                "INSERT INTO users(email, password_hash) VALUES (?, ?)",
+            user = database.execute(
+                "INSERT INTO users(email, password_hash) VALUES (?, ?) RETURNING id, email, credits",
                 (credentials.email.lower(), hash_password(credentials.password)),
-            )
-            user = database.execute("SELECT id, email, credits FROM users WHERE id=?", (cursor.lastrowid,)).fetchone()
-    except sqlite3.IntegrityError as error:
+            ).fetchone()
+    except Exception as error:
+        if "unique" not in str(error).lower():
+            raise
         raise HTTPException(status_code=409, detail="Email này đã được đăng ký.") from error
     return {"token": create_session(user["id"]), "user": serialize_user(user)}
 
@@ -149,7 +224,7 @@ def login(credentials: Credentials) -> dict[str, object]:
 
 
 @app.get("/auth/me")
-def profile(user: sqlite3.Row = Depends(current_user)) -> dict[str, object]:
+def profile(user=Depends(current_user)) -> dict[str, object]:
     return serialize_user(user)
 
 
@@ -165,15 +240,61 @@ def plans() -> dict[str, object]:
     return {"plans": [{"key": key, **plan} for key, plan in PLANS.items()]}
 
 
+@app.get("/skills")
+def list_skills() -> dict[str, object]:
+    with connection() as database:
+        rows = database.execute(
+            "SELECT skills.slug,skills.title,skills.description,skills.tag,skills.price,skills.status,"
+            "skills.legacy_tool,skill_categories.name AS hall FROM skills JOIN skill_categories "
+            "ON skills.category_id=skill_categories.id WHERE skills.status!='hidden' ORDER BY skills.sort_order"
+        ).fetchall()
+    return {"skills": [dict(row) for row in rows]}
+
+
+@app.get("/skills/mine")
+def my_skills(user=Depends(current_user)) -> dict[str, object]:
+    with connection() as database:
+        rows = database.execute(
+            "SELECT skills.slug,skills.title,skills.description,skills.tag,skills.price,skills.status,"
+            "skills.legacy_tool,skill_categories.name AS hall FROM skill_purchases "
+            "JOIN skills ON skills.id=skill_purchases.skill_id JOIN skill_categories "
+            "ON skills.category_id=skill_categories.id WHERE skill_purchases.user_id=? ORDER BY skill_purchases.purchased_at DESC",
+            (user["id"],),
+        ).fetchall()
+    return {"skills": [dict(row) for row in rows]}
+
+
+@app.post("/skills/{slug}/orders")
+def create_skill_order(slug: str, user=Depends(current_user)) -> dict[str, object]:
+    bank = bank_configuration()
+    with connection() as database:
+        skill = database.execute("SELECT * FROM skills WHERE slug=? AND status='active'", (slug,)).fetchone()
+        if skill is None:
+            raise HTTPException(status_code=404, detail="Skill không tồn tại hoặc đang tạm ẩn.")
+        owned = database.execute(
+            "SELECT 1 FROM skill_purchases WHERE user_id=? AND skill_id=?", (user["id"], skill["id"])
+        ).fetchone()
+        if owned:
+            raise HTTPException(status_code=409, detail="Bạn đã sở hữu Skill này.")
+        code = f"MCS{uuid.uuid4().hex[:8].upper()}"
+        database.execute(
+            "INSERT INTO payment_orders(code,user_id,skill_slug,amount,credits) VALUES (?,?,?,?,0)",
+            (code, user["id"], slug, skill["price"]),
+        )
+    query = urlencode({"amount": skill["price"], "addInfo": code, "accountName": bank["name"]})
+    return {"code": code, "skill": {"slug": slug, "title": skill["title"], "price": skill["price"]}, "bank": bank,
+            "qr_url": f"https://img.vietqr.io/image/{bank['bank']}-{bank['account']}-compact2.jpg?{query}"}
+
+
 @app.post("/orders/{plan_key}")
-def create_order(plan_key: str, user: sqlite3.Row = Depends(current_user)) -> dict[str, object]:
+def create_order(plan_key: str, user=Depends(current_user)) -> dict[str, object]:
     plan = PLANS.get(plan_key)
     if plan is None:
         raise HTTPException(status_code=404, detail="Gói không tồn tại.")
     bank = bank_configuration()
     code = f"VMS{uuid.uuid4().hex[:8].upper()}"
     with connection() as database:
-        database.execute("INSERT INTO orders(code, user_id, plan_key, amount, credits) VALUES (?, ?, ?, ?, ?)", (code, user["id"], plan_key, plan["amount"], plan["credits"]))
+        database.execute("INSERT INTO payment_orders(code, user_id, plan_key, amount, credits) VALUES (?, ?, ?, ?, ?)", (code, user["id"], plan_key, plan["amount"], plan["credits"]))
     query = urlencode({"amount": plan["amount"], "addInfo": code, "accountName": bank["name"]})
     qr_url = f"https://img.vietqr.io/image/{bank['bank']}-{bank['account']}-compact2.jpg?{query}"
     return {"code": code, "plan": plan, "bank": bank, "qr_url": qr_url}
@@ -194,12 +315,22 @@ async def receive_sepay_webhook(request: Request, authorization: str | None = He
     with connection() as database:
         if database.execute("SELECT 1 FROM payment_transactions WHERE provider_id=?", (provider_id,)).fetchone():
             return {"ok": True}
-        order = database.execute("SELECT * FROM orders WHERE status='pending' AND ? LIKE '%' || code || '%'", (content,)).fetchone()
+        order = database.execute("SELECT * FROM payment_orders WHERE status='pending' AND ? LIKE '%' || code || '%'", (content,)).fetchone()
         if order is None or amount < order["amount"]:
             return {"ok": True}
         database.execute("INSERT INTO payment_transactions(provider_id, order_code, amount) VALUES (?, ?, ?)", (provider_id, order["code"], amount))
-        database.execute("UPDATE orders SET status='paid', paid_at=CURRENT_TIMESTAMP WHERE id=?", (order["id"],))
-        database.execute("UPDATE users SET credits=credits+? WHERE id=?", (order["credits"], order["user_id"]))
+        database.execute("UPDATE payment_orders SET status='paid', paid_at=CURRENT_TIMESTAMP WHERE id=?", (order["id"],))
+        if order["skill_slug"]:
+            skill = database.execute("SELECT id FROM skills WHERE slug=?", (order["skill_slug"],)).fetchone()
+            if skill is None:
+                raise HTTPException(status_code=409, detail="Skill trong đơn không còn tồn tại.")
+            database.execute(
+                "INSERT INTO skill_purchases(user_id,skill_id,order_code) VALUES (?,?,?) ON CONFLICT(user_id,skill_id) DO NOTHING",
+                (order["user_id"], skill["id"], order["code"]),
+            )
+        else:
+            database.execute("UPDATE users SET credits=credits+? WHERE id=?", (order["credits"], order["user_id"]))
+            database.execute("INSERT INTO credit_transactions(user_id, delta, reason, order_code) VALUES (?, ?, ?, ?)", (order["user_id"], order["credits"], "credit_purchase", order["code"]))
     return {"ok": True}
 
 
@@ -263,8 +394,13 @@ def render(clips: list[Path], music: Path) -> str:
 
 
 @app.get("/health")
-def health() -> dict[str, bool]:
-    return {"ok": True}
+def health() -> dict[str, object]:
+    try:
+        with connection() as database:
+            database.execute("SELECT 1").fetchone()
+    except Exception as error:
+        raise HTTPException(status_code=503, detail="Không thể kết nối cơ sở dữ liệu.") from error
+    return {"ok": True, "database": "postgres" if is_postgres() else "sqlite"}
 
 
 @app.post("/render")
@@ -272,7 +408,7 @@ async def render_multiclip(
     request: Request,
     clips: list[UploadFile] = File(...),
     music: UploadFile = File(...),
-    user: sqlite3.Row = Depends(current_user),
+    user=Depends(current_user),
 ) -> dict[str, object]:
     if not clips or not music.filename:
         raise HTTPException(status_code=400, detail="Cần ít nhất một clip và một file nhạc.")

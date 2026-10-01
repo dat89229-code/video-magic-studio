@@ -893,7 +893,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
         <ChevronLeft size={18} /> Quay về Kho Skill
       </button>
       <section className="detail-hero sales-hero">
-        <div className="detail-cover">
+        <div className={`detail-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""}`}>
           <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
           <div className="detail-cover-shade" />
           <span>{skill.hall}</span>

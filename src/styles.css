@@ -1069,6 +1069,11 @@ em {
 }
 .detail-cover > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
 .detail-cover-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #5d263747, transparent 70%), linear-gradient(0deg, #33101a5f, transparent 65%); }
+.photo-detail-cover .detail-cover-shade {
+  background:
+    linear-gradient(0deg, rgba(25, 18, 20, 0.8) 0%, rgba(25, 18, 20, 0.2) 42%, transparent 66%),
+    linear-gradient(90deg, rgba(25, 18, 20, 0.27), transparent 57%);
+}
 .detail-cover span {
   z-index: 1;
   position: absolute;
@@ -1081,6 +1086,20 @@ em {
   border-radius: 20px;
 }
 .detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: calc(100% - 44px); color: #551b34; background: rgba(255, 250, 246, .96); border: 1px solid rgba(119, 47, 77, .16); box-shadow: 0 10px 24px rgba(92, 38, 62, .18); padding: 12px 16px; border-radius: 10px; font: 900 clamp(21px, 2.2vw, 32px)/1 Arial, "Helvetica Neue", sans-serif; letter-spacing: 0; white-space: nowrap; text-shadow: 0 1px 0 #fff; }
+.photo-detail-cover strong {
+  right: 22px;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: #fffdfb;
+  background: transparent;
+  font: 950 clamp(26px, 3vw, 43px)/0.95 Arial, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.035em;
+  white-space: pre-line;
+  text-shadow: 0 2px 3px rgba(20, 12, 14, 0.9), 0 0 1px rgba(20, 12, 14, 0.95);
+}
 .detail-tags {
   display: flex;
   gap: 8px;

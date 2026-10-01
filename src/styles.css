@@ -1250,6 +1250,10 @@ em {
   display: block;
   position: static;
   padding: 0;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-shadow: inherit;
   color: inherit;
   background: transparent;
   border-radius: 0;

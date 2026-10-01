@@ -882,6 +882,23 @@ em {
   color: #ff9fbb;
   text-shadow: 0 2px 3px rgba(20, 12, 14, 0.95), 0 0 1px rgba(20, 12, 14, 0.95);
 }
+.photo-skill-cover .cover-title--master-template {
+  left: 22px;
+  right: auto;
+  bottom: 19px;
+  max-width: 68%;
+  font-family: "Arial Black", Impact, Arial, sans-serif;
+  font-size: clamp(29px, 4.15vw, 57px);
+  font-weight: 950;
+  line-height: 0.86;
+  letter-spacing: -0.065em;
+  text-transform: uppercase;
+  text-shadow: 0 3px 0 #2e1820, 2px 0 0 #2e1820, -2px 0 0 #2e1820, 0 -1px 0 #2e1820, 0 7px 14px rgba(15, 8, 10, 0.5);
+}
+.photo-skill-cover .cover-title--master-template span + span {
+  color: #ff9cba;
+  text-shadow: 0 3px 0 #2e1820, 2px 0 0 #2e1820, -2px 0 0 #2e1820, 0 -1px 0 #2e1820, 0 7px 14px rgba(15, 8, 10, 0.5);
+}
 .photo-skill-cover > span:not(.shirt-brand) {
   color: #523a43;
   background: rgba(255, 251, 248, 0.93);
@@ -1228,6 +1245,25 @@ em {
   letter-spacing: -0.035em;
   white-space: pre-line;
   text-shadow: 0 2px 3px rgba(20, 12, 14, 0.9), 0 0 1px rgba(20, 12, 14, 0.95);
+}
+.photo-detail-cover .cover-headline span {
+  display: block;
+}
+.master-template-cover .cover-headline {
+  left: 25px;
+  right: auto;
+  bottom: 23px;
+  max-width: 68%;
+  font-family: "Arial Black", Impact, Arial, sans-serif;
+  font-size: clamp(31px, 4.3vw, 60px);
+  font-weight: 950;
+  line-height: 0.86;
+  letter-spacing: -0.065em;
+  text-transform: uppercase;
+  text-shadow: 0 3px 0 #2e1820, 2px 0 0 #2e1820, -2px 0 0 #2e1820, 0 -1px 0 #2e1820, 0 7px 14px rgba(15, 8, 10, 0.5);
+}
+.master-template-cover .cover-headline span + span {
+  color: #ff9cba;
 }
 .detail-tags {
   display: flex;

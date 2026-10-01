@@ -824,6 +824,7 @@ function Card({
 }) {
   const colors = ["#f5dbe3", "#f0cbd7", "#ead8ef", "#f4e2d4", "#ebd4db"];
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
+  const isMasterCoverTemplate = skill.slug === "thuong-hieu-ca-nhan";
   return (
     <article className={`skill-card ${skill.hall === "Sửa ảnh AI" ? "photo-skill-card" : ""}`}>
       <div
@@ -838,7 +839,7 @@ function Card({
           </span>
         ) : null}
         <span>{skill.hall}</span>
-        <strong className="cover-title">
+        <strong className={`cover-title ${isMasterCoverTemplate ? "cover-title--master-template" : ""}`}>
           {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-${lineIndex}`}>{line}</span>)}
         </strong>
         {skill.hall !== "Sửa ảnh AI" && <div className="cover-mark">
@@ -872,6 +873,7 @@ function Card({
 function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; loading: boolean; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
   const isReferenceLayout = skill.slug === "thuong-hieu-ca-nhan";
+  const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
     try {
@@ -903,11 +905,13 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             <p className="reference-crumb">Sảnh Skill / Sảnh I / {skill.title}</p>
             <h1 className="page-title">{skill.title}</h1>
             <p className="page-lead">{skill.description}</p>
-            <div className={`detail-cover reference-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""}`}>
+            <div className={`detail-cover reference-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""} ${isReferenceLayout ? "master-template-cover" : ""}`}>
               <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
               <div className="detail-cover-shade" />
               <span>{skill.hall}</span>
-              <strong>{coverTextBySkill[skill.slug] || skill.title}</strong>
+              <strong className="cover-headline">
+                {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-detail-${lineIndex}`}>{line}</span>)}
+              </strong>
             </div>
             <section className="reference-benefits">
               <h2>Skill này gồm những gì?</h2>

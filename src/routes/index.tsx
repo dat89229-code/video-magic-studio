@@ -504,7 +504,7 @@ function Index() {
             !SKILL_APP && selected.legacy
               ? setPage("studio")
               : ownedSkills.some((skill) => skill.slug === selected.slug)
-                ? setNotice("Nội dung Skill này đang ở trạng thái CONTENT_MISSING; chưa có tài nguyên thật để hiển thị.")
+                ? document.getElementById("owned-skill-content")?.scrollIntoView({ behavior: "smooth", block: "start" })
                 : void checkoutSkill(selected)
           }
         />
@@ -856,10 +856,13 @@ function Card({
 }
 function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
+  const [copied, setCopied] = useState(false);
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {
       await navigator.clipboard.writeText(content.prompt_text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
     } catch {
       // Clipboard access is browser-controlled; the prompt remains visible for manual copy.
     }
@@ -889,7 +892,7 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
             <span>Quyền sở hữu Skill lâu dài</span>
           </div>
           <button className="btn-primary" onClick={use}>
-            {!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Nội dung Skill của bạn" : "Mua Skill · 50.000đ"}
+            {!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Mở Skill" : "Mua Skill · 50.000đ"}
             <ArrowRight size={18} />
           </button>
         </div>
@@ -923,13 +926,12 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
         </div>
       </section>
       <section className="tutorial-section">
-        <div className="tutorial-video">
-          <video autoPlay muted loop playsInline poster="/master-clip-hero.jpg">
-            <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
-          </video>
-          <span>
-            <Play size={16} fill="currentColor" /> Video hướng dẫn
-          </span>
+        <div className="tutorial-video tutorial-unavailable">
+          <Play size={22} />
+          <div>
+            <b>Video hướng dẫn</b>
+            <p>Chưa có video hướng dẫn được import từ Skill nguồn.</p>
+          </div>
         </div>
         <div>
           <p className="eyebrow">NỘI DUNG SKILL</p>
@@ -952,18 +954,44 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
         </div>
       </section>
       {isReady && (
-        <section className="owned-content" aria-label="Nội dung Skill của bạn">
+        <section className="owned-content" id="owned-skill-content" aria-label="Nội dung Skill của bạn">
           <p className="eyebrow">NỘI DUNG SKILL CỦA BẠN</p>
           <h2>Hướng dẫn, Prompt và quy trình thực hiện</h2>
           <div className="owned-grid">
-            <article><small>01 — SKILL NÀY DÙNG ĐỂ LÀM GÌ</small><p>{content?.workflow_text}</p></article>
-            <article className="prompt-card">
-              <small>03 — PROMPT / CÂU LỆNH</small>
-              <pre>{content?.prompt_text}</pre>
-              <button onClick={copyPrompt}>Copy Prompt</button>
+            <article>
+              <small>01 — SKILL NÀY GIÚP BẠN LÀM GÌ</small>
+              <p>{content?.workflow_text}</p>
             </article>
-            <article><small>04 — CÁCH THỰC HIỆN TỪNG BƯỚC</small><p>{content?.steps_text}</p></article>
-            <article><small>08 — LƯU Ý ĐỂ CÓ KẾT QUẢ ĐẸP</small><p>{content?.notes_text}</p></article>
+            <article>
+              <small>02 — CHUẨN BỊ TRƯỚC KHI BẮT ĐẦU</small>
+              <p>{content?.input_notes}</p>
+            </article>
+            <article className="prompt-card">
+              <small>03 — PROMPT 01 / CÂU LỆNH</small>
+              <pre>{content?.prompt_text}</pre>
+              <button onClick={copyPrompt}>{copied ? "ĐÃ SAO CHÉP" : "SAO CHÉP PROMPT"}</button>
+            </article>
+            <article className="steps-card">
+              <small>04 — CÁCH SỬ DỤNG TỪNG BƯỚC</small>
+              {(content?.steps_text || "").split("\n\n").map((step) => <p key={step}>{step}</p>)}
+            </article>
+            <article className="input-output-card">
+              <small>05 — INPUT → OUTPUT</small>
+              <div><b>Input</b><span>{content?.input_notes}</span></div>
+              <div><b>Output</b><span>{content?.output_notes}</span></div>
+            </article>
+            <article>
+              <small>06 — VIDEO HƯỚNG DẪN</small>
+              <p>Thiếu: Skill nguồn chưa có video hướng dẫn được import. Master Clip không thay thế bằng video khác.</p>
+            </article>
+            <article>
+              <small>07 — TÀI NGUYÊN ĐI KÈM</small>
+              {content?.resource_url ? <a className="resource-link" href={content.resource_url} target="_blank" rel="noreferrer">Mở công cụ nền tảng ComfyUI <ArrowRight size={15} /></a> : <p>Thiếu: chưa có tài nguyên/link bổ sung được import.</p>}
+            </article>
+            <article>
+              <small>08 — MẸO ĐỂ RA KẾT QUẢ ĐẸP</small>
+              <p>{content?.notes_text}</p>
+            </article>
           </div>
         </section>
       )}
@@ -974,7 +1002,7 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
           <p>Quyền sở hữu Skill được lưu lâu dài. Tài nguyên hướng dẫn chỉ được hiển thị khi có nội dung đã import, không dùng nội dung giả.</p>
         </div>
         <button className="btn-primary" onClick={use}>
-          {owned ? "Skill của bạn" : "Mua Skill · 50.000đ"} <ArrowRight size={18} />
+          {owned ? "Mở Skill" : "Mua Skill · 50.000đ"} <ArrowRight size={18} />
         </button>
       </section>
     </main>

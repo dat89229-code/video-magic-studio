@@ -209,12 +209,9 @@ def seed_brand_overlay_content(database) -> None:
         "góc chụp, tư thế và ánh sáng đồng nhất để dùng cho mạng xã hội hoặc gian hàng."
     )
     workflow = (
-        "01 — Skill này dùng để làm gì\n"
-        "Tạo 4 ảnh thương hiệu cá nhân từ một ảnh chân dung, giữ nhận diện người thật nhất quán.\n\n"
-        "02 — Bạn cần chuẩn bị gì\n"
-        "Một ảnh chân dung nhìn thẳng, đủ sáng, khuôn mặt không bị che. Ảnh gốc càng rõ thì kết quả càng giữ đúng mặt.\n\n"
-        "03 — Kết quả nhận được\n"
-        "Bốn ảnh khác góc/tư thế nhưng vẫn là cùng một người, với tông màu và ánh sáng đồng nhất như chụp trong một buổi studio."
+        "Từ một tấm ảnh chân dung, tạo cả bộ ảnh thương hiệu cá nhân nhiều góc/tư thế "
+        "khác nhau nhưng vẫn đúng một người. Thực hiện trực tiếp trên ChatGPT hoặc Gemini, "
+        "không cần cài ComfyUI."
     )
     prompt = (
         "Đây là ảnh chân dung của tôi. Từ ảnh này, vẽ thêm cho tôi 4 tấm ảnh thương hiệu cá nhân khác góc/tư thế, "
@@ -231,11 +228,11 @@ def seed_brand_overlay_content(database) -> None:
     )
     steps = (
         "Bước 1 — Chọn ảnh chân dung rõ mặt nhất\n"
-        "Chọn ảnh nhìn thẳng mặt, đủ sáng, không bị che.\n\n"
+        "Chọn ảnh nhìn thẳng mặt, đủ sáng, không bị che — ảnh gốc càng rõ thì cả bộ ảnh sau càng giữ đúng mặt.\n\n"
         "Bước 2 — Tải ảnh lên rồi dán câu lệnh\n"
-        "Tải ảnh chân dung vào ChatGPT hoặc Gemini, sau đó dán Prompt Master Clip và gửi.\n\n"
+        "Bấm biểu tượng kẹp giấy để tải ảnh chân dung lên ChatGPT hoặc Gemini. Dán Prompt Master Clip rồi gửi.\n\n"
         "Bước 3 — Kiểm từng tấm, sửa riêng tấm bị lệch\n"
-        "So với ảnh gốc. Nếu một tấm lệch mặt, yêu cầu vẽ lại riêng tấm đó trong cùng hội thoại; không làm lại cả bộ."
+        "So từng tấm với ảnh gốc. Nếu một tấm lệch mặt, nhắn riêng trong cùng hội thoại: “Vẽ lại tấm số 3, giữ đúng mặt như ảnh gốc hơn.” Đừng làm lại cả bộ 4 tấm."
     )
     notes = (
         "AI giữ mặt tốt nhất trong khoảng 3–4 ảnh liên tiếp. Cần thêm góc thì làm thêm một lượt mới trong cùng hội thoại, "
@@ -243,9 +240,11 @@ def seed_brand_overlay_content(database) -> None:
     )
     database.execute(
         "UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, "
-        "input_notes=?, output_notes=?, steps_text=?, notes_text=?, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
-        (preview, workflow, prompt, "Ảnh chân dung rõ mặt, đủ sáng, không bị che.",
-         "04 ảnh thương hiệu cá nhân đồng nhất về nhận diện, góc chụp và ánh sáng.", steps, notes, skill_id),
+        "input_notes=?, output_notes=?, steps_text=?, notes_text=?, resource_url=?, tutorial_url=NULL, "
+        "updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
+        (preview, workflow, prompt, "Một ảnh chân dung nhìn thẳng mặt, đủ sáng, không bị che.",
+         "04 ảnh thương hiệu cá nhân đồng nhất về nhận diện, góc chụp và ánh sáng.", steps, notes,
+         "https://github.com/comfyanonymous/ComfyUI", skill_id),
     )
 
 

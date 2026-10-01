@@ -478,11 +478,21 @@ button {
 .prompt-card { grid-column: 1 / -1; background: #402a35 !important; }
 .prompt-card small, .prompt-card pre { color: #fff8f4; }
 .prompt-card button { margin-top: 18px; border: 0; border-radius: 999px; padding: 10px 16px; background: var(--gold); color: #3d2832; font-weight: 800; cursor: pointer; }
+.steps-card { grid-column: 1 / -1; }
+.steps-card p { padding: 14px 0; margin: 0; border-top: 1px solid #f0dee4; }
+.steps-card p:first-of-type { margin-top: 14px; }
+.input-output-card > div { display: grid; grid-template-columns: 72px 1fr; gap: 12px; margin-top: 14px; color: var(--ink-soft); line-height: 1.55; }
+.input-output-card b { color: var(--pink-dark); }
+.resource-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; color: #a84268; font-weight: 800; text-decoration: none; }
+.resource-link:hover { text-decoration: underline; }
+.tutorial-unavailable { display: flex; align-items: center; gap: 13px; min-height: 160px; padding: 28px; color: #7d4a60; background: linear-gradient(135deg, #f9edf0, #fff9f5); }
+.tutorial-unavailable p { margin: 5px 0 0; font-size: 14px; line-height: 1.5; }
 
 @media (max-width: 680px) {
   .owned-content { padding: 24px 18px; }
   .owned-grid { grid-template-columns: 1fr; }
   .prompt-card { grid-column: auto; }
+  .steps-card { grid-column: auto; }
 }
 .ownership-section p:last-child {
   max-width: 640px;

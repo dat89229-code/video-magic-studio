@@ -870,8 +870,10 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
       </button>
       <section className="detail-hero sales-hero">
         <div className="detail-cover">
+          <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
+          <div className="detail-cover-shade" />
           <span>{skill.hall}</span>
-          <Sparkles size={52} />
+          <strong>{coverTextBySkill[skill.slug] || skill.title}</strong>
         </div>
         <div>
           <p className="eyebrow">{skill.hall}</p>

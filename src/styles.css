@@ -983,8 +983,12 @@ em {
   justify-content: center;
   background: linear-gradient(135deg, #f3cdd8, #fff9f5);
   position: relative;
+  overflow: hidden;
 }
+.detail-cover > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+.detail-cover-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #5d263747, transparent 70%), linear-gradient(0deg, #33101a5f, transparent 65%); }
 .detail-cover span {
+  z-index: 1;
   position: absolute;
   top: 18px;
   left: 18px;
@@ -994,6 +998,7 @@ em {
   padding: 6px 9px;
   border-radius: 20px;
 }
+.detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: 75%; color: #fff; font: 800 27px/1.05 Inter, ui-sans-serif, sans-serif; text-shadow: 0 2px 12px #3c1320bf; }
 .detail-tags {
   display: flex;
   gap: 8px;

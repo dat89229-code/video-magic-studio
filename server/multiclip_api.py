@@ -97,6 +97,14 @@ def initialize_database() -> None:
                 UNIQUE(user_id, skill_id), FOREIGN KEY(user_id) REFERENCES users(id),
                 FOREIGN KEY(skill_id) REFERENCES skills(id)
             );
+            CREATE TABLE IF NOT EXISTS skill_content (
+                skill_id INTEGER PRIMARY KEY, content_state TEXT NOT NULL DEFAULT 'CONTENT_MISSING'
+                    CHECK(content_state IN ('READY','CONTENT_MISSING')),
+                workflow_text TEXT, prompt_text TEXT, input_notes TEXT, output_notes TEXT,
+                resource_url TEXT, tutorial_url TEXT,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(skill_id) REFERENCES skills(id)
+            );
             CREATE TABLE IF NOT EXISTS credit_transactions (
                 id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, delta INTEGER NOT NULL,
                 reason TEXT NOT NULL, order_code TEXT UNIQUE, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -169,6 +177,13 @@ def seed_skills(database) -> None:
         database.execute(
             "INSERT INTO skills(category_id,slug,title,description,tag,legacy_tool,sort_order) VALUES (?,?,?,?,?,?,?) ON CONFLICT(slug) DO NOTHING",
             (category_id, slug, title, description, tag, legacy, index),
+        )
+        skill_id = database.execute("SELECT id FROM skills WHERE slug=?", (slug,)).fetchone()["id"]
+        # No purchased resource was imported into this repository. Mark that fact
+        # explicitly rather than manufacturing a workflow or prompt for customers.
+        database.execute(
+            "INSERT INTO skill_content(skill_id,content_state) VALUES (?,'CONTENT_MISSING') ON CONFLICT(skill_id) DO NOTHING",
+            (skill_id,),
         )
 
 
@@ -279,6 +294,28 @@ def my_skills(user=Depends(current_user)) -> dict[str, object]:
             (user["id"],),
         ).fetchall()
     return {"skills": [dict(row) for row in rows]}
+
+
+@app.get("/skills/{slug}")
+def skill_detail(slug: str, user=Depends(current_user)) -> dict[str, object]:
+    with connection() as database:
+        skill = database.execute(
+            "SELECT skills.slug,skills.title,skills.description,skills.tag,skills.price,skills.status,"
+            "skills.legacy_tool,skill_categories.name AS hall,skill_content.content_state,"
+            "skill_content.workflow_text,skill_content.prompt_text,skill_content.input_notes,"
+            "skill_content.output_notes,skill_content.resource_url,skill_content.tutorial_url "
+            "FROM skills JOIN skill_categories ON skills.category_id=skill_categories.id "
+            "JOIN skill_content ON skill_content.skill_id=skills.id WHERE skills.slug=?",
+            (slug,),
+        ).fetchone()
+        if skill is None:
+            raise HTTPException(status_code=404, detail="Không tìm thấy Skill.")
+        owned = database.execute(
+            "SELECT 1 FROM skill_purchases JOIN skills ON skills.id=skill_purchases.skill_id "
+            "WHERE skill_purchases.user_id=? AND skills.slug=?",
+            (user["id"], slug),
+        ).fetchone()
+    return {"skill": dict(skill), "owned": bool(owned)}
 
 
 @app.post("/skills/{slug}/orders")

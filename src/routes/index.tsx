@@ -402,7 +402,11 @@ function Index() {
         page={page}
         setPage={setPage}
         openSkills={() => jump()}
-        openTools={() => jump("Edit Video")}
+        openTools={() => {
+          setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
+          setPage("studio");
+          scrollTo({ top: 0, behavior: "smooth" });
+        }}
         account={account}
         auth={() => setAuth(true)}
         credit={() => {
@@ -412,7 +416,11 @@ function Index() {
         menu={menu}
         setMenu={setMenu}
       />
-      {page === "home" && <Home jump={jump} select={select} />}{" "}
+      {page === "home" && <Home jump={jump} select={select} openStudio={() => {
+        setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
+        setPage("studio");
+        scrollTo({ top: 0, behavior: "smooth" });
+      }} />}{" "}
       {page === "skills" && (
         <Skills
           hall={hall}
@@ -426,11 +434,14 @@ function Index() {
       {page === "detail" && (
         <Detail
           skill={selected}
+          owned={ownedSkills.some((skill) => skill.slug === selected.slug)}
           back={() => jump(selected.hall)}
           use={() =>
             selected.legacy
               ? setPage("studio")
-              : void checkoutSkill(selected)
+              : ownedSkills.some((skill) => skill.slug === selected.slug)
+                ? setNotice("Nội dung Skill này đang ở trạng thái CONTENT_MISSING; chưa có tài nguyên thật để hiển thị.")
+                : void checkoutSkill(selected)
           }
         />
       )}{" "}
@@ -513,7 +524,7 @@ function Header(p: any) {
             Trang chủ
           </button>
           <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>
-            Sảnh Skill
+            Kho Skill
           </button>
           <button className={p.page === "studio" ? "active" : ""} onClick={p.openTools}>
             Công cụ AI
@@ -542,7 +553,7 @@ function Header(p: any) {
     </header>
   );
 }
-function Home({ jump, select }: { jump: (x?: Hall) => void; select: (s: Skill) => void }) {
+function Home({ jump, select, openStudio }: { jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
   const photoSkills = skills.filter((skill) => skill.hall === "Sửa ảnh AI");
   const videoSkills = skills.filter((skill) => skill.hall === "Edit Video");
   return (
@@ -568,10 +579,10 @@ function Home({ jump, select }: { jump: (x?: Hall) => void; select: (s: Skill) =
             <p className="hero-lead">Từ một ý tưởng → ảnh đẹp → video bán hàng → nội dung viral.</p>
             <div className="hero-actions">
               <button className="btn-primary" onClick={() => jump()}>
-                Khám phá Skill <ArrowRight size={18} />
+                Khám phá Kho Skill <ArrowRight size={18} />
               </button>
-              <button className="btn-quiet" onClick={() => jump("Edit Video")}>
-                <Play size={17} fill="currentColor" /> Xem Skill video
+              <button className="btn-quiet" onClick={openStudio}>
+                <Play size={17} fill="currentColor" /> Mở AI Video Studio
               </button>
             </div>
             <div className="hero-proof">
@@ -781,7 +792,7 @@ function Card({
     </article>
   );
 }
-function Detail({ skill, back, use }: { skill: Skill; back: () => void; use: () => void }) {
+function Detail({ skill, owned, back, use }: { skill: Skill; owned: boolean; back: () => void; use: () => void }) {
   return (
     <main className="page shell">
       <button className="back" onClick={back}>
@@ -805,7 +816,7 @@ function Detail({ skill, back, use }: { skill: Skill; back: () => void; use: () 
             <span>Quyền sở hữu Skill lâu dài</span>
           </div>
           <button className="btn-primary" onClick={use}>
-            {skill.legacy ? "Mở công cụ Video" : "Mua Skill"}
+            {skill.legacy ? "Mở AI Video Studio" : owned ? "Nội dung Skill của bạn" : "Mua Skill · 50.000đ"}
             <ArrowRight size={18} />
           </button>
         </div>
@@ -848,27 +859,28 @@ function Detail({ skill, back, use }: { skill: Skill; back: () => void; use: () 
           </span>
         </div>
         <div>
-          <p className="eyebrow">HƯỚNG DẪN TỪNG BƯỚC</p>
-          <h2>Đi từ tư liệu tới kết quả</h2>
-          <ol>
-            <li>Chuẩn bị ảnh, video hoặc nội dung đầu vào.</li>
-            <li>Mở Skill và chọn workflow phù hợp.</li>
-            <li>Làm theo hướng dẫn/prompt hiển thị.</li>
-            <li>Nhận kết quả và đưa vào chiến dịch của bạn.</li>
-          </ol>
+          <p className="eyebrow">NỘI DUNG SKILL</p>
+          {owned ? (
+            <>
+              <h2>CONTENT_MISSING</h2>
+              <p className="page-lead">Tài nguyên gốc của Skill này chưa được import vào Master Clip. Không có workflow, prompt hoặc video nào được tự tạo thay thế.</p>
+            </>
+          ) : (
+            <>
+              <h2>Mua để mở nội dung Skill</h2>
+              <p className="page-lead">Sau khi thanh toán, quyền sở hữu được lưu vào Skill của tôi. Nội dung chỉ hiển thị khi có tài nguyên thật đã được import.</p>
+            </>
+          )}
         </div>
       </section>
       <section className="ownership-section">
         <div>
           <p className="eyebrow">SAU KHI MUA</p>
           <h2>Bạn nhận được gì?</h2>
-          <p>
-            Quyền truy cập Skill lâu dài, hướng dẫn sử dụng và lối vào các Tool Master Clip liên
-            quan. Credit AI được quản lý riêng khi chạy tác vụ có chi phí.
-          </p>
+          <p>Quyền sở hữu Skill được lưu lâu dài và tách biệt với credit. Tài nguyên hướng dẫn chỉ được hiển thị khi có nội dung đã import, không dùng nội dung giả.</p>
         </div>
         <button className="btn-primary" onClick={use}>
-          Mua Skill · 50.000đ <ArrowRight size={18} />
+          {owned ? "Skill của bạn" : "Mua Skill · 50.000đ"} <ArrowRight size={18} />
         </button>
       </section>
     </main>
@@ -1170,7 +1182,7 @@ function Payment(p: any) {
               <p className="eyebrow">✓ XÁC NHẬN TỪ SEPAY</p>
               <h3>{isSkill ? "Thanh toán thành công" : "Nạp credit thành công"}</h3>
               <p>
-                {isSkill ? "Skill đã được mở khóa. Quyền sở hữu được lưu trong Skill của tôi." : `+${paid.credits} credit đã được cộng vào số dư của bạn.`}
+                {isSkill ? `Skill “${p.order.skill.title}” đã được mở khóa.` : `+${paid.credits} Credit đã được cộng vào số dư của bạn.`}
               </p>
               {!isSkill && <p><b>Số dư hiện tại: {p.account?.credits ?? "…"} Credit</b></p>}
               <div className="modal-actions">

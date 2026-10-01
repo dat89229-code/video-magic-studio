@@ -1248,6 +1248,11 @@ em {
 }
 .photo-detail-cover .cover-headline span {
   display: block;
+  position: static;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border-radius: 0;
 }
 .master-template-cover .cover-headline {
   left: 25px;

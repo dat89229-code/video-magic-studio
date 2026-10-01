@@ -327,6 +327,7 @@ function Index() {
     [account, setAccount] = useState<{ email: string; credits: number } | null>(null),
     [ownedSkills, setOwnedSkills] = useState<Skill[]>([]),
     [detailContent, setDetailContent] = useState<SkillContent | null>(null),
+    [detailContentLoading, setDetailContentLoading] = useState(false),
     [order, setOrder] = useState<any>(null);
   async function loadOwned(activeToken = token) {
     if (!activeToken) return setOwnedSkills([]);
@@ -339,6 +340,7 @@ function Index() {
   useEffect(() => { void loadOwned(); }, [token]);
   useEffect(() => {
     void (async () => {
+      setDetailContentLoading(true);
       try {
         const response = await fetch(`${API}/skills/${selected.slug}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -348,6 +350,8 @@ function Index() {
         setDetailContent(data.skill || null);
       } catch {
         setDetailContent(null);
+      } finally {
+        setDetailContentLoading(false);
       }
     })();
   }, [selected.slug, token]);
@@ -500,6 +504,7 @@ function Index() {
           skillOnly={SKILL_APP}
           owned={ownedSkills.some((skill) => skill.slug === selected.slug)}
           content={detailContent}
+          loading={detailContentLoading}
           back={() => jump(selected.hall)}
           use={() =>
             !SKILL_APP && selected.legacy
@@ -855,7 +860,7 @@ function Card({
     </article>
   );
 }
-function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; back: () => void; use: () => void }) {
+function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; loading: boolean; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
@@ -926,12 +931,12 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
       <section className="detail-demo">
         <div className="demo-input">
           <small>INPUT</small>
-          <span>{content?.input_notes || "Ảnh / video / ý tưởng của bạn"}</span>
+          <span>{content?.input_notes || (owned && loading ? "Đang tải nội dung Skill đã sở hữu…" : "Ảnh / video / ý tưởng của bạn")}</span>
         </div>
         <ArrowRight size={25} />
         <div className="demo-output">
           <small>OUTPUT</small>
-          <span>{content?.output_notes || "Kết quả sẵn sàng để bán hàng"}</span>
+          <span>{content?.output_notes || (owned && loading ? "Đang tải nội dung Skill đã sở hữu…" : "Kết quả sẵn sàng để bán hàng")}</span>
         </div>
       </section>
       <section className="tutorial-section">
@@ -944,7 +949,12 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
         </div>
         <div>
           <p className="eyebrow">NỘI DUNG SKILL</p>
-          {isReady ? (
+          {owned && loading ? (
+            <>
+              <h2>Đang tải nội dung Skill của bạn</h2>
+              <p className="page-lead">Đang kiểm tra quyền sở hữu và tải tài nguyên đã import.</p>
+            </>
+          ) : isReady ? (
             <>
               <h2>Nội dung Skill của bạn</h2>
               <p className="page-lead">{content?.preview_text}</p>

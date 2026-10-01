@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import os
 import secrets
 import sqlite3
@@ -102,6 +103,7 @@ def initialize_database() -> None:
                     CHECK(content_state IN ('READY','CONTENT_MISSING')),
                 preview_text TEXT, workflow_text TEXT, prompt_text TEXT, input_notes TEXT, output_notes TEXT,
                 steps_text TEXT, notes_text TEXT,
+                owned_sections_json TEXT,
                 resource_url TEXT, tutorial_url TEXT,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(skill_id) REFERENCES skills(id)
@@ -121,7 +123,7 @@ def initialize_database() -> None:
             database.execute(
                 "ALTER TABLE payment_orders ADD COLUMN IF NOT EXISTS order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
             )
-            for column in ("preview_text", "steps_text", "notes_text"):
+            for column in ("preview_text", "steps_text", "notes_text", "owned_sections_json"):
                 database.execute(f"ALTER TABLE skill_content ADD COLUMN IF NOT EXISTS {column} TEXT")
         else:
             columns = database.execute("PRAGMA table_info(payment_orders)").fetchall()
@@ -130,7 +132,7 @@ def initialize_database() -> None:
                     "ALTER TABLE payment_orders ADD COLUMN order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
                 )
             content_columns = {column["name"] for column in database.execute("PRAGMA table_info(skill_content)").fetchall()}
-            for column in ("preview_text", "steps_text", "notes_text"):
+            for column in ("preview_text", "steps_text", "notes_text", "owned_sections_json"):
                 if column not in content_columns:
                     database.execute(f"ALTER TABLE skill_content ADD COLUMN {column} TEXT")
         database.execute(
@@ -238,13 +240,38 @@ def seed_brand_overlay_content(database) -> None:
         "AI giữ mặt tốt nhất trong khoảng 3–4 ảnh liên tiếp. Cần thêm góc thì làm thêm một lượt mới trong cùng hội thoại, "
         "không gộp quá nhiều ảnh vào một lần."
     )
+    # These blocks are the customer-authorized source material, retained in
+    # its original order.  Personal account links, seller contact details and
+    # payment UI from the source are intentionally not imported.
+    owned_sections = [
+        {
+            "number": "01",
+            "title": "Skill này gồm những gì",
+            "body": "Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng",
+        },
+        {
+            "number": "02",
+            "title": "Chuẩn bị trước khi bắt đầu",
+            "body": "Chọn ảnh nhìn thẳng mặt, đủ sáng, không bị che — ảnh gốc càng rõ thì cả bộ ảnh sau càng giữ đúng mặt. Dán câu lệnh vào ChatGPT hoặc Gemini kèm ảnh của bạn. Không cài gì, làm được cả trên điện thoại.",
+        },
+        {
+            "number": "04",
+            "title": "Làm theo 3 bước",
+            "body": "Bước 1 — Chọn ảnh chân dung rõ mặt nhất\nChọn ảnh nhìn thẳng mặt, đủ sáng, không bị che — ảnh gốc càng rõ thì cả bộ ảnh sau càng giữ đúng mặt.\n\nBước 2 — Tải ảnh lên rồi dán câu lệnh\nBấm biểu tượng kẹp giấy để tải ảnh chân dung lên. Rồi dán câu lệnh vào, gửi.\n\nLưu ý: Chat AI giữ mặt tốt nhất trong khoảng 3-4 tấm liền một lượt — sinh nhiều hơn dễ bị trôi mặt dần. Cần thêm góc thì làm thêm một lượt mới trong CÙNG hội thoại, đừng gộp quá nhiều vào một lần.\n\nBước 3 — Kiểm từng tấm, sửa riêng tấm bị lệch\nSo từng tấm với ảnh gốc. Tấm nào lệch mặt thì nhắn riêng trong cùng hội thoại: 'Vẽ lại tấm số 3, giữ đúng mặt như ảnh gốc hơn.' Đừng làm lại cả bộ 4 tấm.",
+        },
+        {
+            "number": "05",
+            "title": "Làm thử ngay",
+            "body": "Tạo bộ 4 ảnh thương hiệu cá nhân để đăng lên trang mạng xã hội bán hàng\n\n1. Chọn một ảnh chân dung rõ mặt nhất bạn có\n2. Làm theo 3 bước trên\n3. Xếp 4 ảnh cạnh nhau xem đã ra một bộ đồng nhất về mặt và tông màu chưa\n4. Đăng thử một tấm lên trang cá nhân hoặc gian hàng\n\nXong sẽ có: Bốn tấm ảnh khác góc/tư thế nhưng rõ ràng cùng một người, tông màu và ánh sáng đồng nhất như chụp cùng một buổi studio.",
+        },
+    ]
     database.execute(
         "UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, "
-        "input_notes=?, output_notes=?, steps_text=?, notes_text=?, resource_url=?, tutorial_url=NULL, "
+        "input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, "
         "updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
         (preview, workflow, prompt, "Một ảnh chân dung nhìn thẳng mặt, đủ sáng, không bị che.",
          "04 ảnh thương hiệu cá nhân đồng nhất về nhận diện, góc chụp và ánh sáng.", steps, notes,
-         "https://github.com/comfyanonymous/ComfyUI", skill_id),
+         json.dumps(owned_sections, ensure_ascii=False), "https://github.com/comfyanonymous/ComfyUI", skill_id),
     )
 
 
@@ -373,7 +400,7 @@ def skill_detail(slug: str, authorization: str | None = Header(default=None)) ->
             "skills.legacy_tool,skill_categories.name AS hall,skill_content.content_state,skill_content.preview_text,"
             "skill_content.workflow_text,skill_content.prompt_text,skill_content.input_notes,"
             "skill_content.output_notes,skill_content.steps_text,skill_content.notes_text,"
-            "skill_content.resource_url,skill_content.tutorial_url "
+            "skill_content.owned_sections_json,skill_content.resource_url,skill_content.tutorial_url "
             "FROM skills JOIN skill_categories ON skills.category_id=skill_categories.id "
             "JOIN skill_content ON skill_content.skill_id=skills.id WHERE skills.slug=?",
             (slug,),

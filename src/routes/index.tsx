@@ -63,6 +63,7 @@ type SkillContent = {
   output_notes?: string | null;
   steps_text?: string | null;
   notes_text?: string | null;
+  owned_sections_json?: string | null;
   resource_url?: string | null;
   tutorial_url?: string | null;
 };
@@ -857,6 +858,14 @@ function Card({
 function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
   const [copied, setCopied] = useState(false);
+  const importedSections = useMemo(() => {
+    try {
+      const value = JSON.parse(content?.owned_sections_json || "[]");
+      return Array.isArray(value) ? value.filter((section) => section?.title && section?.body) : [];
+    } catch {
+      return [];
+    }
+  }, [content?.owned_sections_json]);
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {
@@ -993,6 +1002,16 @@ function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill;
               <p>{content?.notes_text}</p>
             </article>
           </div>
+          {importedSections.length > 0 && (
+            <div className="owned-source-sections" aria-label="Nội dung gốc đã import">
+              {importedSections.map((section: { number?: string; title: string; body: string }) => (
+                <article key={`${section.number}-${section.title}`}>
+                  <small>{section.number ? `${section.number} — ` : ""}{section.title}</small>
+                  <p>{section.body}</p>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       )}
       <section className="ownership-section">

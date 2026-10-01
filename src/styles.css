@@ -737,6 +737,10 @@ em {
 .skill-grid.large {
   grid-template-columns: repeat(3, 1fr);
 }
+.skill-grid.photo-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
 .skill-card {
   overflow: hidden;
   border-radius: 17px;
@@ -750,6 +754,10 @@ em {
   border-radius: 20px;
   background: #fffdfc;
   box-shadow: 0 10px 24px rgba(78, 43, 53, 0.09);
+}
+.photo-skill-card .skill-cover {
+  height: auto;
+  aspect-ratio: 1.72 / 1;
 }
 .skill-cover {
   height: 138px;
@@ -860,8 +868,19 @@ em {
   background: transparent;
   font: 950 clamp(20px, 2.15vw, 31px)/0.95 Arial, "Helvetica Neue", sans-serif;
   letter-spacing: -0.035em;
-  white-space: pre-line;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: nowrap;
   text-shadow: 0 2px 3px rgba(20, 12, 14, 0.9), 0 0 1px rgba(20, 12, 14, 0.95);
+}
+.photo-skill-cover .cover-title span {
+  display: block;
+  color: #fffdfb;
+}
+.photo-skill-cover .cover-title span + span {
+  color: #ff9fbb;
+  text-shadow: 0 2px 3px rgba(20, 12, 14, 0.95), 0 0 1px rgba(20, 12, 14, 0.95);
 }
 .photo-skill-cover > span:not(.shirt-brand) {
   color: #523a43;

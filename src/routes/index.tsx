@@ -30,6 +30,10 @@ const API = (
           : "http://127.0.0.1:8787"
       : "http://127.0.0.1:8787")) as string
 ).replace(/\/$/, "");
+// The dedicated Skill deployment sets this at build time. The existing Video
+// deployment keeps its code path intact, allowing both apps to share a repo.
+const SKILL_APP = import.meta.env.VITE_APP_SURFACE === "skill";
+const SESSION_KEY = "master-clip-session-token";
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Master Clip — AI Skill World" }] }),
   component: Index,
@@ -315,6 +319,21 @@ function Index() {
     }
   }
   useEffect(() => { void loadOwned(); }, [token]);
+  useEffect(() => {
+    const savedToken = window.localStorage.getItem(SESSION_KEY);
+    if (!savedToken) return;
+    void (async () => {
+      try {
+        const response = await fetch(`${API}/auth/me`, { headers: { Authorization: `Bearer ${savedToken}` } });
+        if (!response.ok) throw new Error("Session expired");
+        setToken(savedToken);
+        setAccount(await response.json());
+        await loadOwned(savedToken);
+      } catch {
+        window.localStorage.removeItem(SESSION_KEY);
+      }
+    })();
+  }, []);
   const listed = useMemo(
     () =>
       skills.filter(
@@ -344,6 +363,7 @@ function Index() {
         x = await r.json();
       if (!r.ok || !x.token) throw Error(x.detail || "Không thể đăng nhập.");
       setToken(x.token);
+      window.localStorage.setItem(SESSION_KEY, x.token);
       setAccount(x.user);
       void loadOwned(x.token);
       setAuth(false);
@@ -351,6 +371,15 @@ function Index() {
     } catch (e) {
       setNotice(e instanceof Error ? e.message : "Không thể kết nối tài khoản.");
     }
+  }
+  function logout() {
+    if (token) void fetch(`${API}/auth/logout`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+    window.localStorage.removeItem(SESSION_KEY);
+    setToken("");
+    setAccount(null);
+    setOwnedSkills([]);
+    setAuth(false);
+    setNotice("Bạn đã đăng xuất.");
   }
   async function checkout(plan: "starter" | "pro" | "studio") {
     if (!token) {
@@ -402,6 +431,7 @@ function Index() {
         page={page}
         setPage={setPage}
         openSkills={() => jump()}
+        skillOnly={SKILL_APP}
         openTools={() => {
           setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
           setPage("studio");
@@ -409,6 +439,7 @@ function Index() {
         }}
         account={account}
         auth={() => setAuth(true)}
+        logout={logout}
         credit={() => {
           setOrder(null);
           setPay(true);
@@ -416,7 +447,7 @@ function Index() {
         menu={menu}
         setMenu={setMenu}
       />
-      {page === "home" && <Home jump={jump} select={select} openStudio={() => {
+      {page === "home" && <Home skillOnly={SKILL_APP} jump={jump} select={select} openStudio={() => {
         setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
         setPage("studio");
         scrollTo({ top: 0, behavior: "smooth" });
@@ -434,10 +465,11 @@ function Index() {
       {page === "detail" && (
         <Detail
           skill={selected}
+          skillOnly={SKILL_APP}
           owned={ownedSkills.some((skill) => skill.slug === selected.slug)}
           back={() => jump(selected.hall)}
           use={() =>
-            selected.legacy
+            !SKILL_APP && selected.legacy
               ? setPage("studio")
               : ownedSkills.some((skill) => skill.slug === selected.slug)
                 ? setNotice("Nội dung Skill này đang ở trạng thái CONTENT_MISSING; chưa có tài nguyên thật để hiển thị.")
@@ -445,7 +477,7 @@ function Index() {
           }
         />
       )}{" "}
-      {page === "studio" && (
+      {!SKILL_APP && page === "studio" && (
         <VideoStudio
           skill={selected}
           token={token}
@@ -459,6 +491,7 @@ function Index() {
       {page === "mine" && <MySkills skills={ownedSkills} browse={() => jump()} select={select} />}{" "}
       {page === "combo" && (
         <Combo
+          skillOnly={SKILL_APP}
           credit={() => {
             setOrder(null);
             setPay(true);
@@ -474,6 +507,8 @@ function Index() {
           setEmail={setEmail}
           setPassword={setPassword}
           login={login}
+          account={account}
+          logout={logout}
         />
       )}{" "}
       {pay && (
@@ -484,13 +519,14 @@ function Index() {
           token={token}
           account={account}
           onPaid={paymentCompleted}
+          skillOnly={SKILL_APP}
           openMine={() => {
             setPay(false);
             setPage("mine");
           }}
           useNow={() => {
             setPay(false);
-            setPage(selected.legacy ? "studio" : "detail");
+            setPage(!SKILL_APP && selected.legacy ? "studio" : "detail");
           }}
         />
       )}{" "}
@@ -523,12 +559,11 @@ function Header(p: any) {
           <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}>
             Trang chủ
           </button>
+          {p.skillOnly && <button onClick={() => go("home")}>Sảnh Skill</button>}
           <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>
             Kho Skill
           </button>
-          <button className={p.page === "studio" ? "active" : ""} onClick={p.openTools}>
-            Công cụ AI
-          </button>
+          {!p.skillOnly && <button className={p.page === "studio" ? "active" : ""} onClick={p.openTools}>Công cụ AI</button>}
           <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}>
             Skill của tôi
           </button>
@@ -537,10 +572,7 @@ function Header(p: any) {
           </button>
         </nav>
         <div className="nav-actions">
-          <button className="credit-button" onClick={p.credit}>
-            <Gem size={17} />
-            <span>{p.account ? `${p.account.credits} Credit` : "Nạp Credit"}</span>
-          </button>
+          {!p.skillOnly && <button className="credit-button" onClick={p.credit}><Gem size={17} /><span>{p.account ? `${p.account.credits} Credit` : "Nạp Credit"}</span></button>}
           <button className="account-button" onClick={p.auth}>
             <User size={17} />
             <span>{p.account ? "Tài khoản" : "Đăng nhập"}</span>
@@ -553,7 +585,7 @@ function Header(p: any) {
     </header>
   );
 }
-function Home({ jump, select, openStudio }: { jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
+function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
   const photoSkills = skills.filter((skill) => skill.hall === "Sửa ảnh AI");
   const videoSkills = skills.filter((skill) => skill.hall === "Edit Video");
   return (
@@ -581,9 +613,7 @@ function Home({ jump, select, openStudio }: { jump: (x?: Hall) => void; select: 
               <button className="btn-primary" onClick={() => jump()}>
                 Khám phá Kho Skill <ArrowRight size={18} />
               </button>
-              <button className="btn-quiet" onClick={openStudio}>
-                <Play size={17} fill="currentColor" /> Mở AI Video Studio
-              </button>
+              {!skillOnly && <button className="btn-quiet" onClick={openStudio}><Play size={17} fill="currentColor" /> Mở AI Video Studio</button>}
             </div>
             <div className="hero-proof">
               <span>
@@ -625,7 +655,7 @@ function Home({ jump, select, openStudio }: { jump: (x?: Hall) => void; select: 
           Xem tất cả Skill Chỉnh ảnh <ArrowRight size={17} />
         </button>
       </section>
-      <section className="section video-feature">
+      {!skillOnly && <section className="section video-feature">
         <div className="shell">
           <Section
             eyebrow="SẢNH SKILL 02 · EDIT VIDEO"
@@ -662,7 +692,7 @@ function Home({ jump, select, openStudio }: { jump: (x?: Hall) => void; select: 
             Khám phá toàn bộ Sảnh Edit Video <ArrowRight size={17} />
           </button>
         </div>
-      </section>
+      </section>}
       <section className="section shell hall-feature">
         <div>
           <p className="eyebrow">CÒN NHIỀU HƠN THẾ</p>
@@ -792,7 +822,7 @@ function Card({
     </article>
   );
 }
-function Detail({ skill, owned, back, use }: { skill: Skill; owned: boolean; back: () => void; use: () => void }) {
+function Detail({ skill, skillOnly, owned, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; back: () => void; use: () => void }) {
   return (
     <main className="page shell">
       <button className="back" onClick={back}>
@@ -816,7 +846,7 @@ function Detail({ skill, owned, back, use }: { skill: Skill; owned: boolean; bac
             <span>Quyền sở hữu Skill lâu dài</span>
           </div>
           <button className="btn-primary" onClick={use}>
-            {skill.legacy ? "Mở AI Video Studio" : owned ? "Nội dung Skill của bạn" : "Mua Skill · 50.000đ"}
+            {!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Nội dung Skill của bạn" : "Mua Skill · 50.000đ"}
             <ArrowRight size={18} />
           </button>
         </div>
@@ -829,7 +859,7 @@ function Detail({ skill, owned, back, use }: { skill: Skill; owned: boolean; bac
             "Tạo kết quả đồng nhất với thương hiệu",
             "Rút ngắn thao tác thủ công lặp lại",
             "Có quy trình rõ ràng để bắt đầu",
-            "Dùng độc lập hoặc kết hợp Tool Master Clip",
+            "Áp dụng theo nội dung gốc sau khi sở hữu Skill",
           ].map((item, index) => (
             <article key={item}>
               <span>0{index + 1}</span>
@@ -877,7 +907,7 @@ function Detail({ skill, owned, back, use }: { skill: Skill; owned: boolean; bac
         <div>
           <p className="eyebrow">SAU KHI MUA</p>
           <h2>Bạn nhận được gì?</h2>
-          <p>Quyền sở hữu Skill được lưu lâu dài và tách biệt với credit. Tài nguyên hướng dẫn chỉ được hiển thị khi có nội dung đã import, không dùng nội dung giả.</p>
+          <p>Quyền sở hữu Skill được lưu lâu dài. Tài nguyên hướng dẫn chỉ được hiển thị khi có nội dung đã import, không dùng nội dung giả.</p>
         </div>
         <button className="btn-primary" onClick={use}>
           {owned ? "Skill của bạn" : "Mua Skill · 50.000đ"} <ArrowRight size={18} />
@@ -1030,7 +1060,7 @@ function MySkills({ skills, browse, select }: { skills: Skill[]; browse: () => v
       <main className="page shell">
         <p className="eyebrow">THƯ VIỆN CÁ NHÂN</p>
         <h1 className="page-title">Skill của tôi</h1>
-        <p className="page-lead">Những Skill đã mở khóa được lưu lâu dài, tách biệt với credit AI.</p>
+        <p className="page-lead">Những Skill đã mở khóa được lưu lâu dài trong tài khoản của bạn.</p>
         <div className="skill-grid large">{skills.map((skill, index) => <Card key={skill.slug} skill={skill} index={index} select={select} />)}</div>
       </main>
     );
@@ -1041,7 +1071,7 @@ function MySkills({ skills, browse, select }: { skills: Skill[]; browse: () => v
       <p className="eyebrow">THƯ VIỆN CÁ NHÂN</p>
       <h1 className="page-title">Skill của tôi</h1>
       <p className="page-lead">
-        Đăng nhập để xem những Skill bạn đã sở hữu. Quyền sở hữu Skill được lưu riêng với credit AI.
+        Đăng nhập để xem những Skill bạn đã sở hữu.
       </p>
       <button className="btn-primary" onClick={browse}>
         Khám phá Kho Skill <ArrowRight size={18} />
@@ -1049,7 +1079,7 @@ function MySkills({ skills, browse, select }: { skills: Skill[]; browse: () => v
     </main>
   );
 }
-function Combo({ credit }: { credit: () => void }) {
+function Combo({ credit, skillOnly }: { credit: () => void; skillOnly: boolean }) {
   return (
     <main className="page shell">
       <p className="eyebrow">COMBO MASTER CLIP</p>
@@ -1066,9 +1096,7 @@ function Combo({ credit }: { credit: () => void }) {
           <h2>Combo Content Starter</h2>
           <p>Kết hợp Skill ảnh, video và marketing cho một quy trình nội dung hoàn chỉnh.</p>
         </div>
-        <button className="btn-primary" onClick={credit}>
-          Nạp credit <ArrowRight size={18} />
-        </button>
+        {skillOnly ? <span className="combo-status">Sắp ra mắt</span> : <button className="btn-primary" onClick={credit}>Nạp credit <ArrowRight size={18} /></button>}
       </div>
     </main>
   );
@@ -1105,7 +1133,7 @@ function Auth(p: any) {
         </button>
         <p className="eyebrow">MASTER CLIP</p>
         <h2>Chào mừng bạn trở lại</h2>
-        <p>Đăng nhập để lưu Skill và sử dụng credit AI.</p>
+        <p>Đăng nhập để lưu và mở Skill của bạn.</p>
         <input value={p.email} onChange={(e) => p.setEmail(e.target.value)} placeholder="Email" />
         <input
           type="password"
@@ -1120,6 +1148,7 @@ function Auth(p: any) {
           <button className="btn-primary" onClick={() => p.login("register")}>
             Tạo tài khoản
           </button>
+          {p.account && <button className="btn-quiet" onClick={p.logout}>Đăng xuất</button>}
         </div>
       </div>
     </div>
@@ -1165,9 +1194,9 @@ function Payment(p: any) {
           <X />
         </button>
         <p className="eyebrow">THANH TOÁN VIETQR</p>
-        <h2>{isSkill ? "Mua Skill Master Clip" : "Nạp Credit Master Clip"}</h2>
+        <h2>{isSkill || p.skillOnly ? "Thanh toán Skill" : "Nạp Credit Master Clip"}</h2>
         {!p.order ? (
-          <div className="plans">
+          p.skillOnly ? <p className="page-lead">Hãy mở trang chi tiết của một Skill để tạo đơn thanh toán.</p> : <div className="plans">
             {plans.map((x) => (
               <button key={x.key} onClick={() => p.checkout(x.key)}>
                 <b>{x.name}</b>

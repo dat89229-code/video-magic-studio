@@ -260,6 +260,14 @@ def profile(user=Depends(current_user)) -> dict[str, object]:
     return serialize_user(user)
 
 
+@app.post("/auth/logout")
+def logout(authorization: str | None = Header(default=None)) -> dict[str, bool]:
+    if authorization and authorization.startswith("Bearer "):
+        with connection() as database:
+            database.execute("DELETE FROM sessions WHERE token=?", (authorization.removeprefix("Bearer "),))
+    return {"ok": True}
+
+
 def bank_configuration() -> dict[str, str]:
     required = {"bank": os.getenv("PAYMENT_BANK_CODE", ""), "account": os.getenv("PAYMENT_ACCOUNT_NUMBER", ""), "name": os.getenv("PAYMENT_ACCOUNT_NAME", "")}
     if not all(required.values()):

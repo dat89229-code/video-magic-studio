@@ -1253,7 +1253,7 @@ em {
   left: 25px;
   right: auto;
   bottom: 23px;
-  width: max-content;
+  width: 68%;
   max-width: 68%;
   font-family: "Arial Black", Impact, Arial, sans-serif;
   font-size: clamp(31px, 4.3vw, 60px);

@@ -100,7 +100,8 @@ def initialize_database() -> None:
             CREATE TABLE IF NOT EXISTS skill_content (
                 skill_id INTEGER PRIMARY KEY, content_state TEXT NOT NULL DEFAULT 'CONTENT_MISSING'
                     CHECK(content_state IN ('READY','CONTENT_MISSING')),
-                workflow_text TEXT, prompt_text TEXT, input_notes TEXT, output_notes TEXT,
+                preview_text TEXT, workflow_text TEXT, prompt_text TEXT, input_notes TEXT, output_notes TEXT,
+                steps_text TEXT, notes_text TEXT,
                 resource_url TEXT, tutorial_url TEXT,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY(skill_id) REFERENCES skills(id)
@@ -120,12 +121,18 @@ def initialize_database() -> None:
             database.execute(
                 "ALTER TABLE payment_orders ADD COLUMN IF NOT EXISTS order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
             )
+            for column in ("preview_text", "steps_text", "notes_text"):
+                database.execute(f"ALTER TABLE skill_content ADD COLUMN IF NOT EXISTS {column} TEXT")
         else:
             columns = database.execute("PRAGMA table_info(payment_orders)").fetchall()
             if "order_type" not in {column["name"] for column in columns}:
                 database.execute(
                     "ALTER TABLE payment_orders ADD COLUMN order_type TEXT NOT NULL DEFAULT 'CREDIT_TOPUP'"
                 )
+            content_columns = {column["name"] for column in database.execute("PRAGMA table_info(skill_content)").fetchall()}
+            for column in ("preview_text", "steps_text", "notes_text"):
+                if column not in content_columns:
+                    database.execute(f"ALTER TABLE skill_content ADD COLUMN {column} TEXT")
         database.execute(
             "UPDATE payment_orders SET order_type='SKILL_PURCHASE' "
             "WHERE skill_slug IS NOT NULL AND order_type != 'SKILL_PURCHASE'"
@@ -185,6 +192,61 @@ def seed_skills(database) -> None:
             "INSERT INTO skill_content(skill_id,content_state) VALUES (?,'CONTENT_MISSING') ON CONFLICT(skill_id) DO NOTHING",
             (skill_id,),
         )
+    seed_brand_overlay_content(database)
+
+
+def seed_brand_overlay_content(database) -> None:
+    """Import only the first purchased Skill whose source content was verified.
+
+    The remaining Skills intentionally stay CONTENT_MISSING until their actual
+    customer-authorized materials have been reviewed and imported.
+    """
+    skill_id = database.execute(
+        "SELECT id FROM skills WHERE slug='thuong-hieu-ca-nhan'"
+    ).fetchone()["id"]
+    preview = (
+        "Từ một ảnh chân dung rõ mặt, tạo bộ 4 ảnh thương hiệu cá nhân với "
+        "góc chụp, tư thế và ánh sáng đồng nhất để dùng cho mạng xã hội hoặc gian hàng."
+    )
+    workflow = (
+        "01 — Skill này dùng để làm gì\n"
+        "Tạo 4 ảnh thương hiệu cá nhân từ một ảnh chân dung, giữ nhận diện người thật nhất quán.\n\n"
+        "02 — Bạn cần chuẩn bị gì\n"
+        "Một ảnh chân dung nhìn thẳng, đủ sáng, khuôn mặt không bị che. Ảnh gốc càng rõ thì kết quả càng giữ đúng mặt.\n\n"
+        "03 — Kết quả nhận được\n"
+        "Bốn ảnh khác góc/tư thế nhưng vẫn là cùng một người, với tông màu và ánh sáng đồng nhất như chụp trong một buổi studio."
+    )
+    prompt = (
+        "Đây là ảnh chân dung của tôi. Từ ảnh này, vẽ thêm cho tôi 4 tấm ảnh thương hiệu cá nhân khác góc/tư thế, "
+        "GIỮ ĐÚNG khuôn mặt, kiểu tóc và trang phục như ảnh gốc:\n"
+        "1. Chính diện, cười nhẹ, phông nền văn phòng mờ\n"
+        "2. Nghiêng 3/4, tay khoanh trước ngực, phông nền xám trơn\n"
+        "3. Toàn thân, đứng thẳng, phông nền ngoài trời\n"
+        "4. Cận mặt, ánh sáng studio, phông nền đen\n\n"
+        "Yêu cầu bắt buộc:\n"
+        "- Giữ đúng khuôn mặt như ảnh gốc — đây là ảnh thật của tôi, không phải nhân vật hư cấu, sai mặt là không dùng được.\n"
+        "- Đồng nhất tông màu và ánh sáng giữa 4 tấm, như chụp cùng một buổi.\n"
+        "- Không đội thêm phụ kiện, không đổi màu tóc/da nếu tôi không yêu cầu.\n"
+        "Sau khi ra 4 tấm, cho tôi biết tấm nào giữ mặt giống nhất và tấm nào bị lệch để tôi biết mà yêu cầu sửa lại."
+    )
+    steps = (
+        "Bước 1 — Chọn ảnh chân dung rõ mặt nhất\n"
+        "Chọn ảnh nhìn thẳng mặt, đủ sáng, không bị che.\n\n"
+        "Bước 2 — Tải ảnh lên rồi dán câu lệnh\n"
+        "Tải ảnh chân dung vào ChatGPT hoặc Gemini, sau đó dán Prompt Master Clip và gửi.\n\n"
+        "Bước 3 — Kiểm từng tấm, sửa riêng tấm bị lệch\n"
+        "So với ảnh gốc. Nếu một tấm lệch mặt, yêu cầu vẽ lại riêng tấm đó trong cùng hội thoại; không làm lại cả bộ."
+    )
+    notes = (
+        "AI giữ mặt tốt nhất trong khoảng 3–4 ảnh liên tiếp. Cần thêm góc thì làm thêm một lượt mới trong cùng hội thoại, "
+        "không gộp quá nhiều ảnh vào một lần."
+    )
+    database.execute(
+        "UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, "
+        "input_notes=?, output_notes=?, steps_text=?, notes_text=?, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
+        (preview, workflow, prompt, "Ảnh chân dung rõ mặt, đủ sáng, không bị che.",
+         "04 ảnh thương hiệu cá nhân đồng nhất về nhận diện, góc chụp và ánh sáng.", steps, notes, skill_id),
+    )
 
 
 initialize_database()
@@ -305,25 +367,39 @@ def my_skills(user=Depends(current_user)) -> dict[str, object]:
 
 
 @app.get("/skills/{slug}")
-def skill_detail(slug: str, user=Depends(current_user)) -> dict[str, object]:
+def skill_detail(slug: str, authorization: str | None = Header(default=None)) -> dict[str, object]:
     with connection() as database:
         skill = database.execute(
             "SELECT skills.slug,skills.title,skills.description,skills.tag,skills.price,skills.status,"
-            "skills.legacy_tool,skill_categories.name AS hall,skill_content.content_state,"
+            "skills.legacy_tool,skill_categories.name AS hall,skill_content.content_state,skill_content.preview_text,"
             "skill_content.workflow_text,skill_content.prompt_text,skill_content.input_notes,"
-            "skill_content.output_notes,skill_content.resource_url,skill_content.tutorial_url "
+            "skill_content.output_notes,skill_content.steps_text,skill_content.notes_text,"
+            "skill_content.resource_url,skill_content.tutorial_url "
             "FROM skills JOIN skill_categories ON skills.category_id=skill_categories.id "
             "JOIN skill_content ON skill_content.skill_id=skills.id WHERE skills.slug=?",
             (slug,),
         ).fetchone()
         if skill is None:
             raise HTTPException(status_code=404, detail="Không tìm thấy Skill.")
-        owned = database.execute(
-            "SELECT 1 FROM skill_purchases JOIN skills ON skills.id=skill_purchases.skill_id "
-            "WHERE skill_purchases.user_id=? AND skills.slug=?",
-            (user["id"], slug),
-        ).fetchone()
-    return {"skill": dict(skill), "owned": bool(owned)}
+        user_id = None
+        if authorization and authorization.startswith("Bearer "):
+            session = database.execute(
+                "SELECT user_id FROM sessions WHERE token=?", (authorization.removeprefix("Bearer "),)
+            ).fetchone()
+            user_id = session["user_id"] if session else None
+        owned = False
+        if user_id:
+            owned = bool(database.execute(
+                "SELECT 1 FROM skill_purchases JOIN skills ON skills.id=skill_purchases.skill_id "
+                "WHERE skill_purchases.user_id=? AND skills.slug=?", (user_id, slug)
+            ).fetchone())
+    payload = dict(skill)
+    if not owned:
+        # The sales page can describe a Skill, but its real workflow and prompt
+        # are available only after purchase.
+        for field in ("workflow_text", "prompt_text", "steps_text", "notes_text", "resource_url", "tutorial_url"):
+            payload[field] = None
+    return {"skill": payload, "owned": owned}
 
 
 @app.post("/skills/{slug}/orders")

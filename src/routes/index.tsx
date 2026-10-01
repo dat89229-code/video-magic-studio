@@ -54,6 +54,18 @@ type Skill = {
   status?: string;
   legacy?: boolean;
 };
+type SkillContent = {
+  content_state: "READY" | "CONTENT_MISSING";
+  preview_text?: string | null;
+  workflow_text?: string | null;
+  prompt_text?: string | null;
+  input_notes?: string | null;
+  output_notes?: string | null;
+  steps_text?: string | null;
+  notes_text?: string | null;
+  resource_url?: string | null;
+  tutorial_url?: string | null;
+};
 const halls: {
   name: Exclude<Hall, "Tất cả">;
   description: string;
@@ -292,6 +304,9 @@ const shirtBrandPosition: Record<string, CSSProperties> = {
   "xoa-nen-anh": { "--shirt-brand-x": "58%", "--shirt-brand-y": "62%" } as CSSProperties,
   "xoa-logo-anh": { "--shirt-brand-x": "72%", "--shirt-brand-y": "62%" } as CSSProperties,
 };
+const coverTextBySkill: Record<string, string> = {
+  "thuong-hieu-ca-nhan": "ẢNH THƯƠNG HIỆU",
+};
 
 function Index() {
   const [page, setPage] = useState<"home" | "skills" | "detail" | "mine" | "combo" | "studio">(
@@ -309,6 +324,7 @@ function Index() {
     [token, setToken] = useState(""),
     [account, setAccount] = useState<{ email: string; credits: number } | null>(null),
     [ownedSkills, setOwnedSkills] = useState<Skill[]>([]),
+    [detailContent, setDetailContent] = useState<SkillContent | null>(null),
     [order, setOrder] = useState<any>(null);
   async function loadOwned(activeToken = token) {
     if (!activeToken) return setOwnedSkills([]);
@@ -319,6 +335,20 @@ function Index() {
     }
   }
   useEffect(() => { void loadOwned(); }, [token]);
+  useEffect(() => {
+    void (async () => {
+      try {
+        const response = await fetch(`${API}/skills/${selected.slug}`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        });
+        if (!response.ok) throw new Error("Không thể tải nội dung Skill.");
+        const data = await response.json();
+        setDetailContent(data.skill || null);
+      } catch {
+        setDetailContent(null);
+      }
+    })();
+  }, [selected.slug, token]);
   useEffect(() => {
     const savedToken = window.localStorage.getItem(SESSION_KEY);
     if (!savedToken) return;
@@ -467,6 +497,7 @@ function Index() {
           skill={selected}
           skillOnly={SKILL_APP}
           owned={ownedSkills.some((skill) => skill.slug === selected.slug)}
+          content={detailContent}
           back={() => jump(selected.hall)}
           use={() =>
             !SKILL_APP && selected.legacy
@@ -793,7 +824,7 @@ function Card({
           </span>
         ) : null}
         <span>{skill.hall}</span>
-        <strong className="cover-title">{skill.title}</strong>
+        <strong className="cover-title">{coverTextBySkill[skill.slug] || skill.title}</strong>
         <div className="cover-mark">
           {skill.hall === "Edit Video" || skill.hall === "Video AI/Viral" ? (
             <Film size={32} />
@@ -822,7 +853,16 @@ function Card({
     </article>
   );
 }
-function Detail({ skill, skillOnly, owned, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; back: () => void; use: () => void }) {
+function Detail({ skill, skillOnly, owned, content, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; back: () => void; use: () => void }) {
+  const isReady = owned && content?.content_state === "READY";
+  const copyPrompt = async () => {
+    if (!content?.prompt_text) return;
+    try {
+      await navigator.clipboard.writeText(content.prompt_text);
+    } catch {
+      // Clipboard access is browser-controlled; the prompt remains visible for manual copy.
+    }
+  };
   return (
     <main className="page shell">
       <button className="back" onClick={back}>
@@ -871,12 +911,12 @@ function Detail({ skill, skillOnly, owned, back, use }: { skill: Skill; skillOnl
       <section className="detail-demo">
         <div className="demo-input">
           <small>INPUT</small>
-          <span>Ảnh / video / ý tưởng của bạn</span>
+          <span>{content?.input_notes || "Ảnh / video / ý tưởng của bạn"}</span>
         </div>
         <ArrowRight size={25} />
         <div className="demo-output">
           <small>OUTPUT</small>
-          <span>Kết quả sẵn sàng để bán hàng</span>
+          <span>{content?.output_notes || "Kết quả sẵn sàng để bán hàng"}</span>
         </div>
       </section>
       <section className="tutorial-section">
@@ -890,7 +930,12 @@ function Detail({ skill, skillOnly, owned, back, use }: { skill: Skill; skillOnl
         </div>
         <div>
           <p className="eyebrow">NỘI DUNG SKILL</p>
-          {owned ? (
+          {isReady ? (
+            <>
+              <h2>Nội dung Skill của bạn</h2>
+              <p className="page-lead">{content?.preview_text}</p>
+            </>
+          ) : owned ? (
             <>
               <h2>CONTENT_MISSING</h2>
               <p className="page-lead">Tài nguyên gốc của Skill này chưa được import vào Master Clip. Không có workflow, prompt hoặc video nào được tự tạo thay thế.</p>
@@ -898,11 +943,27 @@ function Detail({ skill, skillOnly, owned, back, use }: { skill: Skill; skillOnl
           ) : (
             <>
               <h2>Mua để mở nội dung Skill</h2>
-              <p className="page-lead">Sau khi thanh toán, quyền sở hữu được lưu vào Skill của tôi. Nội dung chỉ hiển thị khi có tài nguyên thật đã được import.</p>
+              <p className="page-lead">{content?.preview_text || "Sau khi thanh toán, quyền sở hữu được lưu vào Skill của tôi. Nội dung chỉ hiển thị khi có tài nguyên thật đã được import."}</p>
             </>
           )}
         </div>
       </section>
+      {isReady && (
+        <section className="owned-content" aria-label="Nội dung Skill của bạn">
+          <p className="eyebrow">NỘI DUNG SKILL CỦA BẠN</p>
+          <h2>Hướng dẫn, Prompt và quy trình thực hiện</h2>
+          <div className="owned-grid">
+            <article><small>01 — SKILL NÀY DÙNG ĐỂ LÀM GÌ</small><p>{content?.workflow_text}</p></article>
+            <article className="prompt-card">
+              <small>03 — PROMPT / CÂU LỆNH</small>
+              <pre>{content?.prompt_text}</pre>
+              <button onClick={copyPrompt}>Copy Prompt</button>
+            </article>
+            <article><small>04 — CÁCH THỰC HIỆN TỪNG BƯỚC</small><p>{content?.steps_text}</p></article>
+            <article><small>08 — LƯU Ý ĐỂ CÓ KẾT QUẢ ĐẸP</small><p>{content?.notes_text}</p></article>
+          </div>
+        </section>
+      )}
       <section className="ownership-section">
         <div>
           <p className="eyebrow">SAU KHI MUA</p>

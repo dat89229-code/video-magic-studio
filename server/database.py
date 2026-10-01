@@ -19,7 +19,10 @@ from psycopg.rows import dict_row
 
 class PostgresConnection:
     def __init__(self, url: str):
-        self.raw = psycopg.connect(url, row_factory=dict_row)
+        # Supabase's transaction pooler (PgBouncer) reuses server connections.
+        # Disabling prepared statements avoids cross-connection name collisions
+        # while retaining parameterized queries.
+        self.raw = psycopg.connect(url, row_factory=dict_row, prepare_threshold=None)
 
     def execute(self, statement: str, parameters: tuple[Any, ...] = ()):
         return self.raw.execute(statement.replace("?", "%s"), parameters)

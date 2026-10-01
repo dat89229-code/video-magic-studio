@@ -1,11 +1,11 @@
 @import "tailwindcss" source(none);
 @source "../src";
 :root {
-  --ink: #3f2d36;
-  --muted: #846c78;
-  --pink: #d9678d;
-  --pink-dark: #b94d73;
-  --cream: #fffaf7;
+  --ink: #34242a;
+  --muted: #705b63;
+  --pink: #d15e85;
+  --pink-dark: #ad3f67;
+  --cream: #fff8f3;
 }
 * {
   box-sizing: border-box;
@@ -745,6 +745,12 @@ em {
   box-shadow: 0 8px 20px #7d4e5c0b;
   transition: 0.2s;
 }
+.photo-skill-card {
+  border-color: #ead6dc;
+  border-radius: 20px;
+  background: #fffdfc;
+  box-shadow: 0 10px 24px rgba(78, 43, 53, 0.09);
+}
 .skill-cover {
   height: 138px;
   position: relative;
@@ -765,6 +771,14 @@ em {
   background:
     linear-gradient(90deg, #f9dce4a8, transparent 72%),
     linear-gradient(0deg, #40202f35, transparent 62%);
+}
+.photo-skill-cover .skill-cover-shade {
+  background:
+    linear-gradient(0deg, rgba(25, 18, 20, 0.78) 0%, rgba(25, 18, 20, 0.24) 37%, transparent 65%),
+    linear-gradient(90deg, rgba(25, 18, 20, 0.28), transparent 52%);
+}
+.photo-skill-cover:after {
+  display: none;
 }
 .shirt-brand {
   display: none;
@@ -832,6 +846,51 @@ em {
   box-shadow: 0 8px 20px rgba(92, 38, 62, 0.16);
   padding: 10px 12px;
   border-radius: 9px;
+}
+.photo-skill-cover .cover-title {
+  left: 15px;
+  right: 14px;
+  bottom: 14px;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: #fffdfb;
+  background: transparent;
+  font: 950 clamp(20px, 2.15vw, 31px)/0.95 Arial, "Helvetica Neue", sans-serif;
+  letter-spacing: -0.035em;
+  white-space: pre-line;
+  text-shadow: 0 2px 3px rgba(20, 12, 14, 0.9), 0 0 1px rgba(20, 12, 14, 0.95);
+}
+.photo-skill-cover > span:not(.shirt-brand) {
+  color: #523a43;
+  background: rgba(255, 251, 248, 0.93);
+  box-shadow: 0 3px 12px rgba(54, 31, 40, 0.12);
+}
+.photo-skill-card .skill-content {
+  padding: 16px 16px 17px;
+}
+.photo-skill-card .skill-content h3 {
+  min-height: 0;
+  margin: 7px 0 9px;
+  color: #34242a;
+  font-size: 20px;
+  line-height: 1.15;
+}
+.photo-skill-card .skill-content p {
+  min-height: 40px;
+  margin: 0 0 13px;
+  color: #755c65;
+  font-size: 13px;
+  line-height: 1.48;
+}
+.photo-skill-card .card-bottom {
+  margin: 0 0 13px;
+}
+.photo-skill-card .card-bottom b,
+.photo-skill-card .skill-content button {
+  color: var(--pink-dark);
 }
 .cover-mark {
   position: absolute;

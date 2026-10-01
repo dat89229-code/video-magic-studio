@@ -299,7 +299,10 @@ const coverByHall: Record<Exclude<Hall, "Tất cả">, string> = {
 const coverBySkill: Record<string, string> = Object.fromEntries(
   skills.map((skill) => [skill.slug, `/skill-${skill.slug}.webp`]),
 );
-coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-cover-v2.png";
+coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-v3.png";
+coverBySkill["poster-san-pham"] = "/skill-poster-san-pham-v2.png";
+coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v2.png";
+coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v2.png";
 const shirtBrandPosition: Record<string, CSSProperties> = {
   "thuong-hieu-ca-nhan": { "--shirt-brand-x": "69%", "--shirt-brand-y": "63%" } as CSSProperties,
   "poster-san-pham": { "--shirt-brand-x": "64%", "--shirt-brand-y": "63%" } as CSSProperties,
@@ -308,6 +311,9 @@ const shirtBrandPosition: Record<string, CSSProperties> = {
 };
 const coverTextBySkill: Record<string, string> = {
   "thuong-hieu-ca-nhan": "ẢNH THƯƠNG HIỆU",
+  "poster-san-pham": "POSTER SẢN PHẨM",
+  "xoa-nen-anh": "TÁCH NỀN\nTRONG SUỐT",
+  "xoa-logo-anh": "XÓA VẬT THỂ\nKHỎI ẢNH",
 };
 
 function Index() {
@@ -818,9 +824,9 @@ function Card({
 }) {
   const colors = ["#f5dbe3", "#f0cbd7", "#ead8ef", "#f4e2d4", "#ebd4db"];
   return (
-    <article className="skill-card">
+    <article className={`skill-card ${skill.hall === "Sửa ảnh AI" ? "photo-skill-card" : ""}`}>
       <div
-        className={`skill-cover ${coverBySkill[skill.slug] ? "with-shirt-brand" : ""}`}
+        className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${skill.hall !== "Sửa ảnh AI" && coverBySkill[skill.slug] ? "with-shirt-brand" : ""}`}
         style={{ background: `linear-gradient(135deg,${colors[index % 5]},#fffaf6)` }}
       >
         <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
@@ -832,7 +838,7 @@ function Card({
         ) : null}
         <span>{skill.hall}</span>
         <strong className="cover-title">{coverTextBySkill[skill.slug] || skill.title}</strong>
-        <div className="cover-mark">
+        {skill.hall !== "Sửa ảnh AI" && <div className="cover-mark">
           {skill.hall === "Edit Video" || skill.hall === "Video AI/Viral" ? (
             <Film size={32} />
           ) : skill.hall === "Marketing & Social Media" ? (
@@ -840,7 +846,7 @@ function Card({
           ) : (
             <Sparkles size={32} />
           )}
-        </div>
+        </div>}
       </div>
       <div className="skill-content">
         <div className="skill-meta">

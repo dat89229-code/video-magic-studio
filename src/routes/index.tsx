@@ -871,6 +871,7 @@ function Card({
 }
 function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; loading: boolean; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
+  const isReferenceLayout = skill.slug === "thuong-hieu-ca-nhan";
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
     try {
@@ -880,6 +881,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
       return [];
     }
   }, [content?.owned_sections_json]);
+  const steps = useMemo(() => (content?.steps_text || "").split(/\n\s*\n/).filter(Boolean), [content?.steps_text]);
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {
@@ -891,52 +893,70 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
     }
   };
   return (
-    <main className="page shell">
+    <main className={`page shell ${isReferenceLayout ? "reference-skill-page" : ""}`}>
       <button className="back" onClick={back}>
         <ChevronLeft size={18} /> Quay về Kho Skill
       </button>
-      <section className="detail-hero sales-hero">
-        <div className={`detail-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""}`}>
-          <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
-          <div className="detail-cover-shade" />
-          <span>{skill.hall}</span>
-          <strong>{coverTextBySkill[skill.slug] || skill.title}</strong>
-        </div>
-        <div>
-          <p className="eyebrow">{skill.hall}</p>
-          <h1 className="page-title">{skill.title}</h1>
-          <p className="page-lead">{skill.description}</p>
-          <div className="detail-tags">
-            <span>{skill.tag}</span>
-            <span>{skill.status || "Sẵn sàng"}</span>
+      {isReferenceLayout ? (
+        <section className="reference-skill-top">
+          <div className="reference-skill-main">
+            <p className="reference-crumb">Sảnh Skill / Sảnh I / {skill.title}</p>
+            <h1 className="page-title">{skill.title}</h1>
+            <p className="page-lead">{skill.description}</p>
+            <div className={`detail-cover reference-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""}`}>
+              <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
+              <div className="detail-cover-shade" />
+              <span>{skill.hall}</span>
+              <strong>{coverTextBySkill[skill.slug] || skill.title}</strong>
+            </div>
+            <section className="reference-benefits">
+              <h2>Skill này gồm những gì?</h2>
+              {[
+                ["🤖", "Câu lệnh làm việc cho AI", "Dán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay."],
+                ["📱", "Làm được trên điện thoại", "Không cần máy tính mạnh, không cần cài phần mềm."],
+                ["💡", "Cách xử lý lỗi hay gặp", "Có lưu ý thực tế để kiểm kết quả và sửa riêng ảnh bị lệch."],
+                ["🖥️", "Tài nguyên đi kèm", content?.resource_url ? "Có đường dẫn công cụ liên quan trong nội dung Skill." : "Chưa có tài nguyên bổ sung được import."],
+              ].map(([icon, title, text]) => (
+                <article key={title}>
+                  <span>{icon}</span><div><b>{title}</b><p>{text}</p></div>
+                </article>
+              ))}
+            </section>
           </div>
-          <div className="detail-price">
-            <b>50.000đ</b>
-            <span>Quyền sở hữu Skill lâu dài</span>
+          <aside className="reference-quick-start">
+            <div className="reference-owned">{owned ? "✓ Bạn đã mở Skill này" : "Skill chưa được mở khóa"}</div>
+            <h3>{owned ? "Dùng ngay bằng AI của bạn" : "Mua để mở nội dung đầy đủ"}</h3>
+            {owned && isReady ? (
+              <>
+                <div className="quick-step"><b><i>1</i> Sao chép câu lệnh</b><pre>{content?.prompt_text}</pre><button onClick={copyPrompt}>{copied ? "Đã chép" : "Chép"}</button></div>
+                <div className="quick-step"><b><i>2</i> Dán vào AI của bạn rồi Enter</b><p>ChatGPT hoặc Gemini sẽ đọc ảnh và thực hiện theo câu lệnh.</p></div>
+                <div className="quick-step"><b><i>3</i> Kiểm từng ảnh</b><p>Dùng các lưu ý trong hướng dẫn để sửa riêng ảnh bị lệch.</p></div>
+              </>
+            ) : <button className="btn-primary" onClick={use}>Mua Skill · 50.000đ <ArrowRight size={18} /></button>}
+            <div className="quick-foot">Nội dung được lưu trong Skill của tôi và mở lại bất cứ lúc nào.</div>
+          </aside>
+        </section>
+      ) : <>
+        <section className="detail-hero sales-hero">
+          <div className={`detail-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""}`}>
+            <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
+            <div className="detail-cover-shade" />
+            <span>{skill.hall}</span>
+            <strong>{coverTextBySkill[skill.slug] || skill.title}</strong>
           </div>
-          <button className="btn-primary" onClick={use}>
-            {!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Mở Skill" : "Mua Skill · 50.000đ"}
-            <ArrowRight size={18} />
-          </button>
-        </div>
-      </section>
-      <section className="benefits-section">
-        <p className="eyebrow">KẾT QUẢ THAY VÌ LÝ THUYẾT</p>
-        <h2>Skill này làm được gì?</h2>
-        <div className="benefit-grid">
-          {[
-            "Tạo kết quả đồng nhất với thương hiệu",
-            "Rút ngắn thao tác thủ công lặp lại",
-            "Có quy trình rõ ràng để bắt đầu",
-            "Áp dụng theo nội dung gốc sau khi sở hữu Skill",
-          ].map((item, index) => (
-            <article key={item}>
-              <span>0{index + 1}</span>
-              <b>{item}</b>
-            </article>
-          ))}
-        </div>
-      </section>
+          <div>
+            <p className="eyebrow">{skill.hall}</p><h1 className="page-title">{skill.title}</h1><p className="page-lead">{skill.description}</p>
+            <div className="detail-tags"><span>{skill.tag}</span><span>{skill.status || "Sẵn sàng"}</span></div>
+            <div className="detail-price"><b>50.000đ</b><span>Quyền sở hữu Skill lâu dài</span></div>
+            <button className="btn-primary" onClick={use}>{!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Mở Skill" : "Mua Skill · 50.000đ"}<ArrowRight size={18} /></button>
+          </div>
+        </section>
+        <section className="benefits-section">
+          <p className="eyebrow">KẾT QUẢ THAY VÌ LÝ THUYẾT</p><h2>Skill này làm được gì?</h2>
+          <div className="benefit-grid">{["Tạo kết quả đồng nhất với thương hiệu", "Rút ngắn thao tác thủ công lặp lại", "Có quy trình rõ ràng để bắt đầu", "Áp dụng theo nội dung gốc sau khi sở hữu Skill"].map((item, index) => <article key={item}><span>0{index + 1}</span><b>{item}</b></article>)}</div>
+        </section>
+      </>}
+      {!isReferenceLayout && <>
       <section className="detail-demo">
         <div className="demo-input">
           <small>INPUT</small>
@@ -981,7 +1001,36 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
           )}
         </div>
       </section>
-      {isReady && (
+      </>}
+      {isReady && isReferenceLayout && (
+        <section className="reference-owned-content" id="owned-skill-content" aria-label="Nội dung Skill của bạn">
+          <div className="reference-intro">{content?.workflow_text}</div>
+          <div className="reference-copy-callout">
+            <b>Dán vào ChatGPT hoặc Gemini kèm ảnh của bạn. Không cài gì, làm được cả trên điện thoại.</b>
+            <button onClick={copyPrompt}>{copied ? "ĐÃ SAO CHÉP" : "CHÉP CÂU LỆNH"}</button>
+            <small>Prompt được giữ nguyên từ nội dung Skill đã import.</small>
+          </div>
+          <h2>Làm theo 3 bước</h2>
+          <p className="reference-time">◷ Bộ ảnh đầu tiên xong trong vài phút</p>
+          <div className="reference-steps">
+            {steps.map((step, index) => {
+              const [heading, ...body] = step.split("\n");
+              return <article key={step}><span>{index + 1}</span><div><h3>{heading.replace(/^Bước\s*\d+\s*[—–-]?\s*/i, "")}</h3><p>{body.join("\n")}</p></div></article>;
+            })}
+          </div>
+          <article className="reference-practice">
+            <p><b>Làm thử ngay</b> Tạo bộ ảnh thương hiệu cá nhân để đăng lên trang mạng xã hội hoặc gian hàng</p>
+            <ol><li>Chọn một ảnh chân dung rõ mặt nhất bạn có</li><li>Làm theo 3 bước phía trên</li><li>So kết quả với ảnh gốc và sửa riêng tấm bị lệch nếu cần</li></ol>
+            <div><strong>Xong sẽ có:</strong> {content?.output_notes}</div>
+          </article>
+          <div className="reference-extra">
+            <p>{content?.notes_text}</p>
+            {content?.resource_url && <a className="resource-link" href={content.resource_url} target="_blank" rel="noreferrer">Mở công cụ liên quan <ArrowRight size={15} /></a>}
+          </div>
+          {importedSections.length > 0 && <div className="owned-source-sections" aria-label="Nội dung gốc đã import">{importedSections.map((section: { number?: string; title: string; body: string }) => <article key={`${section.number}-${section.title}`}><small>{section.number ? `${section.number} — ` : ""}{section.title}</small><p>{section.body}</p></article>)}</div>}
+        </section>
+      )}
+      {isReady && !isReferenceLayout && (
         <section className="owned-content" id="owned-skill-content" aria-label="Nội dung Skill của bạn">
           <p className="eyebrow">NỘI DUNG SKILL CỦA BẠN</p>
           <h2>Hướng dẫn, Prompt và quy trình thực hiện</h2>

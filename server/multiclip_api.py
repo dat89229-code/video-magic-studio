@@ -455,7 +455,20 @@ async def receive_sepay_webhook(request: Request, authorization: str | None = He
     with connection() as database:
         if database.execute("SELECT 1 FROM payment_transactions WHERE provider_id=?", (provider_id,)).fetchone():
             return {"ok": True}
-        order = database.execute("SELECT * FROM payment_orders WHERE status='pending' AND ? LIKE '%' || code || '%'", (content,)).fetchone()
+        # Do not use SQL LIKE with literal percent signs here. psycopg reserves
+        # percent syntax for bound values, which previously caused a 500 only
+        # when SePay delivered a payment. Use the native string-search function
+        # for each supported database instead.
+        if is_postgres():
+            order = database.execute(
+                "SELECT * FROM payment_orders WHERE status='pending' AND POSITION(code IN ?) > 0",
+                (content,),
+            ).fetchone()
+        else:
+            order = database.execute(
+                "SELECT * FROM payment_orders WHERE status='pending' AND instr(?, code) > 0",
+                (content,),
+            ).fetchone()
         if order is None or amount < order["amount"]:
             return {"ok": True}
         if order["order_type"] not in {"SKILL_PURCHASE", "CREDIT_TOPUP"}:

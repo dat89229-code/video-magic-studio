@@ -453,7 +453,30 @@ async def receive_sepay_webhook(request: Request, authorization: str | None = He
     if not provider_id or amount <= 0:
         raise HTTPException(status_code=400, detail="Dữ liệu giao dịch thiếu mã hoặc số tiền.")
     with connection() as database:
-        if database.execute("SELECT 1 FROM payment_transactions WHERE provider_id=?", (provider_id,)).fetchone():
+        # A provider transaction is normally handled exactly once.  Skill
+        # ownership is deliberately reconciled on a replay as well: this is a
+        # safe repair for an interrupted delivery, while a credit top-up is
+        # never credited a second time.
+        existing_transaction = database.execute(
+            "SELECT order_code FROM payment_transactions WHERE provider_id=?",
+            (provider_id,),
+        ).fetchone()
+        if existing_transaction:
+            order = database.execute(
+                "SELECT * FROM payment_orders WHERE code=?",
+                (existing_transaction["order_code"],),
+            ).fetchone()
+            if order and order["order_type"] == "SKILL_PURCHASE" and order["skill_slug"]:
+                skill = database.execute(
+                    "SELECT id FROM skills WHERE slug=?",
+                    (order["skill_slug"],),
+                ).fetchone()
+                if skill:
+                    database.execute(
+                        "INSERT INTO skill_purchases(user_id,skill_id,order_code) VALUES (?,?,?) "
+                        "ON CONFLICT(user_id,skill_id) DO NOTHING",
+                        (order["user_id"], skill["id"], order["code"]),
+                    )
             return {"ok": True}
         # Do not use SQL LIKE with literal percent signs here. psycopg reserves
         # percent syntax for bound values, which previously caused a 500 only

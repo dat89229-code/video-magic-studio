@@ -298,6 +298,7 @@ const coverByHall: Record<Exclude<Hall, "Tất cả">, string> = {
 const coverBySkill: Record<string, string> = Object.fromEntries(
   skills.map((skill) => [skill.slug, `/skill-${skill.slug}.webp`]),
 );
+coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-cover-v2.png";
 const shirtBrandPosition: Record<string, CSSProperties> = {
   "thuong-hieu-ca-nhan": { "--shirt-brand-x": "69%", "--shirt-brand-y": "63%" } as CSSProperties,
   "poster-san-pham": { "--shirt-brand-x": "64%", "--shirt-brand-y": "63%" } as CSSProperties,

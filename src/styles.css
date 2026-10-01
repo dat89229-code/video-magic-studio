@@ -802,13 +802,16 @@ em {
   left: 14px;
   bottom: 15px;
   max-width: 62%;
-  color: #fff;
+  color: #61213b;
   font:
     800 19px/1.04 Inter,
     ui-sans-serif,
     sans-serif;
   letter-spacing: -0.4px;
-  text-shadow: 0 2px 10px #3a1727a8;
+  text-shadow: 0 1px 0 #fff;
+  background: #fff9f3e8;
+  padding: 7px 9px;
+  border-radius: 7px;
 }
 .cover-mark {
   position: absolute;
@@ -998,7 +1001,7 @@ em {
   padding: 6px 9px;
   border-radius: 20px;
 }
-.detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: 75%; color: #fff; font: 800 27px/1.05 Inter, ui-sans-serif, sans-serif; text-shadow: 0 2px 12px #3c1320bf; }
+.detail-cover strong { position: absolute; z-index: 1; left: 22px; bottom: 20px; max-width: 75%; color: #61213b; background: #fff9f3e8; padding: 10px 12px; border-radius: 9px; font: 900 27px/1.05 Inter, ui-sans-serif, sans-serif; text-shadow: 0 1px 0 #fff; }
 .detail-tags {
   display: flex;
   gap: 8px;

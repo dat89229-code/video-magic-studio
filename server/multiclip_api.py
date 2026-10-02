@@ -327,6 +327,45 @@ Chữ trên nhãn là chỗ máy sai nhiều nhất. Tấm nào chữ bị méo 
         ("Một ảnh sản phẩm ra nguyên bộ 10 poster quảng cáo đồng bộ, không cần cài gì", "Đưa MỘT ảnh sản phẩm, nhận về MỘT BỘ 10 poster quảng cáo khác nhau nhưng cùng một chất. Không cài gì — chạy thẳng trên ChatGPT hoặc Gemini bạn đang có.", prompt, "Một ảnh sản phẩm rõ: thấy toàn bộ sản phẩm, đọc được nhãn, không loá sáng.", "10 poster quảng cáo khác nhau về bối cảnh và bố cục, với sản phẩm giữ đúng ảnh gốc.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id),
     )
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='xoa-nen-anh'").fetchone()["id"]
+    prompt = """Xoá nền bức ảnh này, chỉ giữ lại sản phẩm.
+
+Yêu cầu bắt buộc:
+- GIỮ NGUYÊN 100% sản phẩm: màu sắc, hình dáng, chi tiết, chữ trên bao bì. Không làm đẹp thêm, không chỉnh màu, không thêm bớt gì.
+- Cắt viền sạch, không sót mảng nền. Chú ý kỹ chỗ khó: tóc, lông, quai xách, phần trong suốt như chai lọ thuỷ tinh.
+- Xuất ra file PNG nền trong suốt.
+
+Sau đó làm thêm bản thứ hai từ chính ảnh đã tách:
+- Đặt sản phẩm lên nền trắng thuần, mã màu #FFFFFF
+- Sản phẩm nằm chính giữa, chừa lề đều bốn phía khoảng 10%
+- Ảnh vuông, tỉ lệ 1:1
+- Đây là ảnh bìa để đăng Shopee/TikTok Shop nên đừng thêm chữ, khung viền hay hiệu ứng gì
+
+Cuối cùng, nhìn lại hai ảnh vừa làm và nói cho tôi biết chỗ nào cắt chưa đẹp để tôi biết mà chụp lại lần sau."""
+    steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được việc này.
+
+Bước 2 — Tải ảnh lên rồi dán câu lệnh
+Bấm biểu tượng kẹp giấy hoặc dấu cộng để tải ảnh sản phẩm lên. Rồi bấm nút Chép ở đầu trang, dán câu lệnh vào, gửi.
+
+Bước 3 — Tải về và kiểm ba chỗ
+Bấm vào ảnh kết quả để tải về. Trước khi đăng, phóng to kiểm viền sản phẩm, chữ trên bao bì và màu sản phẩm."""
+    notes = """Gemini thường nhanh hơn cho việc xoá nền, ChatGPT cho màu sắc chuẩn hơn với ảnh sản phẩm. Có cả hai thì thử cả hai rồi chọn bản đẹp hơn.
+
+Tải ảnh lên TRƯỚC rồi mới dán câu lệnh. Làm ngược lại thì AI không biết bạn nói về ảnh nào.
+
+Chỗ nào chưa đạt thì nhắn tiếp trong cùng cuộc trò chuyện, ví dụ 'viền bên trái còn sót nền, cắt lại giúp tôi'. Đừng làm lại từ đầu."""
+    sections = [
+        {"number": "01", "title": "Skill này gồm những gì", "body": "Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có"},
+        {"number": "02", "title": "Chuẩn bị trước khi bắt đầu", "body": "Một ảnh sản phẩm cần tách nền. Tải ảnh lên TRƯỚC rồi mới dán câu lệnh."},
+        {"number": "04", "title": "Làm theo 3 bước", "body": steps},
+        {"number": "05", "title": "Làm thử ngay", "body": "Làm bộ ảnh sản phẩm nền trắng đồng bộ để đăng bán\n\n1. Chọn 3 ảnh sản phẩm bạn đang bán, chụp ở 3 phông nền khác nhau — loại mà đăng lên trông lộn xộn\n2. Làm lần lượt từng ảnh theo 3 bước trên\n3. Xếp 3 ảnh nền trắng cạnh nhau xem đã ra một bộ đồng bộ chưa\n4. Đăng thử lên gian hàng, so với ảnh cũ\n\nXong sẽ có: Ba ảnh sản phẩm cùng nền trắng, sản phẩm căn giữa, nhìn như chụp cùng một buổi trong studio — gian hàng trông chuyên nghiệp hẳn so với ảnh gốc."},
+    ]
+    database.execute(
+        "UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
+        ("Xoá phông trong vài giây, ra ảnh nền trong suốt để ghép vào đâu cũng được", "Biến ảnh sản phẩm chụp ở bất kỳ đâu thành ảnh nền trong suốt và ảnh nền trắng chuẩn sàn — làm ngay trên ChatGPT hoặc Gemini bạn đang có, không cài gì, dùng được cả trên điện thoại.", prompt, "Một ảnh sản phẩm cần tách nền.", "Một file PNG nền trong suốt và một ảnh vuông nền trắng #FFFFFF.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/danielgatis/rembg", skill_id),
+    )
+
 
 initialize_database()
 

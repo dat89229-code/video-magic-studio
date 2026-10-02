@@ -775,6 +775,31 @@ Chọn 1-2 ý tưởng ưng nhất, nhắn AI khai triển thêm góc quay/dàn 
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tìm trend đang lên, phân tích kênh cùng ngách và trả về danh sách ý tưởng content cụ thể, xếp theo tiềm năng."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ngách, nền tảng, đối tượng xem; link kênh của bạn hoặc đối thủ nếu có."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Lấy 10 ý tưởng content thật cho tuần này\n\n1. Chuẩn bị ngách, nền tảng, đối tượng xem, link kênh nếu có\n2. Làm theo 2 bước trên\n3. Đọc lại danh sách, đánh dấu 2-3 ý tưởng phù hợp nhất\n4. Nhờ AI khai triển sâu 1 ý tưởng đã chọn\n\nXong sẽ có: Danh sách 10 ý tưởng content cụ thể, mỗi ý tưởng có góc tiếp cận, lý do, mức tiềm năng, xếp theo tiềm năng giảm dần, đúng ngách và giọng điệu kênh."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tìm chủ đề/trend đang lên, phân tích đối thủ, lên danh sách ý tưởng nội dung theo mức tiềm năng", "Nói ngách và nền tảng của bạn — AI tự tìm trend đang lên, soi kênh cùng ngách, rồi trả về danh sách ý tưởng content cụ thể, xếp theo mức tiềm năng.", prompt, "Ngách, nền tảng, đối tượng xem và link kênh nếu có.", "Danh sách 10 ý tưởng content có góc tiếp cận, lý do và mức tiềm năng.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='seo-video-youtube'").fetchone()["id"]
+    prompt = """Video của tôi đang ở [link video/đang mở sẵn trong YouTube Studio]. SEO đầy đủ cho video này:
+- Dùng \"Hỏi Studio\" lấy timeline/chương thật từ transcript, đặt gần cuối mô tả.
+- Thêm 2 thẻ (Cards) video liên quan, dựng màn hình kết thúc mẫu \"2 video\".
+- Thêm từ khoá: kết hợp từ ngắn + cụm tìm kiếm dài 4-6 từ, gần đầy 500 ký tự.
+- Đối chiếu tiêu đề với các video win nhất kênh, chỉnh nếu lệch pattern.
+- Dựng mô tả đúng thứ tự: intro/hook → khối mặc định của tôi (nếu có, xem dưới) → timeline → hashtag.
+- Bấm Lưu, xác nhận đã lưu thành công.
+
+Khối mặc định của tôi (nếu có, dùng lại cho mọi video): [dán khối mặc định của bạn ở đây, hoặc bỏ trống nếu chưa có]."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+
+Bước 2 — Đưa link video + khối mặc định (lần đầu)
+Điền link video và khối mặc định cuối mô tả nếu kênh có; chỉ cần đưa khối mặc định một lần để AI dùng lại.
+
+Bước 3 — Để AI tự làm đủ 7 phần trong YouTube Studio
+AI mở trang Chi tiết video, làm timeline → thẻ → màn hình kết thúc → từ khoá → tiêu đề → mô tả → hashtag → Lưu.
+
+Bước 4 — Kiểm lại và công khai video khi sẵn sàng
+Mở lại trang Chi tiết video kiểm tiêu đề/mô tả/từ khoá và timeline có khớp nội dung thật không."""
+    notes = "Chưa có khối mặc định cũng không sao — AI vẫn làm các phần còn lại. Chưa ưng tiêu đề hoặc phần nào thì nhắn sửa trong cùng cuộc trò chuyện, AI sửa và lưu lại."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Quy trình SEO 7 phần trong YouTube Studio: timeline, thẻ, màn hình kết thúc, từ khoá, tiêu đề, mô tả, hashtag."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video vừa upload ở trạng thái không công khai, link video và khối mặc định cuối mô tả nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"SEO đầy đủ 1 video vừa upload lên kênh\n\n1. Upload 1 video lên kênh, để Không công khai trong lúc SEO\n2. Chuẩn bị khối mặc định cuối mô tả nếu có\n3. Làm theo 3 bước trên\n4. Kiểm lại trang Chi tiết video, rồi công khai khi ưng ý\n\nXong sẽ có: Video có đủ chương mục, 2 thẻ liên quan, màn hình kết thúc, từ khoá, tiêu đề, mô tả và hashtag; đã lưu thành công trên YouTube Studio."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tối ưu tiêu đề, mô tả, thẻ tag, timeline và thumbnail để video lên đề xuất nhanh hơn", "Đưa 1 video mới đăng vào — AI tự vào YouTube Studio làm timeline/chương, thẻ, màn hình kết thúc, từ khoá, tiêu đề, mô tả và hashtag rồi lưu thật.", prompt, "Video YouTube không công khai, link video và khối mặc định nếu có.", "Video YouTube đã lưu đủ 7 phần SEO trong Studio.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://studio.youtube.com/", skill_id))
+
 
 initialize_database()
 

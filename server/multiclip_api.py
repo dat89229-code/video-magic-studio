@@ -536,6 +536,31 @@ Mở file trong output/, kiểm overlay có che mặt không, hiệu ứng có d
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện dài 1–3 phút; nếu có, chuẩn bị màu thương hiệu."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản cao cấp có hiệu ứng\n\n1. Chọn 1 video nói chuyện dài 1-3 phút, có ít nhất 1 đoạn kiểu liệt kê hoặc số liệu\n2. Làm theo 3 bước trên\n3. So sánh với bản Dạng 1 (nếu có) — thấy rõ 7 lớp hiệu ứng thêm vào\n4. Đăng thử, theo dõi thời gian xem trung bình có tăng\n\nXong sẽ có: 1 video sinh động: zoom đúng lúc, overlay minh hoạ không che mặt, âm thanh phụ trợ tinh tế, tối đa 1 lần crop-mặt và 1 hiệu ứng so sánh — không bị nhồi nhét."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau", "Đưa 1 video nói chuyện vào — AI dựng bản edit cao cấp: zoom theo cảm xúc, overlay hoạt hoạ, âm thanh phụ trợ, từ khoá nhấn 2 màu, crop bám mặt và so sánh trước/sau.", prompt, "Một video nói chuyện dài 1–3 phút; màu thương hiệu nếu có.", "Video dọc sinh động với các hiệu ứng đúng ngữ cảnh, không che mặt.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-3-huong-dan-toi-gian'").fetchone()["id"]
+    prompt = """Video của tôi đang ở input/. Edit Dạng 3 cho video này — bản tối giản cho coach/chuyên gia:
+- Đọc nội dung, viết 1 tiêu đề trắng lớn bám trên khung suốt video (câu hook đắt nhất).
+- Chia nội dung thành các bước/ý theo đúng những gì tôi nói (không ép đánh số cứng nếu nội dung không phải quy trình), text trắng hiện lần lượt.
+- Chèn CTA khéo léo, tự nhiên — câu CTA của tôi (nếu có): [điền câu CTA, không có thì để AI tự viết].
+- Thêm nhạc nền dẫn dắt cảm xúc, tự điều chỉnh to/nhỏ theo có lời hay không.
+- Zoom cực nhẹ, chỉ ở điểm chuyển ý.
+- KHÔNG thêm overlay hoạt hoạ, không crop mặt, không SFX — giữ khung thật sạch.
+
+Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa video vào, đưa câu CTA nếu có
+Bấm Chép câu nhờ việc mẫu, điền câu CTA hay dùng nếu có, dán cùng video vào cuộc trò chuyện.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node.
+
+Bước 4 — Nhận file, kiểm nhạc và CTA
+Mở file trong output/, kiểm nhạc có đủ nhỏ khi bạn đang nói không, CTA có tự nhiên không và tiêu đề có đúng trọng tâm không."""
+    notes = "KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được. Chưa ưng thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'nhạc đoạn đầu to quá, hạ thêm xuống'."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tiêu đề trắng lớn, các bước hiện dần theo nội dung, CTA tự nhiên và nhạc dẫn cảm xúc."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video chia sẻ kiến thức/hướng dẫn dài 1–3 phút và câu CTA nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video hướng dẫn/chia sẻ thành bản tối giản chuyên nghiệp\n\n1. Chọn 1 video bạn chia sẻ kiến thức/hướng dẫn, dài 1-3 phút\n2. Nghĩ trước 1 câu CTA muốn dùng (không có cũng được)\n3. Làm theo 3 bước trên\n4. Đăng thử, so cảm giác sạch, sang với video có nhiều hiệu ứng\n\nXong sẽ có: 1 video khung sạch: tiêu đề trắng lớn rõ ràng, các bước hiện đúng nhịp nội dung, CTA nghe tự nhiên, nhạc dẫn cảm xúc mà không đè lời nói."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tiêu đề trắng lớn, các bước hiện dần theo nội dung, nhạc dẫn dắt cảm xúc — sạch, sang", "Đưa 1 video hướng dẫn/chia sẻ vào — AI dựng bản tối giản kiểu content coach cao cấp: tiêu đề trắng lớn, các bước hiện dần, CTA khéo léo, nhạc dẫn cảm xúc và zoom cực nhẹ.", prompt, "Một video hướng dẫn/chia sẻ dài 1–3 phút; CTA nếu có.", "Video tối giản, sạch, sang, có tiêu đề, các bước, CTA và nhạc đúng nhịp.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

@@ -678,6 +678,31 @@ Mở file trong output/, kiểm các đoạn được chọn có đủ đa dạn
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tự chọn các đoạn đẹp/ấn tượng từ một video dài, ghép theo nhạc thành video quảng cáo ngắn."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video quay liên tục ít nhất 2–3 phút và nhạc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Biến 1 video quay dài thành video quảng cáo ngắn\n\n1. Chọn video quay liên tục dài ít nhất 2-3 phút\n2. Chọn nhạc free-license hoặc bạn có quyền dùng\n3. Làm theo 3 bước trên\n4. So sánh với việc tự cắt tay\n\nXong sẽ có: 1 video ngắn 15-30s, các đoạn được chọn đa dạng góc quay, khớp đúng nhịp nhạc, đoạn ấn tượng nhất rơi vào cao trào."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Chỉ 1 video dài duy nhất, AI tự chọn đoạn ấn tượng nhất rồi ghép theo nhạc như video quảng cáo", "Chỉ 1 video dài duy nhất — AI tự quét, chọn ra các đoạn đẹp/ấn tượng nhất, cắt rời rồi ghép đúng nhịp nhạc thành video ngắn kiểu quảng cáo.", prompt, "Một video dài và nhạc bạn có quyền dùng.", "Video highlight 15–30 giây với các đoạn đa dạng, khớp beat và cao trào nhạc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='edit-video-zoom'").fetchone()["id"]
+    prompt = """File ghi buổi Zoom của tôi đang ở input/. Cắt buổi này thành 1 chuỗi khoá học nhiều phần:
+- Đọc toàn bộ transcript, lập outline theo 4 loại (rác kỹ thuật / nội dung chính / khoảnh khắc cảm xúc thật / lạc trọng tâm) trước khi cắt gì.
+- Cắt bỏ rác kỹ thuật, khoảng lặng >2s, đoạn lạc trọng tâm — GIỮ nguyên mọi khoảnh khắc cảm xúc thật (tiếng cười, câu chuyện tạo kết nối).
+- Chia thành 5 phần theo đúng ranh giới chủ đề tự nhiên (ít hơn/nhiều hơn nếu nội dung không chia đẹp thành 5 — hỏi tôi trước khi đổi số phần).
+- Mỗi phần: làm sạch âm thanh, chỉnh màu nhẹ, chống đơ hình nếu khung tĩnh lâu, nối mạch với phần trước bằng flashback từ chính footage gốc, có tiêu đề + mô tả + chương mục.
+- Giữ 16:9 1920×1080, không crop dọc.
+- Tên chuỗi (nếu có): [điền tên, không có thì tự rút từ nội dung].
+
+Nếu máy chưa có ffmpeg/Whisper thì tự cài trước. Xong việc thì cho tôi biết các file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa file Zoom vào, nói tên chuỗi nếu có
+Bấm Chép câu nhờ việc mẫu, điền tên chuỗi/khoá học nếu có, dán cùng file ghi Zoom vào cuộc trò chuyện.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper.
+
+Bước 4 — Nhận N file, kiểm continuity giữa các phần
+Các file trong output/ kèm titles-descriptions.md và series-overview.md. Xem lần lượt, kiểm các phần có nối mạch tự nhiên không."""
+    notes = "Buổi Zoom càng dài, bước đọc transcript + lập outline càng lâu — buổi 2 tiếng có thể mất 20-40 phút để ra hết 5 phần. Chỗ nào cắt hụt hoặc nối gượng thì nhắn rõ phần và thời điểm cần chỉnh, không cần làm lại cả chuỗi."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Đọc transcript Zoom, lập outline, loại rác kỹ thuật và chia thành chuỗi video 16:9 có tiêu đề, mô tả và chương mục."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một buổi ghi Zoom/đào tạo/coaching từ 45 phút trở lên và tên chuỗi nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 buổi Zoom thành chuỗi khoá học đăng dần\n\n1. Chọn buổi ghi Zoom dài từ 45 phút trở lên\n2. Làm theo 3 bước trên\n3. Xem hết các phần, kiểm outline có đúng những gì đã nói không\n4. Đăng thử phần 1, hẹn phần 2 theo đúng câu nối đã dựng\n\nXong sẽ có: 1 chuỗi 5 video 16:9, mỗi video có tiêu đề/mô tả/chương mục riêng, nối mạch như một khoá học thật."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Video họp, hội thảo quay bằng Zoom tự cắt gọn, bỏ đoạn chết, dựng thành video hoàn chỉnh", "Đưa 1 buổi ghi Zoom dài vào — AI tự đọc transcript, lập outline, cắt bỏ khoảng lặng/rác kỹ thuật, chia thành chuỗi video 16:9 nối mạch kèm tiêu đề/mô tả/chương mục.", prompt, "Một buổi ghi Zoom dài từ 45 phút và tên chuỗi nếu có.", "Một chuỗi video 16:9 có outline, tiêu đề, mô tả và chương mục riêng.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

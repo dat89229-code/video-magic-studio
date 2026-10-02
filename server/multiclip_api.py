@@ -199,10 +199,10 @@ def seed_skills(database) -> None:
 
 
 def seed_brand_overlay_content(database) -> None:
-    """Import only the first purchased Skill whose source content was verified.
+    """Seed the customer-authorized source content for the first Skill.
 
-    The remaining Skills intentionally stay CONTENT_MISSING until their actual
-    customer-authorized materials have been reviewed and imported.
+    Account-specific links, seller contacts and payment UI are intentionally
+    excluded; the purchased workflow itself is retained verbatim.
     """
     skill_id = database.execute(
         "SELECT id FROM skills WHERE slug='thuong-hieu-ca-nhan'"
@@ -224,7 +224,7 @@ def seed_brand_overlay_content(database) -> None:
         "3. Toàn thân, đứng thẳng, phông nền ngoài trời\n"
         "4. Cận mặt, ánh sáng studio, phông nền đen\n\n"
         "Yêu cầu bắt buộc:\n"
-        "- Giữ đúng khuôn mặt như ảnh gốc — đây là ảnh thật của tôi, không phải nhân vật hư cấu, sai mặt là không dùng được.\n"
+        "- Giữ đúng khuôn mặt như ảnh gốc — đây là ảnh THẬT của tôi, không phải nhân vật hư cấu, sai mặt là không dùng được.\n"
         "- Đồng nhất tông màu và ánh sáng giữa 4 tấm, như chụp cùng một buổi.\n"
         "- Không đội thêm phụ kiện, không đổi màu tóc/da nếu tôi không yêu cầu.\n"
         "Sau khi ra 4 tấm, cho tôi biết tấm nào giữ mặt giống nhất và tấm nào bị lệch để tôi biết mà yêu cầu sửa lại."

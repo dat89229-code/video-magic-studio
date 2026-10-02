@@ -1022,7 +1022,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             <small>Prompt được giữ nguyên từ nội dung Skill đã import.</small>
           </div>
           <h2>Làm theo 3 bước</h2>
-          <p className="reference-time">◷ Bộ ảnh đầu tiên xong trong vài phút</p>
+          <p className="reference-time">◷ Bộ ảnh đầu tiên xong trong 3 phút</p>
           <div className="reference-steps">
             {steps.map((step, index) => {
               const [heading, ...body] = step.split("\n");
@@ -1030,15 +1030,14 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             })}
           </div>
           <article className="reference-practice">
-            <p><b>Làm thử ngay</b> Tạo bộ ảnh thương hiệu cá nhân để đăng lên trang mạng xã hội hoặc gian hàng</p>
-            <ol><li>Chọn một ảnh chân dung rõ mặt nhất bạn có</li><li>Làm theo 3 bước phía trên</li><li>So kết quả với ảnh gốc và sửa riêng tấm bị lệch nếu cần</li></ol>
+            <p><b>Làm thử ngay</b> Tạo bộ 4 ảnh thương hiệu cá nhân để đăng lên trang mạng xã hội bán hàng</p>
+            <ol><li>Chọn một ảnh chân dung rõ mặt nhất bạn có</li><li>Làm theo 3 bước trên</li><li>Xếp 4 ảnh cạnh nhau xem đã ra một bộ đồng nhất về mặt và tông màu chưa</li><li>Đăng thử một tấm lên trang cá nhân hoặc gian hàng</li></ol>
             <div><strong>Xong sẽ có:</strong> {content?.output_notes}</div>
           </article>
           <div className="reference-extra">
             <p>{content?.notes_text}</p>
             {content?.resource_url && <a className="resource-link" href={content.resource_url} target="_blank" rel="noreferrer">Mở công cụ liên quan <ArrowRight size={15} /></a>}
           </div>
-          {importedSections.length > 0 && <div className="owned-source-sections" aria-label="Nội dung gốc đã import">{importedSections.map((section: { number?: string; title: string; body: string }) => <article key={`${section.number}-${section.title}`}><small>{section.number ? `${section.number} — ` : ""}{section.title}</small><p>{section.body}</p></article>)}</div>}
         </section>
       )}
       {isReady && !isReferenceLayout && (

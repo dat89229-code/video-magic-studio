@@ -438,6 +438,31 @@ Tải ảnh về, phóng to lên và soi kỹ phần chữ, logo, mã vạch. Đ
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh sản phẩm cũ, mờ hoặc thiếu độ phân giải."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cứu một ảnh sản phẩm cũ mờ thành ảnh đăng bán được\n\n1. Tìm một ảnh sản phẩm cũ bị mờ — loại mà bạn từng ngại đăng\n2. Làm theo 3 bước trên\n3. Mở hai ảnh cạnh nhau, phóng to phần chữ trên bao bì để so\n4. Nếu chữ vẫn đúng và ảnh nét hơn hẳn thì đăng thử lên gian hàng\n\nXong sẽ có: Một ảnh nét gấp đôi ảnh gốc, chữ trên bao bì vẫn đọc đúng, đủ rõ để chạy quảng cáo mà không bị vỡ hạt."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Ảnh nhỏ mờ thành ảnh lớn sắc nét chỉ bằng vài cú bấm chuột, in poster khổ lớn được", "Cứu ảnh sản phẩm mờ, ảnh cũ, ảnh chụp bằng điện thoại đời thấp thành ảnh nét đủ để chạy quảng cáo và in poster — làm ngay trên ChatGPT hoặc Gemini, không cài gì.", prompt, "Một ảnh sản phẩm mờ hoặc độ phân giải thấp.", "Ảnh độ phân giải cao hơn, sản phẩm và chữ trên bao bì được kiểm tra lại.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/upscayl/upscayl", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='multishot'").fetchone()["id"]
+    prompt = """Tôi gửi một ảnh. Hãy tạo cho tôi 9 góc quay khác nhau của ĐÚNG khoảnh khắc này.
+
+Quy tắc bắt buộc:
+- Giữ nguyên nhân vật, trang phục, đạo cụ, bối cảnh và ánh sáng như ảnh gốc. Đây phải là cùng một khoảnh khắc nhìn từ chỗ khác, KHÔNG phải chín khoảnh khắc khác nhau.
+- Chỉ thay ba thứ: vị trí máy quay, cỡ cảnh (cận / trung / toàn), và kiểu ống kính.
+- Chín góc phải khác nhau rõ rệt. Đừng cho tôi chín tấm chỉ xê dịch vài độ.
+- Mỗi tấm ghi rõ bên dưới: máy đặt ở đâu, cỡ cảnh gì, ống kính gì.
+
+Trước khi tạo ảnh, liệt kê cho tôi xem 9 góc bạn định làm. Tôi duyệt xong bạn mới tạo."""
+    steps = """Bước 1 — Chọn ảnh tham chiếu
+Chọn ảnh thấy rõ nhân vật hoặc vật thể chính, đủ sáng, không bị che khuất. Ảnh càng rõ thì các góc mới càng nhất quán.
+
+Bước 2 — Tải ảnh lên rồi dán câu lệnh
+Bấm kẹp giấy tải ảnh lên, bấm nút Chép ở đầu trang rồi dán câu lệnh vào, gửi. Muốn số góc khác 9 thì sửa thẳng con số trong câu lệnh.
+
+Bước 3 — Duyệt danh sách góc rồi cho chạy
+Đọc danh sách, thấy góc nào trùng ý thì đổi: 'Góc 3 và góc 6 gần giống nhau, đổi góc 6 thành nhìn từ trên xuống.' Ưng rồi thì bảo tạo ảnh.
+
+Bước 4 — Kiểm tính nhất quán
+Đặt các tấm cạnh nhau, soi ba thứ: trang phục có đổi không, ánh sáng chiếu cùng hướng không, đạo cụ có còn nguyên chỗ không."""
+    notes = "Ảnh chỉ thấy nửa mặt hoặc bị che nhiều thì máy phải tự bịa phần khuất — các góc sẽ lệch nhau. Muốn STORYBOARD phim thay vì các góc rời: thêm chữ 'Video' vào câu nhờ. Định dùng làm keyframe video thì tính nhất quán quan trọng hơn ảnh đẹp. Tấm nào lệch thì bỏ, đừng tiếc."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính, đủ sáng và không bị che khuất."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 9 góc quay từ một ảnh chân dung của bạn\n\n1. Chọn một ảnh chân dung rõ mặt, đủ sáng\n2. Làm theo 4 bước trên\n3. Đặt 9 tấm cạnh nhau, kiểm trang phục và hướng sáng\n4. Làm lại một lần nữa, lần này thêm chữ 'Video' để xem storyboard khác thế nào\n\nXong sẽ có: Chín tấm nhìn ra ngay là cùng một người, cùng bộ đồ, cùng khoảnh khắc — chỉ khác chỗ đặt máy quay."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Một ảnh ra nhiều góc quay nhất quán, dùng làm keyframe video hoặc storyboard", "Đưa MỘT ảnh, nhận về NHIỀU góc quay của cùng một khoảnh khắc — nhất quán đủ để làm keyframe video. Thêm chữ 'Video' vào câu nhờ thì đổi sang dựng storyboard điện ảnh. Không cài gì.", prompt, "Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính.", "Chín góc quay khác nhau rõ rệt của cùng một khoảnh khắc.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
+
 
 initialize_database()
 

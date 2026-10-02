@@ -584,6 +584,30 @@ Mở file trong output/, kiểm lớp phủ infographic có khác kiểu nhau kh
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Lớp phủ infographic trắng do AI tự thiết kế: tiêu đề hero, thẻ so sánh VS, sơ đồ bước, danh sách và số liệu."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện có phần so sánh hoặc quy trình nhiều bước; 2 màu thương hiệu nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản infographic kiểu HeyGen\n\n1. Chọn video có đoạn so sánh hoặc quy trình nhiều bước\n2. Làm theo 3 bước trên\n3. Kiểm các lớp phủ có đa dạng bố cục không\n4. Đăng thử, so cảm giác chuyên nghiệp với video gốc\n\nXong sẽ có: 1 video xen kẽ talking-head và lớp phủ infographic trắng đa dạng kiểu, màu sắc sáng/sạch, chất lượng hình ảnh nét và nịnh da hơn bản gốc."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xen kẽ lớp phủ infographic trắng do AI tự thiết kế, phong cách chuyên nghiệp kiểu HeyGen", "Đưa 1 video nói chuyện vào — AI tự thiết kế và xen kẽ các lớp phủ infographic trắng toàn màn hình kèm bộ lọc màu pro, phong cách chuyên nghiệp kiểu HeyGen.", prompt, "Một video nói chuyện có đoạn so sánh hoặc quy trình; 2 màu thương hiệu nếu có.", "Video xen kẽ talking-head và lớp phủ infographic trắng đa dạng, đúng nội dung.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='cap-do-1-khung-don'").fetchone()["id"]
+    prompt = """Video dài của tôi đang ở input/. Cắt video này thành short, Cấp độ 1:
+- Quét toàn bộ, tự tìm và cắt ra các đoạn hay nhất (mở-thân-kết trọn vẹn, không cắt giữa ý).
+- Mỗi đoạn crop khung đơn 9:16 bám sát mặt người nói, không cắt đầu.
+- Áp cắt gọn khoảng lặng + thumbnail mở đầu + phụ đề động cho từng đoạn.
+- Số lượng/độ dài mong muốn (nếu có): [điền, không có thì để AI tự ước theo độ dài video gốc, thường 5-8 đoạn].
+- Ưu tiên tìm đoạn nói về (nếu có): [điền mô tả cụ thể, không có thì bỏ qua].
+
+Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết các file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa video dài vào, mô tả đoạn muốn ưu tiên nếu có
+Bấm Chép câu nhờ việc mẫu, điền mô tả đoạn muốn tìm nếu có, dán cùng video vào cuộc trò chuyện.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+
+Bước 4 — Nhận nhiều file, chọn short ưng nhất
+Các file nằm trong output/, đặt tên theo thứ tự điểm số giảm dần. Xem lần lượt, kiểm khung có bám đúng mặt không."""
+    notes = "Video càng dài, bước quét càng lâu — video 1 giờ có thể mất 10-20 phút để ra hết short. Đoạn nào crop lệch mặt thì nhắn rõ short cần canh lại, không cần làm lại cả lô."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"AI quét video dài, tìm đoạn hay nhất, tạo short dọc 9:16 bám mặt, có thumbnail và phụ đề."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video dài 20–60 phút; mô tả chủ đề cần ưu tiên nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 video dài thành bộ short đăng dần trong tuần\n\n1. Chọn 1 video dài 20-60 phút\n2. Làm theo 3 bước trên\n3. Xem hết các short ra được, xếp theo mức độ ưng ý\n4. Lên lịch đăng dần mỗi ngày 1 short\n\nXong sẽ có: 5-8 file short 9:16 riêng biệt, mỗi file là 1 đoạn trọn vẹn ý, khung luôn bám đúng mặt người nói, có thumbnail và phụ đề."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("AI tự tìm đoạn hay nhất trong video dài, cắt thành nhiều short 9:16 bám sát mặt người nói", "Đưa 1 video dài vào — AI tự quét toàn bộ, tìm và cắt ra nhiều đoạn hay nhất thành các short 9:16 riêng biệt, khung luôn bám sát mặt người nói.", prompt, "Một video dài 20–60 phút; chủ đề ưu tiên nếu có.", "5–8 short dọc riêng biệt có thumbnail, phụ đề và khung bám mặt.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

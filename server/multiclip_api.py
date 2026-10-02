@@ -655,6 +655,29 @@ Mở file trong output/, bật nhạc to lên nghe kỹ: mỗi lần đổi cả
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Ghép nhiều clip rời rạc theo beat nhạc, zoom theo nhịp và bộ lọc màu điện ảnh nhất quán."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"5–10 clip ngắn và một bài nhạc free-license hoặc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Ghép 5-10 clip thành 1 video theo nhạc\n\n1. Chọn 5-10 clip ngắn và 1 bài nhạc free-license hoặc bạn có quyền dùng\n2. Làm theo 3 bước trên\n3. Nghe lại với âm lượng to, kiểm nhịp chuyển clip có khớp beat không\n4. Đăng thử lên kênh trend\n\nXong sẽ có: 1 video liền mạch, mỗi lần đổi clip rơi đúng nhịp nhạc, clip ấn tượng nhất nằm ở đoạn cao trào, màu sắc nhất quán cả video."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nhiều clip rời rạc tự ghép liền mạch, mỗi lần chuyển cảnh rơi đúng nhịp beat của nhạc", "Đưa nhiều clip rời rạc + 1 bài nhạc vào — AI ghép lại thành 1 video liền mạch, mỗi lần chuyển clip rơi đúng nhịp beat của nhạc, kèm zoom theo nhịp và bộ lọc màu điện ảnh.", prompt, "5–10 clip và một bài nhạc bạn có quyền dùng.", "Video dọc liền mạch với chuyển cảnh đúng beat và màu sắc nhất quán.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='multiclip-1-video-highlight'").fetchone()["id"]
+    prompt = """Video dài của tôi đang ở input/, nhạc ở assets/music/ (hoặc gợi ý giúp tôi nếu chưa có). Cắt highlight từ video này ghép theo nhạc:
+- Tự chia video thành các đoạn ứng viên theo điểm chuyển cảnh, chấm điểm chọn ra đoạn đẹp/ấn tượng/đa dạng nhất.
+- Ghép các đoạn đã chọn khớp đúng nhịp (beat) nhạc, đoạn đẹp nhất đặt vào đoạn cao trào.
+- Thêm zoom giật theo nhịp, bộ lọc màu điện ảnh, crop dọc nếu tôi cần xuất 9:16.
+- Độ dài thành phẩm mong muốn (nếu có): [điền 15s/20s/30s/trọn bài, không có thì để AI tự ước theo độ dài nhạc].
+
+Nếu máy chưa có ffmpeg/librosa/Node thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa video dài và nhạc vào
+Đưa 1 video dài vào input/, đưa nhạc vào assets/music/ hoặc nhờ AI gợi ý nhạc free-license. Dán câu nhờ việc mẫu.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/thư viện phân tích nhạc (librosa)/Node.
+
+Bước 4 — Nhận file, kiểm độ đa dạng của các đoạn được chọn
+Mở file trong output/, kiểm các đoạn được chọn có đủ đa dạng góc quay không và đoạn đẹp nhất có nằm ở cao trào nhạc không."""
+    notes = "Nhạc đang trend trên TikTok/Reels thường có bản quyền — tự tải file từ nguồn bạn có quyền dùng. Muốn đổi đoạn nào thì nhắn cụ thể thời điểm cần thay, không cần làm lại từ đầu."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tự chọn các đoạn đẹp/ấn tượng từ một video dài, ghép theo nhạc thành video quảng cáo ngắn."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video quay liên tục ít nhất 2–3 phút và nhạc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Biến 1 video quay dài thành video quảng cáo ngắn\n\n1. Chọn video quay liên tục dài ít nhất 2-3 phút\n2. Chọn nhạc free-license hoặc bạn có quyền dùng\n3. Làm theo 3 bước trên\n4. So sánh với việc tự cắt tay\n\nXong sẽ có: 1 video ngắn 15-30s, các đoạn được chọn đa dạng góc quay, khớp đúng nhịp nhạc, đoạn ấn tượng nhất rơi vào cao trào."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Chỉ 1 video dài duy nhất, AI tự chọn đoạn ấn tượng nhất rồi ghép theo nhạc như video quảng cáo", "Chỉ 1 video dài duy nhất — AI tự quét, chọn ra các đoạn đẹp/ấn tượng nhất, cắt rời rồi ghép đúng nhịp nhạc thành video ngắn kiểu quảng cáo.", prompt, "Một video dài và nhạc bạn có quyền dùng.", "Video highlight 15–30 giây với các đoạn đa dạng, khớp beat và cao trào nhạc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

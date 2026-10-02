@@ -389,6 +389,32 @@ Thấy phần khác của ảnh bị đổi dù không yêu cầu thì nhắn l�
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh có watermark, logo chìm, chữ thừa hoặc vật thể cần xoá. Ghi chính xác vị trí và mô tả vùng cần xoá."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Xoá một watermark hoặc logo chìm khỏi ảnh sản phẩm để đăng bán lại\n\n1. Tìm một ảnh có watermark, logo chìm hoặc chữ thừa cần xoá\n2. Làm theo 3 bước trên, mô tả càng chính xác vị trí càng tốt\n3. Phóng to kiểm cả vùng vừa xoá lẫn phần còn lại của ảnh\n4. Đạt yêu cầu thì lưu lại dùng, không thì thử lại với mô tả rõ hơn\n\nXong sẽ có: Ảnh không còn dấu vết watermark/logo ở đúng vị trí đã xoá, phần còn lại của ảnh giữ nguyên như gốc, không lộ vết chỉnh sửa khi phóng to."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xoá logo chìm, chữ thừa, người lạ khỏi ảnh mà không để lại vết", "Xoá watermark, logo chìm, người lạ hoặc chữ thừa khỏi ảnh mà không để lại vết — làm ngay trên ChatGPT hoặc Gemini, không cần cài gì.", prompt, "Một ảnh và mô tả chính xác thứ cần xoá cùng vị trí.", "Ảnh đã xoá đúng vùng cần xoá, phần còn lại giữ nguyên.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/Sanster/IOPaint", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='chinh-sua-anh'").fetchone()["id"]
+    prompt = """Làm đẹp tấm ảnh chân dung này giúp tôi.
+
+Yêu cầu bắt buộc, quan trọng nhất xếp trước:
+- GIỮ ĐÚNG KHUÔN MẶT NGƯỜI TRONG ẢNH. Vẫn phải nhận ra là đúng người đó. Không làm trẻ ra, không đổi dáng mũi/mắt/miệng, không đổi kiểu tóc. Đây là yêu cầu số một, quan trọng hơn việc ảnh có đẹp hay không.
+- Làm rõ nét phần bị mờ, khử nhiễu hạt.
+- Cân bằng lại ánh sáng nếu ảnh thiếu sáng, khử ám vàng nếu ảnh bị ngả màu.
+- Làm mịn da ở mức VỪA PHẢI, vẫn thấy được kết cấu da thật. Đừng làm phẳng lì như tượng sáp.
+- Giữ nguyên bối cảnh phía sau, đừng thay nền.
+- Không thêm trang điểm, không thêm hiệu ứng, không thêm watermark.
+
+Làm xong, đặt ảnh mới cạnh ảnh gốc và nói cho tôi biết bạn đã đổi những gì trên khuôn mặt."""
+    steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được việc này.
+
+Bước 2 — Tải ảnh lên rồi dán câu lệnh
+Bấm biểu tượng kẹp giấy để tải ảnh lên. Rồi bấm nút Chép ở đầu trang, dán câu lệnh vào, gửi.
+
+Bước 3 — Soi kỹ khuôn mặt trước khi dùng
+Phóng to phần mặt, đặt cạnh ảnh gốc mà so. Nhìn kỹ dáng mũi, khoảng cách hai mắt, nếp cười — đây là ba chỗ máy hay đổi nhất mà nhìn lướt không thấy."""
+    notes = """Ảnh thờ, ảnh gia đình, ảnh hồ sơ xin việc — những ảnh BẮT BUỘC phải đúng mặt — thì đừng dùng cách này. Chat AI vẽ lại khuôn mặt nên rất hay ra người khác.
+
+Thấy khác người thì nhắn lại: 'Ảnh này ra người khác rồi. Làm lại, ưu tiên giữ đúng khuôn mặt gốc, chấp nhận ảnh kém đẹp hơn.'"""
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh chân dung cần làm rõ nét, cân sáng hoặc làm mịn da. Với ảnh bắt buộc đúng mặt, dùng dây chuyền cài về máy thay vì Chat AI."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cứu một ảnh chân dung mờ trong điện thoại thành ảnh dùng được\n\n1. Chọn một ảnh chân dung bị mờ hoặc thiếu sáng\n2. Làm theo 3 bước trên\n3. Đặt ảnh mới cạnh ảnh gốc, phóng to phần mặt mà so\n4. Vẫn đúng người và nét hơn hẳn thì lưu lại dùng\n\nXong sẽ có: Ảnh nét hơn, sáng hơn, da mịn vừa phải mà vẫn nhận ra đúng người — không thành một gương mặt lạ."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nét, đẹp mặt mà vẫn đúng người thật, cân màu, mịn da — sáu bước một lượt", "Làm đẹp ảnh chân dung ngay trên ChatGPT hoặc Gemini, không cần cài gì. Cần GIỮ ĐÚNG khuôn mặt thật thì cài dây chuyền 6 bước về máy, vì chat AI hay vẽ ra người khác.", prompt, "Một ảnh chân dung bị mờ, thiếu sáng hoặc cần cân màu.", "Ảnh nét hơn, sáng hơn và da mịn vừa phải, vẫn nhận ra đúng người.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/sczhou/CodeFormer", skill_id))
+
 
 initialize_database()
 

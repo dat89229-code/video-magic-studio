@@ -845,6 +845,32 @@ Kiểm hook 2 giây đầu, chữ tiếng Việt và tính phù hợp của medi
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Dựng video dọc 9:16 theo công thức tin tức/review/giới thiệu, hook 2 giây đầu, media thật và phụ đề karaoke tiếng Việt chuẩn."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ý tưởng, văn bản, URL hoặc ảnh tham chiếu; ảnh/video thật liên quan nếu bạn có sẵn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng một video viral 45 giây từ một chủ đề bạn đang quan tâm\\n\\n1. Chọn chủ đề tin tức/review/giới thiệu có ảnh hoặc video thật liên quan\\n2. Làm theo các bước trên\\n3. Xem contact sheet trước khi xuất: hook, chữ tiếng Việt, media\\n4. Xuất MP4 và xem lại trên điện thoại trước khi đăng\\n\\nXong sẽ có: Một video dọc 9:16 có hook rõ trong 2 giây đầu, phần lớn hình ảnh là media thật, phụ đề karaoke khớp lời và chữ tiếng Việt không lỗi dấu."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tạo video dọc viral từ ý tưởng hoặc tư liệu thật, có hook, phụ đề karaoke và bản MP4 hoàn chỉnh", "Đưa ý tưởng, văn bản, URL hoặc ảnh tham chiếu — AI chọn cấu trúc phù hợp, dùng media thật, dựng preview 9:16 để bạn duyệt rồi mới xuất MP4.", prompt, "Ý tưởng/văn bản/URL/ảnh tham chiếu và media thật liên quan nếu có.", "Video 9:16 MP4 có hook, media thật, phụ đề karaoke khớp lời và chữ tiếng Việt đúng dấu.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org/", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='reel-facebook-viral'").fetchone()["id"]
+    prompt = """Làm Reel Facebook cho tôi.
+Kênh mẫu để học cấu trúc: [link kênh mẫu].
+Fanpage sẽ đăng: [link fanpage].
+Thư mục làm việc đặt ở: [đường dẫn thư mục].
+- Học cấu trúc của kênh mẫu (chủ đề, hook, mật độ chữ, độ dài caption) nhưng KHÔNG sao chép câu chữ, danh tính hay tư liệu của họ.
+- Dựng kho làm việc, mở các thư mục để tôi bỏ video/nhạc/logo vào, rồi làm tiếp.
+- Nội dung chữ trên Reel: [dán nội dung đã duyệt, giữ nguyên từng chữ — hoặc ghi "hãy soạn bản nháp cho tôi xem trước"].
+- Dựng Reel 9:16, kiểm tra xem trước ở nhiều mốc thời gian, tự sửa nếu chữ tràn hay logo che chủ thể.
+- Cho tôi xem video + caption. KHÔNG đăng khi tôi chưa nói rõ "Duyệt".
+Nếu máy chưa có ffmpeg/Python thì tự cài trước. Không đọc hay lưu mật khẩu/OTP của tôi."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Skill này cần AI có thể chạy công cụ dựng video thực tế trên máy.
+
+Bước 2 — Đưa kênh mẫu, fanpage và bỏ tư liệu vào kho
+Điền link kênh mẫu và fanpage. AI dựng kho làm việc với ba thư mục video gốc, nhạc nền, logo để bạn bỏ tư liệu của mình vào.
+
+Bước 3 — Duyệt nội dung và xem Reel AI dựng
+Đưa nội dung chữ đã duyệt hoặc yêu cầu bản nháp. AI dựng Reel, xem preview ở 25%/50%/75% thời lượng, sửa lỗi chữ tràn hoặc logo che chủ thể trước khi đưa bạn xem.
+
+Bước 4 — Xác nhận để AI đăng hoặc lên lịch
+AI chuẩn bị tải Reel, caption và giờ trống; dừng lại với bản tóm tắt trang, tên file, đầu caption, ngày giờ. Chỉ bấm khi bạn nói rõ Duyệt hoặc Lên lịch."""
+    notes = "Chỉ dùng nhạc và video bạn có quyền sử dụng. Lời duyệt cho video cũ không có giá trị cho video mới; AI phải xin xác nhận lại cho từng Reel và không tự đăng trùng khi không chắc giao dịch trước đã thành công."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Học cấu trúc kênh mẫu, dựng Reel dọc 9:16 từ kho video của bạn, thêm chữ cố định/nhạc nền, kiểm preview và chuẩn bị đăng hoặc hẹn lịch sau duyệt."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link kênh mẫu, link fanpage, thư mục làm việc, video/nhạc/logo bạn có quyền dùng và nội dung chữ đã duyệt."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng và hẹn giờ đăng một Reel đầu tiên\\n\\n1. Chuẩn bị 2-3 video ngắn, một bài nhạc có quyền dùng và một đoạn chữ ngắn đã duyệt\\n2. Làm theo các bước trên\\n3. Xem Reel trên điện thoại: chữ có đọc được, logo có che gì không\\n4. Hẹn giờ đăng và kiểm Reel xuất hiện trong danh sách bài đã hẹn\\n\\nXong sẽ có: Một Reel 9:16 khoảng 20 giây có chữ cố định rõ, nhạc nền, đã qua bạn duyệt và nằm trong lịch đăng fanpage; kho ghi lại tư liệu đã dùng."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xây quy trình Reel Facebook từ kho tư liệu, có preview và hẹn lịch đăng sau khi bạn duyệt", "Đưa kênh mẫu, fanpage và tư liệu của bạn — AI học cấu trúc, dựng Reel 9:16, kiểm preview rồi chỉ chuẩn bị đăng/lên lịch khi bạn xác nhận.", prompt, "Link kênh mẫu, fanpage, thư mục làm việc, video/nhạc/logo được phép dùng và nội dung chữ.", "Reel 9:16 với caption, preview đã kiểm, sẵn sàng đăng hoặc đã hẹn lịch sau xác nhận.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org/", skill_id))
+
 
 initialize_database()
 

@@ -18,7 +18,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const API = (
   (import.meta.env.VITE_API_URL ||
@@ -303,18 +303,38 @@ coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-v4.png";
 coverBySkill["poster-san-pham"] = "/skill-poster-san-pham-v3.png";
 coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v3.png";
 coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v3.png";
-const shirtBrandPosition: Record<string, CSSProperties> = {
-  "thuong-hieu-ca-nhan": { "--shirt-brand-x": "69%", "--shirt-brand-y": "63%" } as CSSProperties,
-  "poster-san-pham": { "--shirt-brand-x": "64%", "--shirt-brand-y": "63%" } as CSSProperties,
-  "xoa-nen-anh": { "--shirt-brand-x": "58%", "--shirt-brand-y": "62%" } as CSSProperties,
-  "xoa-logo-anh": { "--shirt-brand-x": "72%", "--shirt-brand-y": "62%" } as CSSProperties,
-};
 const coverTextBySkill: Record<string, string> = {
   "thuong-hieu-ca-nhan": "ẢNH\nTHƯƠNG HIỆU",
   "poster-san-pham": "POSTER\nSẢN PHẨM",
   "xoa-nen-anh": "TÁCH NỀN\nTRONG SUỐT",
   "xoa-logo-anh": "XÓA VẬT THỂ\nKHỎI ẢNH",
+  "chinh-sua-anh": "CHỈNH SỬA\nẢNH",
+  "tang-chat-luong-4k": "NÂNG ẢNH\n4K",
+  "multishot": "MULTISHOT",
+  "hoan-doi-nhan-vat": "HOÁN ĐỔI\nNHÂN VẬT",
+  "dang-1-thoai-thumbnail": "TALKING-HEAD\nCƠ BẢN",
+  "dang-2-hieu-ung-cao-cap": "HIỆU ỨNG\nCAO CẤP",
+  "dang-3-huong-dan-toi-gian": "HƯỚNG DẪN\nTỐI GIẢN",
+  "dang-4-infographic-trang": "VIDEO\nINFOGRAPHIC",
+  "cap-do-1-khung-don": "VIDEO DÀI\n→ SHORT",
+  "cap-do-2-postcard-2-nguoi": "PODCAST\n→ SHORT",
+  "multiclip-ghep-nhac-trend": "CLIP + NHẠC\nTREND",
+  "multiclip-1-video-highlight": "CẮT HIGHLIGHT\nTHEO NHẠC",
+  "edit-video-zoom": "EDIT ZOOM\nTỰ ĐỘNG",
+  "video-tu-dong-google-flow": "VIDEO AI\nVỚI FLOW",
+  "tao-video-viral": "VIDEO VIRAL\n9:16",
+  "reel-facebook-viral": "FACEBOOK REELS\nVIRAL",
+  "subagent-cham-soc": "AGENT\nCHĂM SÓC",
+  "subagent-nghien-cuu": "AGENT\nNGHIÊN CỨU",
+  "seo-video-youtube": "SEO VIDEO\nYOUTUBE",
+  "dang-bai-tu-dong-da-kenh": "ĐĂNG BÀI\nĐA KÊNH",
 };
+const lockedReferenceCovers = new Set([
+  "thuong-hieu-ca-nhan",
+  "poster-san-pham",
+  "xoa-nen-anh",
+  "xoa-logo-anh",
+]);
 
 function Index() {
   const [page, setPage] = useState<"home" | "skills" | "detail" | "mine" | "combo" | "studio">(
@@ -824,33 +844,20 @@ function Card({
 }) {
   const colors = ["#f5dbe3", "#f0cbd7", "#ead8ef", "#f4e2d4", "#ebd4db"];
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
-  const isMasterCoverTemplate = skill.slug === "thuong-hieu-ca-nhan";
+  const isMasterCoverTemplate = lockedReferenceCovers.has(skill.slug);
+  const isRefinedCover = !isMasterCoverTemplate;
   return (
     <article className={`skill-card ${skill.hall === "Sửa ảnh AI" ? "photo-skill-card" : ""}`}>
       <div
-        className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${skill.hall !== "Sửa ảnh AI" && coverBySkill[skill.slug] ? "with-shirt-brand" : ""}`}
+        className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${isRefinedCover ? "cover-system" : ""}`}
         style={{ background: `linear-gradient(135deg,${colors[index % 5]},#fffaf6)` }}
       >
         <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
         <div className="skill-cover-shade" />
-        {coverBySkill[skill.slug] ? (
-          <span className="shirt-brand" style={shirtBrandPosition[skill.slug]}>
-            MASTER CLIP
-          </span>
-        ) : null}
         <span>{skill.hall}</span>
         <strong className={`cover-title ${isMasterCoverTemplate ? "cover-title--master-template" : ""}`}>
           {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-${lineIndex}`}>{line}</span>)}
         </strong>
-        {skill.hall !== "Sửa ảnh AI" && <div className="cover-mark">
-          {skill.hall === "Edit Video" || skill.hall === "Video AI/Viral" ? (
-            <Film size={32} />
-          ) : skill.hall === "Marketing & Social Media" ? (
-            <Wand2 size={32} />
-          ) : (
-            <Sparkles size={32} />
-          )}
-        </div>}
       </div>
       <div className="skill-content">
         <div className="skill-meta">

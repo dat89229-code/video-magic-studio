@@ -760,7 +760,8 @@ em {
   aspect-ratio: 1.72 / 1;
 }
 .skill-cover {
-  height: 138px;
+  height: auto;
+  aspect-ratio: 1.72 / 1;
   position: relative;
   padding: 13px;
   overflow: hidden;
@@ -780,6 +781,41 @@ em {
     linear-gradient(90deg, #f9dce4a8, transparent 72%),
     linear-gradient(0deg, #40202f35, transparent 62%);
 }
+.cover-system > img {
+  filter: brightness(1.03) contrast(1.09) saturate(1.04);
+}
+.cover-system .skill-cover-shade {
+  background:
+    linear-gradient(0deg, rgba(20, 12, 15, 0.78) 0%, rgba(20, 12, 15, 0.20) 44%, transparent 70%),
+    linear-gradient(90deg, rgba(20, 12, 15, 0.22), transparent 52%);
+}
+.cover-system .cover-title {
+  left: 16px;
+  right: 14px;
+  bottom: 15px;
+  max-width: 72%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: #fffdfb;
+  background: transparent;
+  font-family: "Arial Black", Impact, Arial, sans-serif;
+  font-size: clamp(21px, 2.5vw, 38px);
+  font-weight: 950;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+  white-space: normal;
+  text-shadow: 0 3px 0 #2e1820, 2px 0 0 #2e1820, -2px 0 0 #2e1820, 0 -1px 0 #2e1820, 0 7px 14px rgba(15, 8, 10, 0.52);
+}
+.cover-system .cover-title span {
+  display: block;
+  color: #fffdfb;
+}
+.cover-system .cover-title span + span {
+  color: #ff9cba;
+}
 .photo-skill-cover .skill-cover-shade {
   background:
     linear-gradient(0deg, rgba(25, 18, 20, 0.78) 0%, rgba(25, 18, 20, 0.24) 37%, transparent 65%),
@@ -790,31 +826,6 @@ em {
 }
 .shirt-brand {
   display: none;
-}
-.skill-cover.with-shirt-brand .shirt-brand {
-  display: block;
-  position: absolute;
-  z-index: 2;
-  left: var(--shirt-brand-x, 66%);
-  top: var(--shirt-brand-y, 63%);
-  transform: translate(-50%, -50%) rotate(-3deg);
-  width: 47%;
-  padding: 0;
-  border-radius: 0;
-  color: #f7cf6d;
-  font-family: "Inter", sans-serif;
-  font-size: clamp(13px, 1.65vw, 20px);
-  font-weight: 850;
-  letter-spacing: 0.035em;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  background: linear-gradient(180deg, #fff3b1 0%, #f5cb60 40%, #ba7620 72%, #fff1a2 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 1px 1px #6f421344, 0 0 7px #ffe8a455;
-  pointer-events: none;
 }
 .skill-cover:after {
   content: "";
@@ -1214,7 +1225,7 @@ em {
   overflow: hidden;
 }
 .detail-cover > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
-.detail-cover-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #5d263747, transparent 70%), linear-gradient(0deg, #33101a5f, transparent 65%); }
+.detail-cover-shade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(20, 12, 15, .72), transparent 66%), linear-gradient(90deg, rgba(20, 12, 15, .18), transparent 62%); }
 .photo-detail-cover .detail-cover-shade {
   background:
     linear-gradient(0deg, rgba(25, 18, 20, 0.8) 0%, rgba(25, 18, 20, 0.2) 42%, transparent 66%),

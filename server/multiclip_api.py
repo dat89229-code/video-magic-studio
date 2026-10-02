@@ -561,6 +561,29 @@ Mở file trong output/, kiểm nhạc có đủ nhỏ khi bạn đang nói khô
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tiêu đề trắng lớn, các bước hiện dần theo nội dung, CTA tự nhiên và nhạc dẫn cảm xúc."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video chia sẻ kiến thức/hướng dẫn dài 1–3 phút và câu CTA nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video hướng dẫn/chia sẻ thành bản tối giản chuyên nghiệp\n\n1. Chọn 1 video bạn chia sẻ kiến thức/hướng dẫn, dài 1-3 phút\n2. Nghĩ trước 1 câu CTA muốn dùng (không có cũng được)\n3. Làm theo 3 bước trên\n4. Đăng thử, so cảm giác sạch, sang với video có nhiều hiệu ứng\n\nXong sẽ có: 1 video khung sạch: tiêu đề trắng lớn rõ ràng, các bước hiện đúng nhịp nội dung, CTA nghe tự nhiên, nhạc dẫn cảm xúc mà không đè lời nói."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tiêu đề trắng lớn, các bước hiện dần theo nội dung, nhạc dẫn dắt cảm xúc — sạch, sang", "Đưa 1 video hướng dẫn/chia sẻ vào — AI dựng bản tối giản kiểu content coach cao cấp: tiêu đề trắng lớn, các bước hiện dần, CTA khéo léo, nhạc dẫn cảm xúc và zoom cực nhẹ.", prompt, "Một video hướng dẫn/chia sẻ dài 1–3 phút; CTA nếu có.", "Video tối giản, sạch, sang, có tiêu đề, các bước, CTA và nhạc đúng nhịp.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-4-infographic-trang'").fetchone()["id"]
+    prompt = """Video của tôi đang ở input/. Edit Dạng 4 cho video này:
+- Vẫn cắt gọn khoảng lặng + phụ đề động như bản cơ bản.
+- Xen kẽ talking-head với lớp phủ infographic trắng/sáng toàn màn hình — AI tự đọc nội dung, tự chọn khối phù hợp (tiêu đề hero, thẻ so sánh VS, sơ đồ bước, danh sách, số liệu) và tự biến tấu thiết kế mỗi lần khác nhau.
+- Áp bộ lọc màu pro mặc định (sáng nhẹ, tương phản, nịnh da, làm nét).
+- Tông màu thương hiệu của tôi (nếu có): [điền 2 màu, không có thì để AI dùng đỏ+navy mặc định].
+
+Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa video vào, nói rõ tông màu nếu có
+Bấm Chép câu nhờ việc mẫu, điền 2 tông màu thương hiệu nếu có, dán cùng video vào cuộc trò chuyện.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+
+Bước 4 — Nhận file, kiểm độ đa dạng của infographic
+Mở file trong output/, kiểm lớp phủ infographic có khác kiểu nhau không, nội dung có đúng đoạn đang nói không và màu có đúng thương hiệu không."""
+    notes = "Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'lớp phủ ở giây 20 đang lặp kiểu với lớp ở giây 5, đổi sang dạng khác'."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Lớp phủ infographic trắng do AI tự thiết kế: tiêu đề hero, thẻ so sánh VS, sơ đồ bước, danh sách và số liệu."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện có phần so sánh hoặc quy trình nhiều bước; 2 màu thương hiệu nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản infographic kiểu HeyGen\n\n1. Chọn video có đoạn so sánh hoặc quy trình nhiều bước\n2. Làm theo 3 bước trên\n3. Kiểm các lớp phủ có đa dạng bố cục không\n4. Đăng thử, so cảm giác chuyên nghiệp với video gốc\n\nXong sẽ có: 1 video xen kẽ talking-head và lớp phủ infographic trắng đa dạng kiểu, màu sắc sáng/sạch, chất lượng hình ảnh nét và nịnh da hơn bản gốc."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xen kẽ lớp phủ infographic trắng do AI tự thiết kế, phong cách chuyên nghiệp kiểu HeyGen", "Đưa 1 video nói chuyện vào — AI tự thiết kế và xen kẽ các lớp phủ infographic trắng toàn màn hình kèm bộ lọc màu pro, phong cách chuyên nghiệp kiểu HeyGen.", prompt, "Một video nói chuyện có đoạn so sánh hoặc quy trình; 2 màu thương hiệu nếu có.", "Video xen kẽ talking-head và lớp phủ infographic trắng đa dạng, đúng nội dung.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

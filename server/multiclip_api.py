@@ -726,6 +726,33 @@ AI kiểm 3 mốc đầu/giữa/cuối. Xem toàn bộ, để ý mặt/tay/bối
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Workflow tự mở Google Flow, dùng avatar/bối cảnh đã lưu và tạo TVC điện ảnh 10 giây không thoại."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ảnh avatar/nhân vật rõ mặt, ảnh bối cảnh nếu cần và quyền truy cập Google Flow của bạn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 1 TVC 10 giây đầu tiên với avatar của bạn\n\n1. Chuẩn bị ảnh avatar/nhân vật rõ mặt và ảnh bối cảnh, tải lên Flow\n2. Nghĩ 1 ý tưởng ngắn: chủ thể làm gì, ở đâu, không khí thế nào\n3. Làm theo 3 bước trên\n4. Xem lại video, so đối chiếu mặt/bối cảnh với ảnh gốc\n\nXong sẽ có: 1 video dọc 9:16, 10 giây, không thoại, đúng avatar và bối cảnh đã chọn, chuyển động mượt, kết thúc tự nhiên."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nhập kịch bản, Google Flow tự dựng video AI hoàn chỉnh, không cần quay dựng thủ công", "Nói 1 câu ý tưởng — AI tự mở Google Flow, gắn avatar/nhân vật và bối cảnh đã lưu, soạn prompt điện ảnh 10 giây không thoại, tạo và kiểm tra video.", prompt, "Avatar/nhân vật, bối cảnh và ý tưởng TVC ngắn.", "Video TVC dọc 9:16, 10 giây, không thoại, kiểm tra 3 mốc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://flow.google.com/", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='subagent-cham-soc'").fetchone()["id"]
+    prompt = """Trang của tôi: [link Facebook Page]. Vào Meta Business Suite, mở bài viết [link bài viết hoặc \"bài mới nhất\"], trả lời hết bình luận trong [khoảng thời gian, ví dụ \"2 ngày qua\"] chưa có phản hồi từ trang.
+
+Nguyên tắc bắt buộc:
+- Mỗi câu trả lời một kiểu khác nhau thật sự — không copy khuôn câu, độ dài dao động tự nhiên (có câu chỉ vài từ, có câu dài hơn).
+- Câu hỏi thật thì trả lời đúng trọng tâm (tra caption bài viết nếu cần); lời khen/xin tài liệu thì trả ngắn gọn, thân tình.
+- Không bịa link, giá, chính sách cụ thể nếu không chắc — trả lời né nhẹ, mời nhắn riêng.
+- Không tự nhắn tin riêng (Messenger/DM) trừ khi tôi yêu cầu.
+- Không đăng 2 câu giống nhau dưới cùng 1 bình luận.
+- Bỏ qua, để tôi tự xử lý: bình luận mâu thuẫn/cà khịa giữa 2 người, hoặc câu hỏi cần thông tin thật mà không xác minh được.
+
+Xử lý xong báo tôi: đã trả lời bao nhiêu bình luận, bỏ qua bao nhiêu và vì sao."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+
+Bước 2 — Đưa link trang + phạm vi cần xử lý
+Điền link trang và khoảng thời gian hoặc đúng bài viết cụ thể. Nói rõ thông tin AI không được tự bịa nếu không chắc.
+
+Bước 3 — Để AI tự trả lời từng bình luận
+AI mở từng bình luận, gõ và gửi câu trả lời trên giao diện trong phạm vi bạn đã chỉ định.
+
+Bước 4 — Kiểm lại và xử lý phần AI bỏ qua
+AI báo danh sách đã trả lời và danh sách bỏ qua kèm lý do. Bạn tự xử lý phần cần quyết định."""
+    notes = "Thấy câu trả lời nào chưa ưng thì nhắn ngay trong CÙNG cuộc trò chuyện để AI sửa lại. Không để AI tự trả lời phần mâu thuẫn/cà khịa hoặc câu hỏi cần thông tin thật mà không xác minh được."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Quy trình trả lời bình luận Facebook/YouTube tự nhiên, đa dạng, không bịa thông tin và biết bỏ qua đúng lúc."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link Facebook Page, link bài viết hoặc phạm vi thời gian, cùng các thông tin AI không được tự bịa."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Trả lời thử một loạt bình luận thật trên trang của bạn\n\n1. Chọn 1 bài viết đang có nhiều bình luận chưa trả lời\n2. Làm theo 3 bước trên\n3. Đọc lại 5-10 câu trả lời đã gửi, kiểm xem có câu nào giống nhau không\n4. Xử lý tay phần AI báo bỏ qua\n\nXong sẽ có: Các bình luận trong phạm vi đã có phản hồi từ trang, mỗi câu một kiểu khác nhau thật sự, không có thông tin bịa, không có 2 câu giống hệt nhau dưới cùng 1 bình luận."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Trả lời bình luận Facebook/YouTube tự nhiên, đa dạng, không rập khuôn, không bịa thông tin", "AI tự vào Facebook/YouTube trả lời một loạt bình luận thay bạn — mỗi câu một kiểu, tự nhiên, không bịa thông tin khi không chắc và biết bỏ qua đúng lúc.", prompt, "Link trang, link bài viết hoặc phạm vi bình luận, cùng giới hạn thông tin được phép trả lời.", "Báo cáo số bình luận đã trả lời và các bình luận được bỏ qua kèm lý do.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://business.facebook.com/", skill_id))
+
 
 initialize_database()
 

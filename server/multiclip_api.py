@@ -703,6 +703,29 @@ Các file trong output/ kèm titles-descriptions.md và series-overview.md. Xem 
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Đọc transcript Zoom, lập outline, loại rác kỹ thuật và chia thành chuỗi video 16:9 có tiêu đề, mô tả và chương mục."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một buổi ghi Zoom/đào tạo/coaching từ 45 phút trở lên và tên chuỗi nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 buổi Zoom thành chuỗi khoá học đăng dần\n\n1. Chọn buổi ghi Zoom dài từ 45 phút trở lên\n2. Làm theo 3 bước trên\n3. Xem hết các phần, kiểm outline có đúng những gì đã nói không\n4. Đăng thử phần 1, hẹn phần 2 theo đúng câu nối đã dựng\n\nXong sẽ có: 1 chuỗi 5 video 16:9, mỗi video có tiêu đề/mô tả/chương mục riêng, nối mạch như một khoá học thật."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Video họp, hội thảo quay bằng Zoom tự cắt gọn, bỏ đoạn chết, dựng thành video hoàn chỉnh", "Đưa 1 buổi ghi Zoom dài vào — AI tự đọc transcript, lập outline, cắt bỏ khoảng lặng/rác kỹ thuật, chia thành chuỗi video 16:9 nối mạch kèm tiêu đề/mô tả/chương mục.", prompt, "Một buổi ghi Zoom dài từ 45 phút và tên chuỗi nếu có.", "Một chuỗi video 16:9 có outline, tiêu đề, mô tả và chương mục riêng.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='video-tu-dong-google-flow'").fetchone()["id"]
+    prompt = """Mở Google Flow cho tôi và tạo 1 TVC: [mô tả ý tưởng của bạn, ví dụ \"tôi và nhân vật chính đi giữa thảo nguyên Mông Cổ lúc hoàng hôn\"].
+
+Dùng đúng avatar/nhân vật và bối cảnh tôi đã lưu (hỏi tôi nếu chưa rõ dùng cái nào).
+
+Giữ đúng cấu hình đã khoá: Thành phần, Omni 1.1 Flash, 9:16, chất lượng cao nhất hiện có, 10 giây, x1, không thoại/không voice-over.
+
+Kiểm tra kỹ 3 mốc đầu/giữa/cuối trước khi cho tôi xem, sửa lại tối đa 1 lần nếu có lỗi rõ."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+
+Bước 2 — Onboarding lần đầu: chọn project + xác nhận avatar/nhân vật
+Tự đăng nhập/chọn hoặc tạo project trong Flow, rồi xác nhận tên avatar/nhân vật. Nếu chưa có avatar/nhân vật trong Flow, tự tải ảnh lên Flow trước.
+
+Bước 3 — Nói ý tưởng, để AI tự mở Flow và tạo
+Điền ý tưởng cụ thể: chủ thể + hành động + bối cảnh. AI soạn prompt, gắn đúng component, kiểm cấu hình rồi tạo x1 để thử nhận diện trước.
+
+Bước 4 — Xem toàn bộ 10 giây, duyệt hoặc yêu cầu sửa
+AI kiểm 3 mốc đầu/giữa/cuối. Xem toàn bộ, để ý mặt/tay/bối cảnh; nếu lỗi rõ thì nêu cụ thể để sửa tối đa một lần."""
+    notes = "Bản web có thể đọc nội dung nhưng không điều khiển Google Flow thật. Mỗi lượt tạo tốn credit Flow thật — chỉ tạo x1 để thử nhận diện trước. Có lỗi rõ thì mô tả chính xác lỗi ở đâu."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Workflow tự mở Google Flow, dùng avatar/bối cảnh đã lưu và tạo TVC điện ảnh 10 giây không thoại."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ảnh avatar/nhân vật rõ mặt, ảnh bối cảnh nếu cần và quyền truy cập Google Flow của bạn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 1 TVC 10 giây đầu tiên với avatar của bạn\n\n1. Chuẩn bị ảnh avatar/nhân vật rõ mặt và ảnh bối cảnh, tải lên Flow\n2. Nghĩ 1 ý tưởng ngắn: chủ thể làm gì, ở đâu, không khí thế nào\n3. Làm theo 3 bước trên\n4. Xem lại video, so đối chiếu mặt/bối cảnh với ảnh gốc\n\nXong sẽ có: 1 video dọc 9:16, 10 giây, không thoại, đúng avatar và bối cảnh đã chọn, chuyển động mượt, kết thúc tự nhiên."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nhập kịch bản, Google Flow tự dựng video AI hoàn chỉnh, không cần quay dựng thủ công", "Nói 1 câu ý tưởng — AI tự mở Google Flow, gắn avatar/nhân vật và bối cảnh đã lưu, soạn prompt điện ảnh 10 giây không thoại, tạo và kiểm tra video.", prompt, "Avatar/nhân vật, bối cảnh và ý tưởng TVC ngắn.", "Video TVC dọc 9:16, 10 giây, không thoại, kiểm tra 3 mốc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://flow.google.com/", skill_id))
+
 
 initialize_database()
 

@@ -514,6 +514,28 @@ Mở file trong thư mục output/, kiểm thumbnail, phụ đề và điểm c�
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Cắt gọn tự nhiên, thumbnail AI và phụ đề động cho video nói chuyện."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện trước camera, dài 1–5 phút; đường dẫn file hoặc file upload."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thật thành short đăng được ngay\n\n1. Chọn 1 video quay cảnh bạn nói chuyện, dài 1-5 phút\n2. Làm theo 4 bước trên\n3. Xem lại kết quả trong output/, kiểm thumbnail, phụ đề, điểm cắt\n4. Đăng thử lên kênh của bạn\n\nXong sẽ có: 1 video dọc 9:16, mở đầu bằng thumbnail đúng nội dung, phụ đề chạy khớp lời, không còn khoảng lặng/từ đệm thừa."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Cắt gọn tự nhiên, mở đầu bằng thumbnail AI tự viết, phụ đề động chạy theo lời nói", "Đưa 1 video nói chuyện trước camera vào — AI tự cắt gọn khoảng lặng/từ đệm, tự viết thumbnail mở đầu, thêm phụ đề động và xuất video dọc 9:16.", prompt, "Một video nói chuyện trước camera, dài 1–5 phút.", "Một video dọc 9:16 có thumbnail mở đầu, phụ đề động và điểm cắt gọn.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-2-hieu-ung-cao-cap'").fetchone()["id"]
+    prompt = """Video của tôi đang ở input/. Edit Dạng 2 cho video này — bản cao cấp nhiều hiệu ứng:
+- Vẫn cắt gọn khoảng lặng + thumbnail mở đầu + phụ đề động như bản cơ bản.
+- Thêm zoom theo nhịp cảm xúc, overlay hoạt hoạ minh hoạ đúng nội dung đang nói, âm thanh phụ trợ (SFX) khớp lúc hiệu ứng xuất hiện, từ khoá đắt nhấn 2 màu, 1 lần crop bám mặt ở giữa video, và 1 hiệu ứng so sánh trước/sau nếu nội dung có kiểu \"thay vì A hãy B\".
+- Màu thương hiệu của tôi (nếu có): [điền màu, không có thì bỏ qua để AI tự chọn].
+
+Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
+    steps = """Bước 1 — Cài Skill vào AI của bạn
+Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Bước 2 — Đưa video vào, nói rõ màu thương hiệu nếu có
+Bấm Chép câu nhờ việc mẫu, điền màu thương hiệu nếu có, dán cùng video vào cuộc trò chuyện.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+
+Bước 4 — Nhận file, kiểm tra 3 chỗ hay lệch
+Mở file trong output/, kiểm overlay có che mặt không, hiệu ứng có dồn dập không và từ khoá nhấn có đúng ý chính không."""
+    notes = "Không có màu riêng cũng không sao — AI tự chọn tông neon+trắng mặc định. Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'overlay ở giây 12 đang che một phần mặt, đẩy xuống thấp hơn'."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện dài 1–3 phút; nếu có, chuẩn bị màu thương hiệu."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản cao cấp có hiệu ứng\n\n1. Chọn 1 video nói chuyện dài 1-3 phút, có ít nhất 1 đoạn kiểu liệt kê hoặc số liệu\n2. Làm theo 3 bước trên\n3. So sánh với bản Dạng 1 (nếu có) — thấy rõ 7 lớp hiệu ứng thêm vào\n4. Đăng thử, theo dõi thời gian xem trung bình có tăng\n\nXong sẽ có: 1 video sinh động: zoom đúng lúc, overlay minh hoạ không che mặt, âm thanh phụ trợ tinh tế, tối đa 1 lần crop-mặt và 1 hiệu ứng so sánh — không bị nhồi nhét."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau", "Đưa 1 video nói chuyện vào — AI dựng bản edit cao cấp: zoom theo cảm xúc, overlay hoạt hoạ, âm thanh phụ trợ, từ khoá nhấn 2 màu, crop bám mặt và so sánh trước/sau.", prompt, "Một video nói chuyện dài 1–3 phút; màu thương hiệu nếu có.", "Video dọc sinh động với các hiệu ứng đúng ngữ cảnh, không che mặt.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
+
 
 initialize_database()
 

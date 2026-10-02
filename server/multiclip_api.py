@@ -463,6 +463,34 @@ Bước 4 — Kiểm tính nhất quán
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính, đủ sáng và không bị che khuất."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 9 góc quay từ một ảnh chân dung của bạn\n\n1. Chọn một ảnh chân dung rõ mặt, đủ sáng\n2. Làm theo 4 bước trên\n3. Đặt 9 tấm cạnh nhau, kiểm trang phục và hướng sáng\n4. Làm lại một lần nữa, lần này thêm chữ 'Video' để xem storyboard khác thế nào\n\nXong sẽ có: Chín tấm nhìn ra ngay là cùng một người, cùng bộ đồ, cùng khoảnh khắc — chỉ khác chỗ đặt máy quay."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Một ảnh ra nhiều góc quay nhất quán, dùng làm keyframe video hoặc storyboard", "Đưa MỘT ảnh, nhận về NHIỀU góc quay của cùng một khoảnh khắc — nhất quán đủ để làm keyframe video. Thêm chữ 'Video' vào câu nhờ thì đổi sang dựng storyboard điện ảnh. Không cài gì.", prompt, "Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính.", "Chín góc quay khác nhau rõ rệt của cùng một khoảnh khắc.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='hoan-doi-nhan-vat'").fetchone()["id"]
+    prompt = """Tôi gửi ảnh nhân vật thương hiệu của tôi. Đây là ảnh neo — nhân vật này phải giữ nguyên nhận diện qua mọi ảnh về sau.
+
+KHOÁ DANH TÍNH, không bao giờ được đổi:
+- Khuôn mặt: đúng người trong ảnh neo, không làm trẻ ra, không đổi dáng mắt/mũi/miệng.
+- Kiểu tóc và màu tóc: đúng như ảnh neo.
+- Trang phục đặc trưng: đúng kiểu, đúng màu như ảnh neo.
+
+ĐƯỢC PHÉP ĐỔI THOẢI MÁI:
+- Bối cảnh, ánh sáng, thời gian trong ngày
+- Tư thế, hướng nhìn, biểu cảm
+- Góc máy, cỡ cảnh, đạo cụ trong tay
+
+Việc tôi cần: đặt nhân vật này vào bối cảnh sau — <ghi bối cảnh bạn muốn>.
+
+Tạo xong, đặt ảnh mới cạnh ảnh neo và tự đánh giá: có nhận ra là cùng một người không? Không giống thì làm lại, đừng đưa tôi tấm sai."""
+    steps = """Bước 1 — Chọn một ảnh neo và giữ mãi
+Chọn tấm ảnh rõ mặt nhất, đủ sáng, nhìn thẳng hoặc hơi nghiêng, thấy được cả kiểu tóc và trang phục đặc trưng. Lưu riêng ra một chỗ.
+
+Bước 2 — Tải ảnh neo lên rồi dán câu lệnh
+Bấm kẹp giấy tải ảnh neo lên. Bấm nút Chép ở đầu trang, dán câu lệnh vào, thay chỗ ngoặc nhọn bằng bối cảnh bạn muốn, rồi gửi.
+
+Bước 3 — So với ảnh neo trước khi dùng
+Đặt ảnh mới cạnh ảnh neo. Soi ba chỗ máy hay đổi nhất: dáng mũi, khoảng cách hai mắt, màu tóc."""
+    notes = "Đây là quyết định dùng mãi. Mỗi lần đổi ảnh neo là nhân vật của bạn đổi mặt, khách hàng sẽ thấy ngay là không nhất quán. Tả bối cảnh càng cụ thể càng tốt. Thấy lệch thì làm lại ngay, đừng dùng tạm."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh neo rõ mặt, tóc và trang phục đặc trưng của nhân vật thương hiệu."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Đưa nhân vật thương hiệu của bạn qua ba bối cảnh khác nhau\n\n1. Chọn ảnh neo cho nhân vật thương hiệu\n2. Làm ba ảnh với ba bối cảnh khác hẳn nhau: trong nhà, ngoài trời, ban đêm\n3. Đặt cả ba cạnh ảnh neo mà so mặt\n4. Cả ba đều nhận ra là một người thì bạn đã có bộ ảnh dùng được\n\nXong sẽ có: Ba ảnh ở ba bối cảnh khác hẳn nhau, nhưng nhìn phát nhận ra ngay là cùng một nhân vật."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Một nhân vật thương hiệu cố định, đặt vào bối cảnh nào cũng vẫn là một người", "Một nhân vật thương hiệu cố định — cùng khuôn mặt, cùng trang phục — xuất hiện ở bối cảnh nào cũng vẫn nhận ra là một người. Không cài gì, chạy thẳng trên AI bạn đang có.", prompt, "Một ảnh neo rõ mặt, tóc và trang phục đặc trưng.", "Ảnh nhân vật nhất quán ở bối cảnh mới.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
+
 
 initialize_database()
 

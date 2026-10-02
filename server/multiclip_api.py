@@ -366,6 +366,29 @@ Chỗ nào chưa đạt thì nhắn tiếp trong cùng cuộc trò chuyện, ví
         ("Xoá phông trong vài giây, ra ảnh nền trong suốt để ghép vào đâu cũng được", "Biến ảnh sản phẩm chụp ở bất kỳ đâu thành ảnh nền trong suốt và ảnh nền trắng chuẩn sàn — làm ngay trên ChatGPT hoặc Gemini bạn đang có, không cài gì, dùng được cả trên điện thoại.", prompt, "Một ảnh sản phẩm cần tách nền.", "Một file PNG nền trong suốt và một ảnh vuông nền trắng #FFFFFF.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/danielgatis/rembg", skill_id),
     )
 
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='xoa-logo-anh'").fetchone()["id"]
+    prompt = """Xoá [mô tả CHÍNH XÁC thứ cần xoá và vị trí, ví dụ: dòng chữ watermark màu trắng mờ ở góc dưới bên phải] khỏi bức ảnh này, vẽ lấp lại chỗ đó bằng đúng những gì lẽ ra phải có ở đó (tiếp tục hoạ tiết/màu nền xung quanh).
+
+Yêu cầu bắt buộc:
+- CHỈ xoá đúng vùng tôi mô tả, GIỮ NGUYÊN 100% mọi phần khác của ảnh — không vẽ lại, không đổi màu, không đổi bố cục chỗ khác.
+- Vùng vừa xoá phải liền mạch với phần ảnh xung quanh, không để lại viền, vết mờ hay khác tông màu.
+- Không thêm watermark hay chữ ký nào khác vào ảnh.
+
+Sau khi xong, phóng to đúng vùng vừa xoá và cho tôi biết có còn thấy vết chỉnh sửa không."""
+    steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được việc này.
+
+Bước 2 — Tải ảnh lên, mô tả CHÍNH XÁC vùng cần xoá
+Bấm biểu tượng kẹp giấy để tải ảnh lên. Điền rõ vị trí và mô tả thứ cần xoá vào câu lệnh (ví dụ 'logo hình tròn màu đỏ ở góc trên bên trái') rồi gửi.
+
+Bước 3 — Phóng to kiểm đúng vùng vừa xoá
+Tải ảnh về, phóng to đúng vùng vừa xoá xem có còn viền, vết mờ hay lệch tông màu không. Kiểm luôn các phần khác của ảnh xem có bị vẽ lại ngoài ý muốn không."""
+    notes = """Mô tả càng chính xác vị trí thì AI càng ít đụng nhầm vào phần khác. Mô tả mơ hồ như 'xoá watermark' mà ảnh có nhiều chữ dễ khiến AI xoá nhầm hoặc vẽ lại cả những phần không cần.
+
+Thấy phần khác của ảnh bị đổi dù không yêu cầu thì nhắn lại: 'Chỉ sửa đúng vùng tôi nói, đừng đụng chỗ khác.' Vẫn không được thì cần chuyển sang cài IOPaint ở cuối trang."""
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh có watermark, logo chìm, chữ thừa hoặc vật thể cần xoá. Ghi chính xác vị trí và mô tả vùng cần xoá."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Xoá một watermark hoặc logo chìm khỏi ảnh sản phẩm để đăng bán lại\n\n1. Tìm một ảnh có watermark, logo chìm hoặc chữ thừa cần xoá\n2. Làm theo 3 bước trên, mô tả càng chính xác vị trí càng tốt\n3. Phóng to kiểm cả vùng vừa xoá lẫn phần còn lại của ảnh\n4. Đạt yêu cầu thì lưu lại dùng, không thì thử lại với mô tả rõ hơn\n\nXong sẽ có: Ảnh không còn dấu vết watermark/logo ở đúng vị trí đã xoá, phần còn lại của ảnh giữ nguyên như gốc, không lộ vết chỉnh sửa khi phóng to."}]
+    database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xoá logo chìm, chữ thừa, người lạ khỏi ảnh mà không để lại vết", "Xoá watermark, logo chìm, người lạ hoặc chữ thừa khỏi ảnh mà không để lại vết — làm ngay trên ChatGPT hoặc Gemini, không cần cài gì.", prompt, "Một ảnh và mô tả chính xác thứ cần xoá cùng vị trí.", "Ảnh đã xoá đúng vùng cần xoá, phần còn lại giữ nguyên.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://github.com/Sanster/IOPaint", skill_id))
+
 
 initialize_database()
 

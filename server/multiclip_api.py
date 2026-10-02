@@ -195,6 +195,7 @@ def seed_skills(database) -> None:
             (skill_id,),
         )
     seed_brand_overlay_content(database)
+    seed_verified_source_content(database)
 
 
 def seed_brand_overlay_content(database) -> None:
@@ -272,6 +273,58 @@ def seed_brand_overlay_content(database) -> None:
         (preview, workflow, prompt, "Một ảnh chân dung nhìn thẳng mặt, đủ sáng, không bị che.",
          "04 ảnh thương hiệu cá nhân đồng nhất về nhận diện, góc chụp và ánh sáng.", steps, notes,
          json.dumps(owned_sections, ensure_ascii=False), "https://github.com/comfyanonymous/ComfyUI", skill_id),
+    )
+
+
+def seed_verified_source_content(database) -> None:
+    """Import only source Skills whose purchased content was verified verbatim.
+
+    Source account links, payment information, seller contacts and licence codes
+    are intentionally excluded.  This function is idempotent so existing owners
+    keep their purchases while the owned lesson content is updated.
+    """
+    skill_id = database.execute("SELECT id FROM skills WHERE slug='poster-san-pham'").fetchone()["id"]
+    prompt = """Tôi gửi ảnh sản phẩm của tôi. Hãy dựng cho tôi một bộ 10 poster quảng cáo đồng bộ, làm đúng như một art director quảng cáo thật.
+
+Làm theo đúng thứ tự, ĐỪNG tạo ảnh ngay:
+
+1. PHÂN TÍCH SẢN PHẨM trước. Mô tả cho tôi: loại sản phẩm, hình dáng, chất liệu, màu, chữ trên nhãn, góc nhìn nào là an toàn. Ghi rõ những gì BẮT BUỘC phải giữ nguyên.
+
+2. VẠCH BẢN ĐỒ 10 CONCEPT khác nhau rồi đưa tôi xem trước. Mỗi concept ghi rõ: bối cảnh, ánh sáng, bảng màu, góc máy, có người mẫu hay không. Mười concept phải KHÁC NHAU rõ rệt, không được 10 tấm cùng một kiểu đặt giữa khung.
+
+3. Chờ tôi duyệt rồi mới tạo ảnh.
+
+Quy tắc không được phá:
+- Giữ nguyên hình dáng, tỷ lệ, màu, chất liệu, nhãn mác và số lượng sản phẩm đúng như ảnh tôi gửi.
+- Không thêm chữ, giá, khuyến mãi, logo hay watermark nào tôi không đưa. Nếu concept nào cần chữ, hỏi tôi chữ chính xác trước khi tạo.
+- Không thêm thành phần, công dụng hay lời quảng cáo mà sản phẩm của tôi không có.
+
+Tạo xong, tự soi lại từng tấm: tấm nào sản phẩm bị sai so với ảnh gốc thì làm lại tấm đó."""
+    steps = """Bước 1 — Chuẩn bị một ảnh sản phẩm rõ
+Chụp hoặc chọn một ảnh thấy rõ toàn bộ sản phẩm, đọc được chữ trên nhãn, không bị loá sáng. Nền gì cũng được — bối cảnh sẽ thay hết.
+
+Bước 2 — Tải ảnh lên rồi dán câu lệnh
+Bấm kẹp giấy tải ảnh sản phẩm lên, bấm nút Chép ở đầu trang rồi dán câu lệnh vào, gửi.
+
+Bước 3 — Duyệt bản đồ concept rồi cho chạy
+Đọc 10 concept, thấy cái nào không hợp thì nói thẳng: “Concept 4 và 7 quá giống nhau, đổi concept 7 sang bối cảnh ngoài trời.” Ưng rồi thì bảo tạo ảnh.
+
+Bước 4 — Soi lại sản phẩm trên từng tấm
+Phóng to phần sản phẩm trên từng tấm, so với ảnh gốc: đúng màu chưa, đúng hình dáng chưa, chữ trên nhãn có bị bịa không."""
+    notes = """Ảnh gốc mờ hoặc thiếu sáng thì mọi tấm poster đều thừa hưởng cái sai đó. Ảnh chưa rõ thì chạy Skill 'Tăng chất lượng 4k' trước.
+
+AI sẽ KHÔNG tạo ảnh ngay — đúng như thiết kế. Nó phân tích và đưa bản đồ 10 concept trước. Đây là bước quyết định bộ ảnh có khác nhau hay không, đọc kỹ đừng bỏ qua.
+
+Chữ trên nhãn là chỗ máy sai nhiều nhất. Tấm nào chữ bị méo hoặc bịa thì bảo làm lại riêng tấm đó, đừng làm lại cả bộ."""
+    sections = [
+        {"number": "01", "title": "Skill này gồm những gì", "body": "Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},
+        {"number": "02", "title": "Chuẩn bị trước khi bắt đầu", "body": "Chụp hoặc chọn một ảnh thấy rõ toàn bộ sản phẩm, đọc được chữ trên nhãn, không bị loá sáng. Nền gì cũng được — bối cảnh sẽ thay hết."},
+        {"number": "04", "title": "Làm theo 4 bước", "body": steps},
+        {"number": "05", "title": "Làm thử ngay", "body": "Dựng bộ 10 poster cho một sản phẩm bạn đang bán\n\n1. Chọn một sản phẩm bạn đang bán, chụp một ảnh rõ\n2. Làm theo 4 bước trên\n3. Đếm xem 10 tấm có thật sự khác nhau không, hay chỉ đổi màu nền\n4. Chọn 3 tấm ưng nhất, phóng to soi kỹ phần nhãn sản phẩm\n\nXong sẽ có: Mười poster khác nhau rõ rệt về bối cảnh và bố cục, nhưng sản phẩm trên cả mười tấm đều đúng như ảnh gốc."},
+    ]
+    database.execute(
+        "UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?",
+        ("Một ảnh sản phẩm ra nguyên bộ 10 poster quảng cáo đồng bộ, không cần cài gì", "Đưa MỘT ảnh sản phẩm, nhận về MỘT BỘ 10 poster quảng cáo khác nhau nhưng cùng một chất. Không cài gì — chạy thẳng trên ChatGPT hoặc Gemini bạn đang có.", prompt, "Một ảnh sản phẩm rõ: thấy toàn bộ sản phẩm, đọc được nhãn, không loá sáng.", "10 poster quảng cáo khác nhau về bối cảnh và bố cục, với sản phẩm giữ đúng ảnh gốc.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id),
     )
 
 

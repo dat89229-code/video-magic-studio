@@ -305,6 +305,7 @@ coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v3.png";
 coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v3.png";
 coverBySkill["chinh-sua-anh"] = "/skill-chinh-sua-anh-v4.png";
 coverBySkill["tang-chat-luong-4k"] = "/skill-tang-chat-luong-4k-v4.png";
+coverBySkill["multishot"] = "/skill-multishot-v4.png";
 const coverTextBySkill: Record<string, string> = {
   "thuong-hieu-ca-nhan": "ẢNH\nTHƯƠNG HIỆU",
   "poster-san-pham": "POSTER\nSẢN PHẨM",
@@ -848,7 +849,7 @@ function Card({
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const isMasterCoverTemplate = lockedReferenceCovers.has(skill.slug);
   const isRefinedCover = !isMasterCoverTemplate;
-  const isFullPosterCover = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug);
+  const isFullPosterCover = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot"].includes(skill.slug);
   return (
     <article className={`skill-card ${skill.hall === "Sửa ảnh AI" ? "photo-skill-card" : ""}`}>
       <div
@@ -888,7 +889,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
   // lesson has been checked and imported.  It deliberately shares the same
   // Master Clip visual template; the lesson text remains specific to its slug.
   const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat", "dang-1-thoai-thumbnail", "dang-2-hieu-ung-cao-cap", "dang-3-huong-dan-toi-gian", "dang-4-infographic-trang", "cap-do-1-khung-don", "cap-do-2-postcard-2-nguoi", "multiclip-ghep-nhac-trend", "multiclip-1-video-highlight", "edit-video-zoom", "video-tu-dong-google-flow", "subagent-cham-soc", "subagent-nghien-cuu", "seo-video-youtube", "dang-bai-tu-dong-da-kenh", "tao-video-viral", "reel-facebook-viral"].includes(skill.slug);
-  const isFullPosterCover = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug);
+  const isFullPosterCover = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot"].includes(skill.slug);
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {

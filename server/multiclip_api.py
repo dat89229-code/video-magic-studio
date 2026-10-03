@@ -933,18 +933,32 @@ Nguyên tắc bắt buộc:
 
 Xử lý xong báo tôi: đã trả lời bao nhiêu bình luận, bỏ qua bao nhiêu và vì sao."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: Dán được vào ChatGPT/Claude bản web cũng đọc hiểu nội dung, nhưng KHÔNG thao tác thật trên Google Flow/YouTube Studio/Facebook được — bản web không có quyền điều khiển trình duyệt. Muốn AI tự làm thật, cần Claude Code/Codex có bật công cụ trình duyệt (xem phần 'Cài đặt' bên dưới nếu chưa có).
 
 Bước 2 — Đưa link trang + phạm vi cần xử lý
-Điền link trang và khoảng thời gian hoặc đúng bài viết cụ thể. Nói rõ thông tin AI không được tự bịa nếu không chắc.
+AI biết đúng trang/kênh và khoảng bình luận cần trả lời.
+
+Dán câu nhờ việc mẫu, điền link trang và khoảng thời gian (ví dụ '2 ngày qua', hoặc đúng 1 bài viết cụ thể).
+
+Lưu ý: Nói rõ luôn thông tin nào AI KHÔNG được tự bịa nếu không chắc (giá, chính sách, link cụ thể) — càng rõ, AI càng ít phải né.
 
 Bước 3 — Để AI tự trả lời từng bình luận
-AI mở từng bình luận, gõ và gửi câu trả lời trên giao diện trong phạm vi bạn đã chỉ định.
+Các bình luận trong phạm vi đã được trả lời, mỗi câu một kiểu.
+
+AI tự mở từng bình luận, gõ và gửi câu trả lời thật trên Meta Business Suite. Việc này mất vài phút vì thao tác thật trên giao diện, không phải sinh chữ suông.
 
 Bước 4 — Kiểm lại và xử lý phần AI bỏ qua
-AI báo danh sách đã trả lời và danh sách bỏ qua kèm lý do. Bạn tự xử lý phần cần quyết định."""
-    notes = "Thấy câu trả lời nào chưa ưng thì nhắn ngay trong CÙNG cuộc trò chuyện để AI sửa lại. Không để AI tự trả lời phần mâu thuẫn/cà khịa hoặc câu hỏi cần thông tin thật mà không xác minh được."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Quy trình trả lời bình luận Facebook/YouTube tự nhiên, đa dạng, không bịa thông tin và biết bỏ qua đúng lúc."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link Facebook Page, link bài viết hoặc phạm vi thời gian, cùng các thông tin AI không được tự bịa."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Trả lời thử một loạt bình luận thật trên trang của bạn\n\n1. Chọn 1 bài viết đang có nhiều bình luận chưa trả lời\n2. Làm theo 3 bước trên\n3. Đọc lại 5-10 câu trả lời đã gửi, kiểm xem có câu nào giống nhau không\n4. Xử lý tay phần AI báo bỏ qua\n\nXong sẽ có: Các bình luận trong phạm vi đã có phản hồi từ trang, mỗi câu một kiểu khác nhau thật sự, không có thông tin bịa, không có 2 câu giống hệt nhau dưới cùng 1 bình luận."}]
+Không sót bình luận cần bạn tự quyết, không có câu trả lời sai lệch.
+
+AI báo danh sách đã trả lời + danh sách bỏ qua (nếu có) kèm lý do. Bạn tự xử lý phần bỏ qua.
+
+Lưu ý: Thấy câu trả lời nào chưa ưng thì nhắn ngay trong CÙNG cuộc trò chuyện để AI sửa lại, đừng để sai rồi mới bắt làm lại từ đầu."""
+    notes = "Hướng dẫn này viết cho Meta Business Suite — phần mềm nguồn mở giấy phép Dịch vụ của Meta — Skill chỉ là quy trình thao tác, không đóng gói lại phần mềm, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link Facebook Page, link bài viết hoặc phạm vi thời gian, cùng các thông tin AI không được tự bịa nếu không chắc."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Trả lời thử một loạt bình luận thật trên trang của bạn\n\n1. Chọn 1 bài viết đang có nhiều bình luận chưa trả lời\n2. Làm theo 3 bước trên\n3. Đọc lại 5-10 câu trả lời đã gửi, kiểm xem có câu nào giống nhau không\n4. Xử lý tay phần AI báo bỏ qua (nếu có)\n\nXong sẽ có: Các bình luận trong phạm vi đã có phản hồi từ trang, mỗi câu một kiểu khác nhau thật sự, không có thông tin bịa, không có 2 câu giống hệt nhau dưới cùng 1 bình luận."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Trả lời bình luận Facebook/YouTube tự nhiên, đa dạng, không rập khuôn, không bịa thông tin", "AI tự vào Facebook/YouTube trả lời một loạt bình luận thay bạn — mỗi câu một kiểu, tự nhiên, không bịa thông tin khi không chắc và biết bỏ qua đúng lúc.", prompt, "Link trang, link bài viết hoặc phạm vi bình luận, cùng giới hạn thông tin được phép trả lời.", "Báo cáo số bình luận đã trả lời và các bình luận được bỏ qua kèm lý do.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://business.facebook.com/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='subagent-nghien-cuu'").fetchone()["id"]

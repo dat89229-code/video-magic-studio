@@ -1072,22 +1072,24 @@ em {
 }
 .hall-tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow: auto;
-  padding-bottom: 8px;
+  padding: 4px 0 10px;
 }
 .hall-tabs button {
   flex: 0 0 auto;
   background: white;
   border: 1px solid #ead9df;
   color: #65414f;
-  padding: 11px 16px;
+  min-height: 52px;
+  padding: 13px 20px;
   border-radius: 99px;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.035em;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
   line-height: 1.15;
   text-transform: uppercase;
+  cursor: pointer;
   box-shadow: 0 2px 8px rgba(126, 67, 91, 0.08);
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }

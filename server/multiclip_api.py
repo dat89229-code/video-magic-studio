@@ -596,18 +596,32 @@ Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuy�
 
 Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video vào, nói rõ màu thương hiệu nếu có
-Bấm Chép câu nhờ việc mẫu, điền màu thương hiệu nếu có, dán cùng video vào cuộc trò chuyện.
+AI bắt đầu dựng đúng video của bạn, đúng tông màu.
+
+Bấm Chép câu nhờ việc mẫu, điền màu thương hiệu nếu có (mã màu hoặc mô tả 'xanh navy và vàng'), dán cùng video vào cuộc trò chuyện.
+
+Lưu ý: Không có màu riêng cũng không sao — AI tự chọn tông neon+trắng mặc định.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt — cứ để AI tự làm.
 
 Bước 4 — Nhận file, kiểm tra 3 chỗ hay lệch
-Mở file trong output/, kiểm overlay có che mặt không, hiệu ứng có dồn dập không và từ khoá nhấn có đúng ý chính không."""
-    notes = "Không có màu riêng cũng không sao — AI tự chọn tông neon+trắng mặc định. Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'overlay ở giây 12 đang che một phần mặt, đẩy xuống thấp hơn'."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện dài 1–3 phút; nếu có, chuẩn bị màu thương hiệu."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản cao cấp có hiệu ứng\n\n1. Chọn 1 video nói chuyện dài 1-3 phút, có ít nhất 1 đoạn kiểu liệt kê hoặc số liệu\n2. Làm theo 3 bước trên\n3. So sánh với bản Dạng 1 (nếu có) — thấy rõ 7 lớp hiệu ứng thêm vào\n4. Đăng thử, theo dõi thời gian xem trung bình có tăng\n\nXong sẽ có: 1 video sinh động: zoom đúng lúc, overlay minh hoạ không che mặt, âm thanh phụ trợ tinh tế, tối đa 1 lần crop-mặt và 1 hiệu ứng so sánh — không bị nhồi nhét."}]
+Có video sinh động, không lỗi hiệu ứng.
+
+Mở file trong output/, kiểm: overlay có che mặt chỗ nào không, các hiệu ứng có cách nhau đủ xa (không dồn dập) không, từ khoá nhấn có đúng ý chính không.
+
+Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'overlay ở giây 12 đang che một phần mặt, đẩy xuống thấp hơn'."""
+    notes = "Không có màu riêng cũng không sao — AI tự chọn tông neon+trắng mặc định. Các hiệu ứng cần cách nhau đủ xa, overlay không che mặt và từ khoá nhấn phải đúng ý chính."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện dài 1–3 phút; nếu có, chuẩn bị màu thương hiệu."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản cao cấp có hiệu ứng\n\n1. Chọn 1 video nói chuyện dài 1-3 phút, có ít nhất 1 đoạn kiểu liệt kê hoặc số liệu\n2. Làm theo 3 bước trên\n3. So sánh với bản Dạng 1 (nếu có) — thấy rõ 7 lớp hiệu ứng thêm vào\n4. Đăng thử, theo dõi thời gian xem trung bình có tăng so với video thường không\n\nXong sẽ có: 1 video sinh động: zoom đúng lúc, overlay minh hoạ không che mặt, âm thanh phụ trợ tinh tế, tối đa 1 lần crop-mặt và 1 hiệu ứng so sánh — không bị nhồi nhét, không lặp kiểu hiệu ứng."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Zoom theo cảm xúc, overlay hoạt hoạ, âm thanh, crop bám mặt, so sánh trước/sau", "Đưa 1 video nói chuyện vào — AI dựng bản edit cao cấp: zoom theo cảm xúc, overlay hoạt hoạ, âm thanh phụ trợ, từ khoá nhấn 2 màu, crop bám mặt và so sánh trước/sau.", prompt, "Một video nói chuyện dài 1–3 phút; màu thương hiệu nếu có.", "Video dọc sinh động với các hiệu ứng đúng ngữ cảnh, không che mặt.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-3-huong-dan-toi-gian'").fetchone()["id"]

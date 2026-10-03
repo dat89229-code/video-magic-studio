@@ -888,24 +888,36 @@ Lưu ý: Chỗ nào cắt hụt hoặc nối gượng thì nhắn rõ: 'phần 2
     skill_id = database.execute("SELECT id FROM skills WHERE slug='video-tu-dong-google-flow'").fetchone()["id"]
     prompt = """Mở Google Flow cho tôi và tạo 1 TVC: [mô tả ý tưởng của bạn, ví dụ \"tôi và nhân vật chính đi giữa thảo nguyên Mông Cổ lúc hoàng hôn\"].
 
-Dùng đúng avatar/nhân vật và bối cảnh tôi đã lưu (hỏi tôi nếu chưa rõ dùng cái nào).
-
-Giữ đúng cấu hình đã khoá: Thành phần, Omni 1.1 Flash, 9:16, chất lượng cao nhất hiện có, 10 giây, x1, không thoại/không voice-over.
-
-Kiểm tra kỹ 3 mốc đầu/giữa/cuối trước khi cho tôi xem, sửa lại tối đa 1 lần nếu có lỗi rõ."""
+Dùng đúng avatar/nhân vật và bối cảnh tôi đã lưu (hỏi tôi nếu chưa rõ dùng cái nào). Giữ đúng cấu hình đã khoá: Thành phần, Omni 1.1 Flash, 9:16, chất lượng cao nhất hiện có, 10 giây, x1, không thoại/không voice-over. Kiểm tra kỹ 3 mốc đầu/giữa/cuối trước khi cho tôi xem, sửa lại tối đa 1 lần nếu có lỗi rõ."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: Dán được vào ChatGPT/Claude bản web cũng đọc hiểu nội dung, nhưng KHÔNG thao tác thật trên Google Flow/YouTube Studio/Facebook được — bản web không có quyền điều khiển trình duyệt. Muốn AI tự làm thật, cần Claude Code/Codex có bật công cụ trình duyệt (xem phần 'Cài đặt' bên dưới nếu chưa có).
 
 Bước 2 — Onboarding lần đầu: chọn project + xác nhận avatar/nhân vật
-Tự đăng nhập/chọn hoặc tạo project trong Flow, rồi xác nhận tên avatar/nhân vật. Nếu chưa có avatar/nhân vật trong Flow, tự tải ảnh lên Flow trước.
+AI biết dùng đúng project và đúng tài sản của bạn cho mọi lần sau.
+
+Lần đầu, AI sẽ mở flow.google.com và nhờ bạn tự đăng nhập/chọn hoặc tạo project (AI không xử lý mật khẩu/OTP hộ bạn). Xác nhận tên avatar/nhân vật bạn muốn dùng — AI ghi lại để dùng thẳng cho các lần sau.
+
+Lưu ý: Nếu chưa có avatar/nhân vật trong Flow, tự tải ảnh lên Flow trước rồi mới gọi skill này.
 
 Bước 3 — Nói ý tưởng, để AI tự mở Flow và tạo
-Điền ý tưởng cụ thể: chủ thể + hành động + bối cảnh. AI soạn prompt, gắn đúng component, kiểm cấu hình rồi tạo x1 để thử nhận diện trước.
+Có 1 TVC 10 giây đúng ý tưởng, đúng cấu hình đã khoá.
+
+Dán câu nhờ việc mẫu, điền ý tưởng cụ thể (chủ thể + hành động + bối cảnh). AI tự soạn prompt, gắn đúng component, kiểm tra cấu hình rồi bấm tạo.
+
+Lưu ý: Mỗi lượt tạo tốn credit Flow thật — AI chỉ tạo x1 để thử nhận diện trước, không tự tạo thêm bản nếu bạn chưa yêu cầu.
 
 Bước 4 — Xem toàn bộ 10 giây, duyệt hoặc yêu cầu sửa
-AI kiểm 3 mốc đầu/giữa/cuối. Xem toàn bộ, để ý mặt/tay/bối cảnh; nếu lỗi rõ thì nêu cụ thể để sửa tối đa một lần."""
-    notes = "Bản web có thể đọc nội dung nhưng không điều khiển Google Flow thật. Mỗi lượt tạo tốn credit Flow thật — chỉ tạo x1 để thử nhận diện trước. Có lỗi rõ thì mô tả chính xác lỗi ở đâu."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Workflow tự mở Google Flow, dùng avatar/bối cảnh đã lưu và tạo TVC điện ảnh 10 giây không thoại."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ảnh avatar/nhân vật rõ mặt, ảnh bối cảnh nếu cần và quyền truy cập Google Flow của bạn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 1 TVC 10 giây đầu tiên với avatar của bạn\n\n1. Chuẩn bị ảnh avatar/nhân vật rõ mặt và ảnh bối cảnh, tải lên Flow\n2. Nghĩ 1 ý tưởng ngắn: chủ thể làm gì, ở đâu, không khí thế nào\n3. Làm theo 3 bước trên\n4. Xem lại video, so đối chiếu mặt/bối cảnh với ảnh gốc\n\nXong sẽ có: 1 video dọc 9:16, 10 giây, không thoại, đúng avatar và bối cảnh đã chọn, chuyển động mượt, kết thúc tự nhiên."}]
+Có video đúng nhận diện, đúng bối cảnh, không lỗi rõ.
+
+AI tự phát và kiểm 3 mốc đầu/giữa/cuối trước khi cho bạn xem. Bạn xem lại toàn bộ, đặc biệt để ý mặt/tay/bối cảnh có đúng và ổn định không.
+
+Lưu ý: Có lỗi rõ (đổi người, sai bối cảnh, đứng hình sớm) thì nhắn cụ thể lỗi ở đâu — AI sửa đúng nguyên nhân và tạo lại tối đa 1 lần trong phạm vi yêu cầu ban đầu."""
+    notes = "Hướng dẫn này viết cho Google Flow — phần mềm nguồn mở giấy phép Dịch vụ của Google — Skill chỉ là workflow điều khiển, không đóng gói lại phần mềm, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh avatar/nhân vật rõ mặt, một ảnh bối cảnh muốn dùng, ý tưởng TVC ngắn và quyền truy cập Google Flow của bạn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 1 TVC 10 giây đầu tiên với avatar của bạn\n\n1. Chuẩn bị 1 ảnh avatar/nhân vật rõ mặt và 1 ảnh bối cảnh muốn dùng, tải lên Flow\n2. Nghĩ 1 ý tưởng ngắn: chủ thể làm gì, ở đâu, không khí thế nào\n3. Làm theo 3 bước trên\n4. Xem lại video, so đối chiếu mặt/bối cảnh với ảnh gốc đã tải lên\n\nXong sẽ có: 1 video dọc 9:16, 10 giây, không thoại, đúng avatar và bối cảnh đã chọn, chuyển động mượt, kết thúc tự nhiên (không đứng hình cứng), sẵn sàng đăng hoặc ghép tiếp."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nhập kịch bản, Google Flow tự dựng video AI hoàn chỉnh, không cần quay dựng thủ công", "Nói 1 câu ý tưởng — AI tự mở Google Flow, gắn avatar/nhân vật và bối cảnh đã lưu, soạn prompt điện ảnh 10 giây không thoại, tạo và kiểm tra video.", prompt, "Avatar/nhân vật, bối cảnh và ý tưởng TVC ngắn.", "Video TVC dọc 9:16, 10 giây, không thoại, kiểm tra 3 mốc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://flow.google.com/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='subagent-cham-soc'").fetchone()["id"]

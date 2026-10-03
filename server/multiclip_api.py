@@ -351,13 +351,21 @@ Sau đó làm thêm bản thứ hai từ chính ảnh đã tách:
 
 Cuối cùng, nhìn lại hai ảnh vừa làm và nói cho tôi biết chỗ nào cắt chưa đẹp để tôi biết mà chụp lại lần sau."""
     steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Sẵn sàng làm, không cài gì cả.
+
 Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được việc này.
 
 Bước 2 — Tải ảnh lên rồi dán câu lệnh
+AI làm ra hai ảnh: nền trong suốt và nền trắng.
+
 Bấm biểu tượng kẹp giấy hoặc dấu cộng để tải ảnh sản phẩm lên. Rồi bấm nút Chép ở đầu trang, dán câu lệnh vào, gửi.
 
 Bước 3 — Tải về và kiểm ba chỗ
-Bấm vào ảnh kết quả để tải về. Trước khi đăng, phóng to kiểm viền sản phẩm, chữ trên bao bì và màu sản phẩm."""
+Bấm vào ảnh kết quả để tải về. Trước khi đăng, phóng to kiểm ba chỗ AI hay làm hỏng:
+
+• Viền sản phẩm — có bị ăn lẹm vào hay còn sót mảng nền không
+• Chữ trên bao bì — có bị AI vẽ lại thành chữ sai không
+• Màu sản phẩm — có bị lệch so với ảnh gốc không"""
     notes = """Gemini thường nhanh hơn cho việc xoá nền, ChatGPT cho màu sắc chuẩn hơn với ảnh sản phẩm. Có cả hai thì thử cả hai rồi chọn bản đẹp hơn.
 
 Tải ảnh lên TRƯỚC rồi mới dán câu lệnh. Làm ngược lại thì AI không biết bạn nói về ảnh nào.

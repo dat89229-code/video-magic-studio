@@ -635,18 +635,30 @@ Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuy�
 
 Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video vào, đưa câu CTA nếu có
+AI bắt đầu dựng đúng video, đúng thông điệp kêu gọi của bạn.
+
 Bấm Chép câu nhờ việc mẫu, điền câu CTA hay dùng nếu có, dán cùng video vào cuộc trò chuyện.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node.
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node — cứ để AI tự làm, các lần sau nhanh ngay.
 
 Bước 4 — Nhận file, kiểm nhạc và CTA
-Mở file trong output/, kiểm nhạc có đủ nhỏ khi bạn đang nói không, CTA có tự nhiên không và tiêu đề có đúng trọng tâm không."""
-    notes = "KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được. Chưa ưng thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'nhạc đoạn đầu to quá, hạ thêm xuống'."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tiêu đề trắng lớn, các bước hiện dần theo nội dung, CTA tự nhiên và nhạc dẫn cảm xúc."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video chia sẻ kiến thức/hướng dẫn dài 1–3 phút và câu CTA nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video hướng dẫn/chia sẻ thành bản tối giản chuyên nghiệp\n\n1. Chọn 1 video bạn chia sẻ kiến thức/hướng dẫn, dài 1-3 phút\n2. Nghĩ trước 1 câu CTA muốn dùng (không có cũng được)\n3. Làm theo 3 bước trên\n4. Đăng thử, so cảm giác sạch, sang với video có nhiều hiệu ứng\n\nXong sẽ có: 1 video khung sạch: tiêu đề trắng lớn rõ ràng, các bước hiện đúng nhịp nội dung, CTA nghe tự nhiên, nhạc dẫn cảm xúc mà không đè lời nói."}]
+Có video sạch, chuyên nghiệp, đúng thông điệp.
+
+Mở file trong output/, kiểm: nhạc có đủ nhỏ khi bạn đang nói không (không đè giọng), CTA có tự nhiên không, tiêu đề có đúng trọng tâm không.
+
+Lưu ý: Chưa ưng thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'nhạc đoạn đầu to quá, hạ thêm xuống'."""
+    notes = "KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được. Nhạc phải không đè giọng, CTA tự nhiên và tiêu đề đúng trọng tâm; chưa ưng thì chỉnh tiếp trong cùng cuộc trò chuyện."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video chia sẻ kiến thức/hướng dẫn dài 1–3 phút và câu CTA nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video hướng dẫn/chia sẻ thành bản tối giản chuyên nghiệp\n\n1. Chọn 1 video bạn chia sẻ kiến thức/hướng dẫn, dài 1-3 phút\n2. Nghĩ trước 1 câu CTA muốn dùng (không có cũng được)\n3. Làm theo 3 bước trên\n4. Đăng thử, so cảm giác 'sạch, sang' với video có nhiều hiệu ứng\n\nXong sẽ có: 1 video khung sạch: tiêu đề trắng lớn rõ ràng, các bước hiện đúng nhịp nội dung, CTA nghe tự nhiên không như quảng cáo, nhạc dẫn cảm xúc mà không đè lời nói."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tiêu đề trắng lớn, các bước hiện dần theo nội dung, nhạc dẫn dắt cảm xúc — sạch, sang", "Đưa 1 video hướng dẫn/chia sẻ vào — AI dựng bản tối giản kiểu content coach cao cấp: tiêu đề trắng lớn, các bước hiện dần, CTA khéo léo, nhạc dẫn cảm xúc và zoom cực nhẹ.", prompt, "Một video hướng dẫn/chia sẻ dài 1–3 phút; CTA nếu có.", "Video tối giản, sạch, sang, có tiêu đề, các bước, CTA và nhạc đúng nhịp.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-4-infographic-trang'").fetchone()["id"]

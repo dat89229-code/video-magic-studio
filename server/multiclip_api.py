@@ -392,12 +392,18 @@ Yêu cầu bắt buộc:
 
 Sau khi xong, phóng to đúng vùng vừa xoá và cho tôi biết có còn thấy vết chỉnh sửa không."""
     steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Sẵn sàng làm, không cài gì cả.
+
 Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được việc này.
 
 Bước 2 — Tải ảnh lên, mô tả CHÍNH XÁC vùng cần xoá
+AI xoá đúng vùng cần, giữ nguyên phần còn lại.
+
 Bấm biểu tượng kẹp giấy để tải ảnh lên. Điền rõ vị trí và mô tả thứ cần xoá vào câu lệnh (ví dụ 'logo hình tròn màu đỏ ở góc trên bên trái') rồi gửi.
 
 Bước 3 — Phóng to kiểm đúng vùng vừa xoá
+Không còn thấy vết chỉnh sửa.
+
 Tải ảnh về, phóng to đúng vùng vừa xoá xem có còn viền, vết mờ hay lệch tông màu không. Kiểm luôn các phần khác của ảnh xem có bị vẽ lại ngoài ý muốn không."""
     notes = """Mô tả càng chính xác vị trí thì AI càng ít đụng nhầm vào phần khác. Mô tả mơ hồ như 'xoá watermark' mà ảnh có nhiều chữ dễ khiến AI xoá nhầm hoặc vẽ lại cả những phần không cần.
 

@@ -1,16 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
+  Bell,
   Check,
   ChevronLeft,
   Clapperboard,
   Film,
   Gem,
+  Headphones,
   ImageIcon,
   Menu,
+  MessageCircle,
   Music2,
   Play,
   Search,
+  SlidersHorizontal,
   Sparkles,
   User,
   Upload,
@@ -513,6 +517,10 @@ function Index() {
         page={page}
         setPage={setPage}
         openSkills={() => jump()}
+        searchSkills={(search: string) => {
+          setQuery(search);
+          jump();
+        }}
         skillOnly={SKILL_APP}
         openTools={() => {
           setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
@@ -528,6 +536,7 @@ function Index() {
         }}
         menu={menu}
         setMenu={setMenu}
+        notify={(message: string) => setNotice(message)}
       />
       {page === "home" && <Home skillOnly={SKILL_APP} jump={jump} select={select} openStudio={() => {
         setSelected(skills.find((skill) => skill.slug === "multiclip-ghep-nhac-trend") || skills[0]);
@@ -627,6 +636,7 @@ function Index() {
   );
 }
 function Header(p: any) {
+  const [search, setSearch] = useState("");
   const go = (x: "home" | "mine" | "combo") => {
     p.setPage(x);
     p.setMenu(false);
@@ -642,8 +652,26 @@ function Header(p: any) {
           <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}><Clapperboard size={20} /><span>Skill của tôi</span></button>
           <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}><Gem size={20} /><span>Combo</span></button>
         </nav>
+        <div className="sidebar-support">
+          <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={18} /><span>Thông báo</span></button>
+          <button onClick={() => p.notify("Hỗ trợ Master Clip: chúng tôi sẽ phản hồi trong giờ làm việc.")}><Headphones size={18} /><span>Hỗ trợ</span></button>
+        </div>
         <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>Tài khoản</span></button>
       </aside>
+      <header className="studio-utilitybar">
+        <button className="studio-home-button" onClick={() => go("home")}><span>⌂</span> Trang chủ</button>
+        <form className="studio-search" onSubmit={(event) => { event.preventDefault(); p.searchSkills(search); }}>
+          <Search size={21} />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Tìm kiếm Skill, chủ đề, từ khóa..." aria-label="Tìm kiếm Skill" />
+          <button type="submit" aria-label="Tìm kiếm Skill"><SlidersHorizontal size={21} /></button>
+        </form>
+        <div className="studio-utility-actions">
+          <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={23} /><span>Thông báo</span></button>
+          <button onClick={() => p.notify("Hỗ trợ Master Clip: chúng tôi sẽ phản hồi trong giờ làm việc.")}><Headphones size={23} /><span>Hỗ trợ</span></button>
+          <button onClick={() => p.notify("Chat với nhà cung cấp đã sẵn sàng. Vui lòng gửi yêu cầu hỗ trợ của bạn.")}><MessageCircle size={23} /><span>Chat với nhà cung cấp</span></button>
+          <button className="studio-upgrade" onClick={p.credit}><Gem size={24} /><span>Nâng cấp</span><ArrowRight size={19} /></button>
+        </div>
+      </header>
       <header className="topbar">
         <div className="shell nav-shell">
           <button className="brand" onClick={() => go("home")}>
@@ -681,8 +709,8 @@ function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jum
   return (
     <main className="studio-home">
       <section className="studio-home-head">
-        <div><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
-        <button className="btn-primary" onClick={() => jump()}>Khám phá Kho Skill <ArrowRight size={18} /></button>
+        <div className="studio-heading-copy"><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
+        <aside className="studio-promo" aria-label="Khám phá Master Clip AI Skill World"><div><b>AI giúp bạn<br />sáng tạo dễ dàng hơn</b><small>MASTER CLIP<br />AI SKILL WORLD</small><button className="btn-primary" onClick={() => jump()}>Khám phá ngay <ArrowRight size={18} /></button></div><img src="/home-feature-style.png" alt="Master Clip AI Skill World" /></aside>
       </section>
       <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">NỔI BẬT</p><h2>Cover Skill nổi bật</h2></div><button className="text-link" onClick={() => jump()}>Xem tất cả <ArrowRight size={17} /></button></div><div className="featured-cover-grid">{featuredSkills.map(({ skill, image, label }) => <button key={skill.slug} className="featured-cover" onClick={() => select(skill)}><img src={image} alt={skill.title} /><span><b>{label}</b><small>{skill.title}</small></span></button>)}</div></section>
       <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">VIDEO DEMO</p><h2>Xem kết quả thực tế</h2></div><button className="text-link" onClick={() => jump("Edit Video")}>Sảnh Edit Video <ArrowRight size={17} /></button></div><div className="demo-video-grid">{demos.map((demo) => <article className="demo-video" key={demo.src}><video controls preload="metadata" playsInline><source src={demo.src} type="video/mp4" /></video><span><Play size={16} fill="currentColor" /><b>{demo.title}</b></span></article>)}</div></section>

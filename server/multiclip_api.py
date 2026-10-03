@@ -818,18 +818,32 @@ Lưu ý: Chưa khớp thì nhắn: 'Đoạn giây [X] chuyển clip đang lệch
 
 Nếu máy chưa có ffmpeg/librosa/Node thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video dài và nhạc vào
-Đưa 1 video dài vào input/, đưa nhạc vào assets/music/ hoặc nhờ AI gợi ý nhạc free-license. Dán câu nhờ việc mẫu.
+AI quét đúng video, ghép đúng theo bài nhạc bạn muốn dùng.
+
+Đưa 1 video dài vào input/, đưa nhạc vào assets/music/ (hoặc nhờ AI gợi ý nhạc free-license). Dán câu nhờ việc mẫu vào cuộc trò chuyện.
+
+Lưu ý: Nhạc đang trend trên TikTok/Reels thường có bản quyền — tự tải file đó từ nguồn bạn có quyền dùng, AI không tự tải hộ.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
 Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/thư viện phân tích nhạc (librosa)/Node.
 
 Bước 4 — Nhận file, kiểm độ đa dạng của các đoạn được chọn
-Mở file trong output/, kiểm các đoạn được chọn có đủ đa dạng góc quay không và đoạn đẹp nhất có nằm ở cao trào nhạc không."""
-    notes = "Nhạc đang trend trên TikTok/Reels thường có bản quyền — tự tải file từ nguồn bạn có quyền dùng. Muốn đổi đoạn nào thì nhắn cụ thể thời điểm cần thay, không cần làm lại từ đầu."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tự chọn các đoạn đẹp/ấn tượng từ một video dài, ghép theo nhạc thành video quảng cáo ngắn."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video quay liên tục ít nhất 2–3 phút và nhạc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Biến 1 video quay dài thành video quảng cáo ngắn\n\n1. Chọn video quay liên tục dài ít nhất 2-3 phút\n2. Chọn nhạc free-license hoặc bạn có quyền dùng\n3. Làm theo 3 bước trên\n4. So sánh với việc tự cắt tay\n\nXong sẽ có: 1 video ngắn 15-30s, các đoạn được chọn đa dạng góc quay, khớp đúng nhịp nhạc, đoạn ấn tượng nhất rơi vào cao trào."}]
+Có video đăng được ngay, không lặp cảnh giống nhau.
+
+Mở file trong output/, kiểm: các đoạn được chọn có đủ đa dạng góc quay không (không chọn 3-4 đoạn trông giống hệt nhau), đoạn đẹp nhất có nằm ở cao trào nhạc không.
+
+Lưu ý: Muốn đổi đoạn nào thì nhắn cụ thể: 'bỏ đoạn giây [X], thay bằng đoạn khác đa dạng hơn' — không cần làm lại từ đầu."""
+    notes = "Hướng dẫn này viết cho FFmpeg + OpenAI Whisper + MediaPipe — phần mềm nguồn mở giấy phép Mã nguồn mở (LGPL/GPL, MIT, Apache-2.0) — công cụ nền chạy trên máy bạn, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video bạn quay liên tục dài ít nhất 2–3 phút (quay sản phẩm hoặc hậu trường) và một bài nhạc free-license hoặc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Biến 1 video quay dài (không cắt sẵn) thành video quảng cáo ngắn\n\n1. Chọn 1 video bạn quay liên tục, dài ít nhất 2-3 phút (quay sản phẩm, hậu trường)\n2. Chọn 1 bài nhạc free-license hoặc bạn có quyền dùng\n3. Làm theo 3 bước trên\n4. So sánh với việc tự ngồi cắt tay — thấy AI chọn đoạn có hợp lý không\n\nXong sẽ có: 1 video ngắn 15-30s, các đoạn được chọn đa dạng góc quay, khớp đúng nhịp nhạc, đoạn ấn tượng nhất rơi vào cao trào — như video bán hàng dù bạn chỉ quay 1 lần liên tục."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Chỉ 1 video dài duy nhất, AI tự chọn đoạn ấn tượng nhất rồi ghép theo nhạc như video quảng cáo", "Chỉ 1 video dài duy nhất — AI tự quét, chọn ra các đoạn đẹp/ấn tượng nhất, cắt rời rồi ghép đúng nhịp nhạc thành video ngắn kiểu quảng cáo.", prompt, "Một video dài và nhạc bạn có quyền dùng.", "Video highlight 15–30 giây với các đoạn đa dạng, khớp beat và cao trào nhạc.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='edit-video-zoom'").fetchone()["id"]

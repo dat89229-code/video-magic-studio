@@ -642,7 +642,7 @@ function Header(p: any) {
           <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}><Clapperboard size={20} /><span>Skill của tôi</span></button>
           <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}><Gem size={20} /><span>Combo</span></button>
         </nav>
-        <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>{p.account ? "Tài khoản" : "Đăng nhập"}</span></button>
+        <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>Tài khoản</span></button>
       </aside>
       <header className="topbar">
         <div className="shell nav-shell">

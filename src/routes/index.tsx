@@ -13,6 +13,8 @@ import {
   MessageCircle,
   Music2,
   Play,
+  PanelLeftClose,
+  PanelLeftOpen,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -368,6 +370,7 @@ function Index() {
     [query, setQuery] = useState(""),
     [selected, setSelected] = useState<Skill>(skills[14]),
     [menu, setMenu] = useState(false),
+    [sidebarCompact, setSidebarCompact] = useState(false),
     [auth, setAuth] = useState(false),
     [pay, setPay] = useState(false),
     [notice, setNotice] = useState(""),
@@ -512,7 +515,7 @@ function Index() {
     if (response.ok) setAccount(await response.json());
   }
   return (
-    <div className="skill-world">
+    <div className={`skill-world${sidebarCompact ? " sidebar-compact" : ""}`}>
       <Header
         page={page}
         setPage={setPage}
@@ -536,6 +539,8 @@ function Index() {
         }}
         menu={menu}
         setMenu={setMenu}
+        sidebarCompact={sidebarCompact}
+        setSidebarCompact={setSidebarCompact}
         notify={(message: string) => setNotice(message)}
       />
       {page === "home" && <Home skillOnly={SKILL_APP} jump={jump} select={select} openStudio={() => {
@@ -592,6 +597,16 @@ function Index() {
         />
       )}
       <Footer />
+      <a
+        className="zalo-chat-button"
+        href="https://zalo.me/0812997729"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Trò chuyện qua Zalo với Master Clip, số 0812997729"
+      >
+        <MessageCircle size={19} />
+        <span>Chat Zalo</span>
+      </a>
       {auth && (
         <Auth
           close={() => setAuth(false)}
@@ -645,7 +660,17 @@ function Header(p: any) {
   return (
     <>
       <aside className="skill-sidebar" aria-label="Điều hướng Master Clip">
-        <button className="sidebar-brand" onClick={() => go("home")} aria-label="Master Clip trang chủ">MC</button>
+        <div className="sidebar-top">
+          <button className="sidebar-brand" onClick={() => go("home")} aria-label="Master Clip trang chủ">MC</button>
+          <button
+            className="sidebar-size-toggle"
+            onClick={() => p.setSidebarCompact(!p.sidebarCompact)}
+            aria-label={p.sidebarCompact ? "Mở rộng menu" : "Thu gọn menu"}
+            title={p.sidebarCompact ? "Mở rộng menu" : "Thu gọn menu"}
+          >
+            {p.sidebarCompact ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
+        </div>
         <nav>
           <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}><Sparkles size={20} /><span>Sảnh Skill</span></button>
           <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}><ImageIcon size={20} /><span>Kho Skill</span></button>
@@ -654,7 +679,7 @@ function Header(p: any) {
         </nav>
         <div className="sidebar-support">
           <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={18} /><span>Thông báo</span></button>
-          <button onClick={() => p.notify("Hỗ trợ Master Clip: chúng tôi sẽ phản hồi trong giờ làm việc.")}><Headphones size={18} /><span>Hỗ trợ</span></button>
+          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><Headphones size={18} /><span>Hỗ trợ</span></button>
         </div>
         <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>Tài khoản</span></button>
       </aside>
@@ -667,8 +692,8 @@ function Header(p: any) {
         </form>
         <div className="studio-utility-actions">
           <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={23} /><span>Thông báo</span></button>
-          <button onClick={() => p.notify("Hỗ trợ Master Clip: chúng tôi sẽ phản hồi trong giờ làm việc.")}><Headphones size={23} /><span>Hỗ trợ</span></button>
-          <button onClick={() => p.notify("Chat với nhà cung cấp đã sẵn sàng. Vui lòng gửi yêu cầu hỗ trợ của bạn.")}><MessageCircle size={23} /><span>Chat với nhà cung cấp</span></button>
+          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><Headphones size={23} /><span>Hỗ trợ</span></button>
+          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><MessageCircle size={23} /><span>Chat với nhà cung cấp</span></button>
           <button className="studio-upgrade" onClick={p.credit}><Gem size={24} /><span>Nâng cấp</span><ArrowRight size={19} /></button>
         </div>
       </header>

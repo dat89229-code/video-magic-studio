@@ -35,16 +35,17 @@ button {
   position: fixed;
   z-index: 40;
   inset: 0 auto 0 0;
-  width: 177px;
-  padding: 24px 14px;
+  width: 160px;
+  padding: 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 22px;
+  gap: 18px;
   background: #fffdfb;
   border-right: 1px solid #ead9df;
   box-shadow: 8px 0 24px rgba(94, 48, 64, 0.05);
 }
+.sidebar-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .sidebar-brand {
   width: 52px;
   height: 52px;
@@ -56,6 +57,8 @@ button {
   font-weight: 900;
   box-shadow: 0 8px 18px #d67b9c55;
 }
+.sidebar-size-toggle { width: 32px; height: 32px; flex: 0 0 auto; display: grid; place-items: center; border: 0; border-radius: 10px; color: #765b66; background: #f8eef1; }
+.sidebar-size-toggle:hover { color: var(--pink-dark); background: #fff0f4; }
 .skill-sidebar nav {
   display: grid;
   width: 100%;
@@ -99,11 +102,22 @@ button {
 @media (min-width: 901px) {
   .skill-world > main,
   .skill-world > .footer {
-    margin-left: 177px;
+    margin-left: 160px;
   }
   .skill-world > .topbar {
     display: none;
   }
+}
+.sidebar-compact .skill-sidebar { width: 76px; padding-inline: 12px; }
+.sidebar-compact .sidebar-top { justify-content: center; }
+.sidebar-compact .sidebar-size-toggle { position: absolute; top: 74px; right: 8px; z-index: 2; }
+.sidebar-compact .skill-sidebar nav button,
+.sidebar-compact .sidebar-support button,
+.sidebar-compact .sidebar-account { justify-content: center; padding-inline: 0; gap: 0; }
+.sidebar-compact .skill-sidebar span { display: none; }
+@media (min-width: 901px) {
+  .sidebar-compact > main,
+  .sidebar-compact > .footer { margin-left: 76px; }
 }
 .studio-utilitybar { display: none; }
 @media (min-width: 901px) {
@@ -112,7 +126,7 @@ button {
     z-index: 35;
     top: 0;
     height: 81px;
-    margin-left: 177px;
+    margin-left: 160px;
     padding: 0 34px;
     display: flex;
     align-items: center;
@@ -131,6 +145,7 @@ button {
   .studio-utility-actions > button:not(.studio-upgrade):hover { color: var(--pink-dark); }
   .studio-upgrade { border: 0; border-radius: 16px; padding: 13px 16px; display: flex; align-items: center; gap: 9px; color: #d13c72; background: #fff; font-size: 15px; font-weight: 950; box-shadow: 0 5px 18px rgba(97, 49, 65, .08); }
 }
+.sidebar-compact .studio-utilitybar { margin-left: 76px; }
 @media (min-width: 901px) and (max-width: 1450px) {
   .studio-utilitybar { padding-inline: 22px; }
   .studio-utility-actions { gap: 11px; }
@@ -1729,6 +1744,26 @@ footer {
 .payment-ready small {
   color: #9b7e89;
 }
+.zalo-chat-button {
+  position: fixed;
+  z-index: 55;
+  right: 24px;
+  bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 17px;
+  border-radius: 999px;
+  color: #fff;
+  background: #1677ee;
+  box-shadow: 0 10px 24px rgba(22, 119, 238, .32);
+  font-size: 14px;
+  font-weight: 850;
+  text-decoration: none;
+  transition: transform .18s ease, background .18s ease;
+}
+.zalo-chat-button:hover { transform: translateY(-2px); background: #0e66d0; }
 .notice {
   position: fixed;
   z-index: 60;
@@ -1855,6 +1890,7 @@ footer {
   .studio-home-head { grid-template-columns: 1fr; margin: 0 0 34px; padding: 38px 20px 30px; gap: 28px; }
   .studio-heading-copy { padding: 0; }
   .studio-promo { max-width: 680px; }
+  .zalo-chat-button { right: 16px; bottom: 16px; min-height: 42px; padding-inline: 14px; }
   .featured-cover-grid,
   .demo-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .reference-skill-top {

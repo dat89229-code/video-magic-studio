@@ -133,10 +133,9 @@ button {
 }
 @media (min-width: 901px) and (max-width: 1450px) {
   .studio-utilitybar { padding-inline: 22px; }
-  .studio-utility-actions > button:not(.studio-upgrade) span { display: none; }
-  .studio-utility-actions > button:not(.studio-upgrade) { padding: 8px 3px; }
-  .studio-upgrade span { display: none; }
-  .studio-upgrade { padding: 12px; }
+  .studio-utility-actions { gap: 11px; }
+  .studio-utility-actions > button:not(.studio-upgrade) { gap: 5px; font-size: 11px; }
+  .studio-upgrade { gap: 6px; padding: 11px 12px; font-size: 13px; }
 }
 .shell {
   width: min(1160px, calc(100% - 40px));

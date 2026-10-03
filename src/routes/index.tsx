@@ -681,7 +681,7 @@ function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jum
   return (
     <main className="studio-home">
       <section className="studio-home-head">
-        <div><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>Sảnh Skill của Nguyệt KOL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
+        <div><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
         <button className="btn-primary" onClick={() => jump()}>Khám phá Kho Skill <ArrowRight size={18} /></button>
       </section>
       <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">NỔI BẬT</p><h2>Cover Skill nổi bật</h2></div><button className="text-link" onClick={() => jump()}>Xem tất cả <ArrowRight size={17} /></button></div><div className="featured-cover-grid">{featuredSkills.map(({ skill, image, label }) => <button key={skill.slug} className="featured-cover" onClick={() => select(skill)}><img src={image} alt={skill.title} /><span><b>{label}</b><small>{skill.title}</small></span></button>)}</div></section>

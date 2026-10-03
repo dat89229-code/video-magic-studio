@@ -1080,15 +1080,28 @@ em {
   flex: 0 0 auto;
   background: white;
   border: 1px solid #ead9df;
-  color: #7e626d;
-  padding: 9px 13px;
+  color: #65414f;
+  padding: 11px 16px;
   border-radius: 99px;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(126, 67, 91, 0.08);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.hall-tabs button:hover {
+  border-color: #d66288;
+  color: #bf416b;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(183, 65, 105, 0.16);
 }
 .hall-tabs .selected {
   background: #d66288;
   color: white;
   border-color: #d66288;
+  box-shadow: 0 5px 14px rgba(183, 65, 105, 0.28);
 }
 .results {
   margin: 28px 0 16px;

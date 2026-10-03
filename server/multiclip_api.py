@@ -1068,21 +1068,36 @@ Lưu ý: Bạn tự đăng nhập Facebook khi AI mở trang — AI không đọ
 - Ưu tiên tuyệt đối ảnh/video thật liên quan trực tiếp — nếu không đủ tư liệu thật, dừng lại và báo tôi thiếu gì, đừng tự tạo hình AI giả làm bằng chứng.
 - Phụ đề karaoke theo đúng lời đọc, chữ tiếng Việt phải đúng dấu, không tràn/che mặt.
 - Thời lượng: [45 giây / điền số khác nếu có].
-- Cho tôi xem contact sheet/preview trước, tôi duyệt rồi mới xuất MP4. Nếu máy chưa có công cụ dựng thì tự cài trước.
-Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
+- Cho tôi xem contact sheet/preview trước, tôi duyệt rồi mới xuất MP4.
+
+Nếu máy chưa có công cụ dựng thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Skill này cần AI có thể chạy công cụ dựng video thực tế trên máy.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà Skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được.
 
 Bước 2 — Đưa ý tưởng/nguồn và media thật nếu có
-Dán câu nhờ việc mẫu, điền ý tưởng/văn bản/URL, đính kèm ảnh hoặc video thật nếu có sẵn. Nếu không đủ tư liệu thật, AI phải dừng và báo rõ phần thiếu.
+AI có đủ nguyên liệu để nghiên cứu và dựng đúng nội dung.
 
-Bước 3 — Để AI cài môi trường lần đầu rồi dựng bản nháp
-Trên máy mới, AI cài công cụ dựng cần thiết; sau đó nghiên cứu, tìm/tải media, viết kịch bản và dựng preview.
+Dán câu nhờ việc mẫu, điền ý tưởng/văn bản/URL, đính kèm ảnh/video thật nếu bạn đã có sẵn (AI vẫn tự tìm thêm nếu thiếu, nhưng có sẵn thì nhanh và chuẩn hơn).
+
+Lưu ý: Nếu chủ đề cần media thật mà không tìm/tải được đủ, AI sẽ DỪNG LẠI báo thiếu gì thay vì tự vẽ hình AI giả làm bằng chứng — đây là quy định bắt buộc, không phải AI làm biếng.
+
+Bước 3 — Để AI tự cài môi trường (chỉ lần đầu) rồi dựng
+Máy sẵn sàng dựng video, ra bản preview để bạn duyệt.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài công cụ dựng — cứ để AI tự làm. Sau đó AI nghiên cứu, tìm/tải media, viết kịch bản, dựng bản nháp.
 
 Bước 4 — Duyệt contact sheet, xuất MP4
-Kiểm hook 2 giây đầu, chữ tiếng Việt và tính phù hợp của media trên preview. Chỉ nói xuất sau khi đã ưng bản nháp."""
-    notes = "Ưu tiên media thật liên quan trực tiếp. Nếu media không đủ, yêu cầu AI báo thiếu thay vì dùng hình AI giả làm bằng chứng. Sửa ở bản nháp trước khi render lại để tránh tốn thời gian."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Dựng video dọc 9:16 theo công thức tin tức/review/giới thiệu, hook 2 giây đầu, media thật và phụ đề karaoke tiếng Việt chuẩn."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ý tưởng, văn bản, URL hoặc ảnh tham chiếu; ảnh/video thật liên quan nếu bạn có sẵn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng một video viral 45 giây từ một chủ đề bạn đang quan tâm\\n\\n1. Chọn chủ đề tin tức/review/giới thiệu có ảnh hoặc video thật liên quan\\n2. Làm theo các bước trên\\n3. Xem contact sheet trước khi xuất: hook, chữ tiếng Việt, media\\n4. Xuất MP4 và xem lại trên điện thoại trước khi đăng\\n\\nXong sẽ có: Một video dọc 9:16 có hook rõ trong 2 giây đầu, phần lớn hình ảnh là media thật, phụ đề karaoke khớp lời và chữ tiếng Việt không lỗi dấu."}]
+Có video hoàn chỉnh, đúng ý, sẵn sàng đăng.
+
+AI cho xem contact sheet/preview trước — kiểm hook 2 giây đầu có đủ mạnh không, chữ có đúng dấu không, media có đúng chủ đề không. Ưng thì nói 'xuất' để AI render MP4 thật.
+
+Lưu ý: Chưa ưng thì nhắn chỉnh cụ thể trước khi xuất — sửa trên bản nháp rẻ hơn nhiều so với render lại từ đầu."""
+    notes = "Ưu tiên media thật liên quan trực tiếp. Nếu media không đủ, AI báo thiếu thay vì dùng hình AI giả làm bằng chứng. Sửa trên bản nháp trước khi render lại để tránh tốn thời gian. Hướng dẫn này dùng FFmpeg, OpenAI Whisper và MediaPipe — các công cụ nền chạy trên máy bạn."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\\n\\nLàm được trên điện thoại\\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\\n\\nCách xử lý lỗi hay gặp\\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\\n\\nBản cài về máy cho ai cần\\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ý tưởng, văn bản, URL hoặc ảnh tham chiếu; ảnh/video thật liên quan nếu bạn có sẵn."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng 1 video viral 45 giây từ 1 chủ đề bạn đang quan tâm\\n\\n1. Chọn 1 chủ đề (tin tức/review/giới thiệu) đang có sẵn ảnh hoặc video thật liên quan\\n2. Làm theo 3 bước trên\\n3. Xem lại contact sheet trước khi xuất — kiểm hook, chữ tiếng Việt, media\\n4. Xuất MP4, xem lại toàn bộ trên điện thoại trước khi đăng\\n\\nXong sẽ có: 1 video dọc 9:16, hook rõ trong 2 giây đầu, ≥70% hình ảnh là media thật, phụ đề karaoke khớp lời, chữ tiếng Việt không lỗi dấu, kết luận trả lời đúng lời hứa của hook."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tạo video dọc viral từ ý tưởng hoặc tư liệu thật, có hook, phụ đề karaoke và bản MP4 hoàn chỉnh", "Đưa ý tưởng, văn bản, URL hoặc ảnh tham chiếu — AI chọn cấu trúc phù hợp, dùng media thật, dựng preview 9:16 để bạn duyệt rồi mới xuất MP4.", prompt, "Ý tưởng/văn bản/URL/ảnh tham chiếu và media thật liên quan nếu có.", "Video 9:16 MP4 có hook, media thật, phụ đề karaoke khớp lời và chữ tiếng Việt đúng dấu.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='reel-facebook-viral'").fetchone()["id"]

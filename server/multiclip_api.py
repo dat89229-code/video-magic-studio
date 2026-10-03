@@ -560,18 +560,32 @@ Lưu ý: Chỉ cần lệch một chút là qua nhiều ảnh sẽ trôi thành 
 
 Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước, đừng hỏi tôi từng bước trừ khi bị chặn quyền hệ thống. Xong việc thì cho tôi biết file kết quả nằm ở đâu và chỗ nào bạn không chắc thì nói rõ."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau. Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video vào, nhờ việc
-Dán câu nhờ việc mẫu trong cùng cuộc trò chuyện. Kèm theo video của bạn — nói rõ đường dẫn file hoặc kéo thả nếu AI hỗ trợ.
+AI bắt đầu edit đúng video của bạn.
+
+Bấm nút Chép ở câu nhờ việc mẫu (mục 'Nhờ việc thử' ngay sau khi cài Skill), dán vào cùng cuộc trò chuyện. Kèm theo video của bạn — nói rõ đường dẫn file hoặc kéo thả nếu AI hỗ trợ.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu dùng trên 1 máy mới, AI cần thêm vài phút để cài ffmpeg/Whisper/Node. Các lần edit sau trên máy này sẽ nhanh ngay từ đầu.
+Máy sẵn sàng chạy các skill edit video về sau, không phải cài lại.
+
+Lần đầu dùng trên 1 máy mới, AI cần thêm vài phút để cài ffmpeg/Whisper/Node — cứ để nó tự làm. Các lần edit sau trên máy này sẽ nhanh ngay từ đầu.
+
+Lưu ý: AI báo thiếu quyền cài đặt hệ thống thì mới cần bạn can thiệp (vd bấm 'Cho phép' ở hộp thoại Windows) — còn lại để nó tự xử lý.
 
 Bước 4 — Nhận file, kiểm tra và chỉnh nếu cần
-Mở file trong thư mục output/, kiểm thumbnail, phụ đề và điểm cắt. Chưa ưng thì nhắn tiếp trong cùng cuộc trò chuyện."""
-    notes = "KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được. AI báo thiếu quyền cài đặt hệ thống thì mới cần bạn can thiệp."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Cắt gọn tự nhiên, thumbnail AI và phụ đề động cho video nói chuyện."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện trước camera, dài 1–5 phút; đường dẫn file hoặc file upload."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thật thành short đăng được ngay\n\n1. Chọn 1 video quay cảnh bạn nói chuyện, dài 1-5 phút\n2. Làm theo 4 bước trên\n3. Xem lại kết quả trong output/, kiểm thumbnail, phụ đề, điểm cắt\n4. Đăng thử lên kênh của bạn\n\nXong sẽ có: 1 video dọc 9:16, mở đầu bằng thumbnail đúng nội dung, phụ đề chạy khớp lời, không còn khoảng lặng/từ đệm thừa."}]
+Có video đăng được ngay.
+
+AI báo đường dẫn file trong thư mục output/. Mở lên xem: thumbnail có đúng nội dung không, phụ đề có khớp lời không, chỗ cắt có bị hụt từ không.
+
+Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'chỉnh lại tiêu đề thumbnail cho ngắn hơn' — đừng bắt AI làm lại từ đầu."""
+    notes = "KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà Skill này cần chạy ffmpeg/Whisper thật mới ra file video. AI báo thiếu quyền cài đặt hệ thống thì mới cần bạn can thiệp; các lần edit sau trên máy này sẽ nhanh ngay từ đầu."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện trước camera, dài 1–5 phút; đường dẫn file hoặc file upload."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thật của bạn thành short đăng được ngay\n\n1. Chọn 1 video quay cảnh bạn nói chuyện, dài 1-5 phút\n2. Làm theo 3 bước trên\n3. Xem lại kết quả trong output/, kiểm 3 chỗ: thumbnail, phụ đề, điểm cắt\n4. Đăng thử lên kênh của bạn, so cảm giác với video chưa edit\n\nXong sẽ có: 1 video dọc 9:16, mở đầu bằng thumbnail đúng nội dung, phụ đề chạy khớp lời, không còn khoảng lặng/từ đệm thừa — nhìn chuyên nghiệp như có người edit tay."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Cắt gọn tự nhiên, mở đầu bằng thumbnail AI tự viết, phụ đề động chạy theo lời nói", "Đưa 1 video nói chuyện trước camera vào — AI tự cắt gọn khoảng lặng/từ đệm, tự viết thumbnail mở đầu, thêm phụ đề động và xuất video dọc 9:16.", prompt, "Một video nói chuyện trước camera, dài 1–5 phút.", "Một video dọc 9:16 có thumbnail mở đầu, phụ đề động và điểm cắt gọn.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-2-hieu-ung-cao-cap'").fetchone()["id"]

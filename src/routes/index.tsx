@@ -882,7 +882,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
   // A source-aligned layout is enabled only after that Skill's purchased
   // lesson has been checked and imported.  It deliberately shares the same
   // Master Clip visual template; the lesson text remains specific to its slug.
-  const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat"].includes(skill.slug);
+  const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat", "dang-1-thoai-thumbnail"].includes(skill.slug);
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
@@ -910,7 +910,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
       result: resultIndex === -1 ? "" : lines[resultIndex].replace(/^Xong sẽ có:\s*/i, ""),
     };
   }, [practiceSection]);
-  const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : ["multishot", "hoan-doi-nhan-vat"].includes(skill.slug) ? "5 phút" : ["xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug) ? "2 phút" : "3 phút";
+  const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : ["multishot", "hoan-doi-nhan-vat"].includes(skill.slug) ? "5 phút" : skill.slug === "dang-1-thoai-thumbnail" ? "5–10 phút" : ["xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug) ? "2 phút" : "3 phút";
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {

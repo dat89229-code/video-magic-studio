@@ -1101,29 +1101,44 @@ Lưu ý: Chưa ưng thì nhắn chỉnh cụ thể trước khi xuất — sửa
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tạo video dọc viral từ ý tưởng hoặc tư liệu thật, có hook, phụ đề karaoke và bản MP4 hoàn chỉnh", "Đưa ý tưởng, văn bản, URL hoặc ảnh tham chiếu — AI chọn cấu trúc phù hợp, dùng media thật, dựng preview 9:16 để bạn duyệt rồi mới xuất MP4.", prompt, "Ý tưởng/văn bản/URL/ảnh tham chiếu và media thật liên quan nếu có.", "Video 9:16 MP4 có hook, media thật, phụ đề karaoke khớp lời và chữ tiếng Việt đúng dấu.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='reel-facebook-viral'").fetchone()["id"]
-    prompt = """Làm Reel Facebook cho tôi.
-Kênh mẫu để học cấu trúc: [link kênh mẫu].
-Fanpage sẽ đăng: [link fanpage].
-Thư mục làm việc đặt ở: [đường dẫn thư mục].
+    prompt = """Làm Reel Facebook cho tôi. Kênh mẫu để học cấu trúc: [link kênh mẫu]. Fanpage sẽ đăng: [link fanpage]. Thư mục làm việc đặt ở: [đường dẫn thư mục].
+
 - Học cấu trúc của kênh mẫu (chủ đề, hook, mật độ chữ, độ dài caption) nhưng KHÔNG sao chép câu chữ, danh tính hay tư liệu của họ.
 - Dựng kho làm việc, mở các thư mục để tôi bỏ video/nhạc/logo vào, rồi làm tiếp.
 - Nội dung chữ trên Reel: [dán nội dung đã duyệt, giữ nguyên từng chữ — hoặc ghi "hãy soạn bản nháp cho tôi xem trước"].
 - Dựng Reel 9:16, kiểm tra xem trước ở nhiều mốc thời gian, tự sửa nếu chữ tràn hay logo che chủ thể.
 - Cho tôi xem video + caption. KHÔNG đăng khi tôi chưa nói rõ "Duyệt".
+
 Nếu máy chưa có ffmpeg/Python thì tự cài trước. Không đọc hay lưu mật khẩu/OTP của tôi."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Skill này cần AI có thể chạy công cụ dựng video thực tế trên máy.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà Skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được.
 
 Bước 2 — Đưa kênh mẫu, fanpage và bỏ tư liệu vào kho
-Điền link kênh mẫu và fanpage. AI dựng kho làm việc với ba thư mục video gốc, nhạc nền, logo để bạn bỏ tư liệu của mình vào.
+AI có đủ nguyên liệu và biết đăng lên đâu.
+
+Dán câu nhờ việc mẫu, điền link kênh mẫu + fanpage. AI dựng kho làm việc rồi mở 3 thư mục: video gốc, nhạc nền, logo — bạn bỏ tư liệu của mình vào.
+
+Lưu ý: Chỉ dùng nhạc và video bạn có quyền dùng. Nhạc trend có bản quyền có thể khiến Facebook cảnh báo hoặc gỡ Reel.
 
 Bước 3 — Duyệt nội dung và xem Reel AI dựng
-Đưa nội dung chữ đã duyệt hoặc yêu cầu bản nháp. AI dựng Reel, xem preview ở 25%/50%/75% thời lượng, sửa lỗi chữ tràn hoặc logo che chủ thể trước khi đưa bạn xem.
+Có Reel + caption đúng ý, đã kiểm tra xem trước.
+
+Đưa nội dung chữ bạn đã duyệt (AI giữ nguyên từng chữ), hoặc nhờ AI soạn bản nháp để bạn xem trước. AI dựng, tự xem ảnh xem trước ở 25%/50%/75% thời lượng, tự sửa lỗi chữ tràn hay logo che chủ thể rồi mới đưa bạn xem.
+
+Lưu ý: Muốn đổi gì thì nói đúng phần đó ('bỏ logo', 'chữ nhỏ hơn') — AI chỉ đổi phần đó rồi dựng lại, không làm lại từ đầu.
 
 Bước 4 — Xác nhận để AI đăng hoặc lên lịch
-AI chuẩn bị tải Reel, caption và giờ trống; dừng lại với bản tóm tắt trang, tên file, đầu caption, ngày giờ. Chỉ bấm khi bạn nói rõ Duyệt hoặc Lên lịch."""
-    notes = "Chỉ dùng nhạc và video bạn có quyền sử dụng. Lời duyệt cho video cũ không có giá trị cho video mới; AI phải xin xác nhận lại cho từng Reel và không tự đăng trùng khi không chắc giao dịch trước đã thành công."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Học cấu trúc kênh mẫu, dựng Reel dọc 9:16 từ kho video của bạn, thêm chữ cố định/nhạc nền, kiểm preview và chuẩn bị đăng hoặc hẹn lịch sau duyệt."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link kênh mẫu, link fanpage, thư mục làm việc, video/nhạc/logo bạn có quyền dùng và nội dung chữ đã duyệt."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng và hẹn giờ đăng một Reel đầu tiên\\n\\n1. Chuẩn bị 2-3 video ngắn, một bài nhạc có quyền dùng và một đoạn chữ ngắn đã duyệt\\n2. Làm theo các bước trên\\n3. Xem Reel trên điện thoại: chữ có đọc được, logo có che gì không\\n4. Hẹn giờ đăng và kiểm Reel xuất hiện trong danh sách bài đã hẹn\\n\\nXong sẽ có: Một Reel 9:16 khoảng 20 giây có chữ cố định rõ, nhạc nền, đã qua bạn duyệt và nằm trong lịch đăng fanpage; kho ghi lại tư liệu đã dùng."}]
+Reel lên đúng fanpage, đúng giờ trống kế tiếp.
+
+AI mở Facebook, tải Reel, điền caption, chọn giờ trống gần nhất theo khung giờ và giới hạn số bài mỗi ngày đã cấu hình — rồi DỪNG, đưa bạn tóm tắt (trang, tên file, đầu caption, ngày giờ). Bạn nói rõ 'Duyệt' hoặc 'Lên lịch' thì AI mới bấm.
+
+Lưu ý: Lời 'Duyệt' cho video cũ không có giá trị cho video mới — mỗi Reel AI đều hỏi lại. AI không bật quảng cáo/boost và không tự đăng trùng khi không chắc lần trước đã thành công."""
+    notes = "Chỉ dùng nhạc và video bạn có quyền sử dụng. Mỗi Reel cần duyệt riêng; AI không tự đăng trùng khi không chắc lần trước đã thành công. Hướng dẫn này dùng FFmpeg, chạy trên máy bạn."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\\n\\nLàm được trên điện thoại\\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\\n\\nCách xử lý lỗi hay gặp\\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\\n\\nBản cài về máy cho ai cần\\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link kênh mẫu, link fanpage, thư mục làm việc, video/nhạc/logo bạn có quyền dùng và nội dung chữ đã duyệt."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Dựng và hẹn giờ đăng 1 Reel đầu tiên\\n\\n1. Chuẩn bị 2-3 video ngắn, 1 bài nhạc bạn có quyền dùng, 1 đoạn chữ ngắn đã duyệt\\n2. Làm theo 3 bước trên\\n3. Xem Reel trên điện thoại: chữ có đọc được, logo có che gì không\\n4. Hẹn giờ đăng, kiểm tra Reel xuất hiện trong danh sách bài đã hẹn\\n\\nXong sẽ có: 1 Reel 9:16 dài ~20 giây có chữ cố định đọc rõ + nhạc nền, đã qua bạn duyệt và nằm trong lịch đăng của fanpage; kho ghi lại tư liệu nào đã dùng."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xây quy trình Reel Facebook từ kho tư liệu, có preview và hẹn lịch đăng sau khi bạn duyệt", "Đưa kênh mẫu, fanpage và tư liệu của bạn — AI học cấu trúc, dựng Reel 9:16, kiểm preview rồi chỉ chuẩn bị đăng/lên lịch khi bạn xác nhận.", prompt, "Link kênh mẫu, fanpage, thư mục làm việc, video/nhạc/logo được phép dùng và nội dung chữ.", "Reel 9:16 với caption, preview đã kiểm, sẵn sàng đăng hoặc đã hẹn lịch sau xác nhận.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org/", skill_id))
 
 

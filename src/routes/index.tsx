@@ -709,7 +709,7 @@ function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jum
   return (
     <main className="studio-home">
       <section className="studio-home-head">
-        <div className="studio-heading-copy"><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
+        <div className="studio-heading-copy"><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Mỗi Skill là một <strong>câu lệnh soạn sẵn</strong> — dán vào ChatGPT hoặc Gemini - CÓ ẢNH VIRAL NGAY.</p></div>
         <aside className="studio-promo" aria-label="Khám phá Master Clip AI Skill World"><div><b>AI giúp bạn<br />sáng tạo dễ dàng hơn</b><small>MASTER CLIP<br />AI SKILL WORLD</small><button className="btn-primary" onClick={() => jump()}>Khám phá ngay <ArrowRight size={18} /></button></div><img src="/home-banner-tieu-nguyet.png" alt="Nhân vật Master Clip AI Skill World" /></aside>
       </section>
       <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">NỔI BẬT</p><h2>Cover Skill nổi bật</h2></div><button className="text-link" onClick={() => jump()}>Xem tất cả <ArrowRight size={17} /></button></div><div className="featured-cover-grid">{featuredSkills.map(({ skill, image, label }) => <button key={skill.slug} className="featured-cover" onClick={() => select(skill)}><img src={image} alt={skill.title} /><span><b>{label}</b><small>{skill.title}</small></span></button>)}</div></section>

@@ -243,7 +243,7 @@ button {
 }
 .studio-home-head::after { content: ""; position: absolute; z-index: 0; left: 4%; bottom: -112px; width: 78%; height: 190px; border-radius: 50%; border-top: 2px solid #f4d3dc; transform: rotate(5deg); }
 .studio-heading-copy, .studio-promo { position: relative; z-index: 1; }
-.studio-heading-copy { padding-top: 18px; }
+.studio-heading-copy { padding: 18px 0 0 clamp(28px, 3vw, 58px); }
 .studio-home-head h1,
 .studio-section h2 {
   margin: 0;
@@ -1853,7 +1853,7 @@ footer {
   .skill-sidebar { display: none; }
   .studio-home { width: min(100% - 40px, 1160px); padding: 42px 0 58px; }
   .studio-home-head { grid-template-columns: 1fr; margin: 0 0 34px; padding: 38px 20px 30px; gap: 28px; }
-  .studio-heading-copy { padding-top: 0; }
+  .studio-heading-copy { padding: 0; }
   .studio-promo { max-width: 680px; }
   .featured-cover-grid,
   .demo-video-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }

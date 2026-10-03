@@ -882,7 +882,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
   // A source-aligned layout is enabled only after that Skill's purchased
   // lesson has been checked and imported.  It deliberately shares the same
   // Master Clip visual template; the lesson text remains specific to its slug.
-  const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat", "dang-1-thoai-thumbnail", "dang-2-hieu-ung-cao-cap", "dang-3-huong-dan-toi-gian", "dang-4-infographic-trang", "cap-do-1-khung-don", "cap-do-2-postcard-2-nguoi", "multiclip-ghep-nhac-trend", "multiclip-1-video-highlight"].includes(skill.slug);
+  const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat", "dang-1-thoai-thumbnail", "dang-2-hieu-ung-cao-cap", "dang-3-huong-dan-toi-gian", "dang-4-infographic-trang", "cap-do-1-khung-don", "cap-do-2-postcard-2-nguoi", "multiclip-ghep-nhac-trend", "multiclip-1-video-highlight", "edit-video-zoom"].includes(skill.slug);
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
@@ -910,7 +910,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
       result: resultIndex === -1 ? "" : lines[resultIndex].replace(/^Xong sẽ có:\s*/i, ""),
     };
   }, [practiceSection]);
-  const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : ["multishot", "hoan-doi-nhan-vat"].includes(skill.slug) ? "5 phút" : skill.slug === "dang-1-thoai-thumbnail" ? "5–10 phút" : ["dang-2-hieu-ung-cao-cap", "dang-4-infographic-trang", "cap-do-1-khung-don"].includes(skill.slug) ? "10–20 phút" : skill.slug === "cap-do-2-postcard-2-nguoi" ? "15–25 phút" : ["multiclip-ghep-nhac-trend", "multiclip-1-video-highlight"].includes(skill.slug) ? "10–15 phút" : skill.slug === "dang-3-huong-dan-toi-gian" ? "8–12 phút" : ["xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug) ? "2 phút" : "3 phút";
+  const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : ["multishot", "hoan-doi-nhan-vat"].includes(skill.slug) ? "5 phút" : skill.slug === "dang-1-thoai-thumbnail" ? "5–10 phút" : ["dang-2-hieu-ung-cao-cap", "dang-4-infographic-trang", "cap-do-1-khung-don"].includes(skill.slug) ? "10–20 phút" : skill.slug === "cap-do-2-postcard-2-nguoi" ? "15–25 phút" : skill.slug === "edit-video-zoom" ? "20–40 phút" : ["multiclip-ghep-nhac-trend", "multiclip-1-video-highlight"].includes(skill.slug) ? "10–15 phút" : skill.slug === "dang-3-huong-dan-toi-gian" ? "8–12 phút" : ["xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k"].includes(skill.slug) ? "2 phút" : "3 phút";
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {

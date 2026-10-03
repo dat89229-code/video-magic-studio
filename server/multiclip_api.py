@@ -857,18 +857,32 @@ Lưu ý: Muốn đổi đoạn nào thì nhắn cụ thể: 'bỏ đoạn giây 
 
 Nếu máy chưa có ffmpeg/Whisper thì tự cài trước. Xong việc thì cho tôi biết các file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa file Zoom vào, nói tên chuỗi nếu có
+AI bắt đầu xử lý đúng buổi ghi của bạn.
+
 Bấm Chép câu nhờ việc mẫu, điền tên chuỗi/khoá học nếu có, dán cùng file ghi Zoom vào cuộc trò chuyện.
 
+Lưu ý: Buổi Zoom càng dài, bước đọc transcript + lập outline càng lâu — buổi 2 tiếng có thể mất 20-40 phút để ra hết 5 phần.
+
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper.
+Máy sẵn sàng chạy skill này, không phải cài lại.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper — cứ để AI tự làm, các lần sau nhanh ngay.
 
 Bước 4 — Nhận N file, kiểm continuity giữa các phần
-Các file trong output/ kèm titles-descriptions.md và series-overview.md. Xem lần lượt, kiểm các phần có nối mạch tự nhiên không."""
-    notes = "Buổi Zoom càng dài, bước đọc transcript + lập outline càng lâu — buổi 2 tiếng có thể mất 20-40 phút để ra hết 5 phần. Chỗ nào cắt hụt hoặc nối gượng thì nhắn rõ phần và thời điểm cần chỉnh, không cần làm lại cả chuỗi."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Đọc transcript Zoom, lập outline, loại rác kỹ thuật và chia thành chuỗi video 16:9 có tiêu đề, mô tả và chương mục."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một buổi ghi Zoom/đào tạo/coaching từ 45 phút trở lên và tên chuỗi nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 buổi Zoom thành chuỗi khoá học đăng dần\n\n1. Chọn buổi ghi Zoom dài từ 45 phút trở lên\n2. Làm theo 3 bước trên\n3. Xem hết các phần, kiểm outline có đúng những gì đã nói không\n4. Đăng thử phần 1, hẹn phần 2 theo đúng câu nối đã dựng\n\nXong sẽ có: 1 chuỗi 5 video 16:9, mỗi video có tiêu đề/mô tả/chương mục riêng, nối mạch như một khoá học thật."}]
+Có sẵn chuỗi video đăng được ngay, nối mạch tự nhiên.
+
+Các file nằm trong output/, kèm titles-descriptions.md và series-overview.md. Xem lần lượt, kiểm: các phần có nối mạch tự nhiên không, có khoảnh khắc cảm xúc nào bị cắt nhầm không.
+
+Lưu ý: Chỗ nào cắt hụt hoặc nối gượng thì nhắn rõ: 'phần 2 giây 45 đang nối gượng với phần 1, chỉnh lại đoạn dẫn' — không cần làm lại cả chuỗi."""
+    notes = "Hướng dẫn này viết cho FFmpeg + OpenAI Whisper + MediaPipe — phần mềm nguồn mở giấy phép Mã nguồn mở (LGPL/GPL, MIT, Apache-2.0) — công cụ nền chạy trên máy bạn, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một buổi ghi Zoom dài (đào tạo, coaching hoặc hội thảo) từ 45 phút trở lên, cùng tên chuỗi/khoá học nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 buổi ghi Zoom bạn đang có thành chuỗi khoá học đăng dần\n\n1. Chọn 1 buổi ghi Zoom dài (đào tạo, coaching, hội thảo) từ 45 phút trở lên\n2. Làm theo 3 bước trên\n3. Xem hết các phần, kiểm outline (series-overview.md) có đúng những gì đã nói không\n4. Đăng thử phần 1, hẹn phần 2 theo đúng câu nối đã dựng\n\nXong sẽ có: 1 chuỗi 5 video 16:9, mỗi video có tiêu đề/mô tả/chương mục riêng, nối mạch với nhau như 1 khoá học thật, âm thanh sạch, không còn khoảng lặng/rác kỹ thuật."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Video họp, hội thảo quay bằng Zoom tự cắt gọn, bỏ đoạn chết, dựng thành video hoàn chỉnh", "Đưa 1 buổi ghi Zoom dài vào — AI tự đọc transcript, lập outline, cắt bỏ khoảng lặng/rác kỹ thuật, chia thành chuỗi video 16:9 nối mạch kèm tiêu đề/mô tả/chương mục.", prompt, "Một buổi ghi Zoom dài từ 45 phút và tên chuỗi nếu có.", "Một chuỗi video 16:9 có outline, tiêu đề, mô tả và chương mục riêng.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='video-tu-dong-google-flow'").fetchone()["id"]

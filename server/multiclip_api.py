@@ -670,18 +670,30 @@ Lưu ý: Chưa ưng thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví d�
 
 Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video vào, nói rõ tông màu nếu có
+AI bắt đầu dựng đúng video, đúng nhận diện thương hiệu.
+
 Bấm Chép câu nhờ việc mẫu, điền 2 tông màu thương hiệu nếu có, dán cùng video vào cuộc trò chuyện.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt — cứ để AI tự làm.
 
 Bước 4 — Nhận file, kiểm độ đa dạng của infographic
-Mở file trong output/, kiểm lớp phủ infographic có khác kiểu nhau không, nội dung có đúng đoạn đang nói không và màu có đúng thương hiệu không."""
-    notes = "Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'lớp phủ ở giây 20 đang lặp kiểu với lớp ở giây 5, đổi sang dạng khác'."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Lớp phủ infographic trắng do AI tự thiết kế: tiêu đề hero, thẻ so sánh VS, sơ đồ bước, danh sách và số liệu."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện có phần so sánh hoặc quy trình nhiều bước; 2 màu thương hiệu nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản infographic kiểu HeyGen\n\n1. Chọn video có đoạn so sánh hoặc quy trình nhiều bước\n2. Làm theo 3 bước trên\n3. Kiểm các lớp phủ có đa dạng bố cục không\n4. Đăng thử, so cảm giác chuyên nghiệp với video gốc\n\nXong sẽ có: 1 video xen kẽ talking-head và lớp phủ infographic trắng đa dạng kiểu, màu sắc sáng/sạch, chất lượng hình ảnh nét và nịnh da hơn bản gốc."}]
+Có video chuyên nghiệp, không lặp mẫu.
+
+Mở file trong output/, kiểm: các lớp phủ infographic có khác kiểu nhau không (không lặp mẫu), nội dung mỗi lớp có đúng đoạn đang nói không, màu có đúng thương hiệu không.
+
+Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'lớp phủ ở giây 20 đang lặp kiểu với lớp ở giây 5, đổi sang dạng khác'."""
+    notes = "Các lớp phủ infographic phải đa dạng, không lặp mẫu; nội dung mỗi lớp khớp đoạn đang nói và màu đúng thương hiệu."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video nói chuyện có phần so sánh hoặc quy trình nhiều bước; 2 màu thương hiệu nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Edit 1 video nói chuyện thành bản infographic kiểu HeyGen\n\n1. Chọn 1 video nói chuyện có ít nhất 1 đoạn so sánh (vd 'thủ công' vs 'dùng AI') hoặc 1 quy trình nhiều bước\n2. Làm theo 3 bước trên\n3. Kiểm các lớp phủ có đa dạng bố cục không\n4. Đăng thử, so cảm giác chuyên nghiệp với video gốc chưa edit\n\nXong sẽ có: 1 video xen kẽ talking-head và lớp phủ infographic trắng đa dạng kiểu (không lặp mẫu), màu sắc sáng/sạch, chất lượng hình ảnh nét và nịnh da hơn bản gốc."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Xen kẽ lớp phủ infographic trắng do AI tự thiết kế, phong cách chuyên nghiệp kiểu HeyGen", "Đưa 1 video nói chuyện vào — AI tự thiết kế và xen kẽ các lớp phủ infographic trắng toàn màn hình kèm bộ lọc màu pro, phong cách chuyên nghiệp kiểu HeyGen.", prompt, "Một video nói chuyện có đoạn so sánh hoặc quy trình; 2 màu thương hiệu nếu có.", "Video xen kẽ talking-head và lớp phủ infographic trắng đa dạng, đúng nội dung.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='cap-do-1-khung-don'").fetchone()["id"]

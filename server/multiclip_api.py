@@ -483,17 +483,31 @@ Quy tắc bắt buộc:
 
 Trước khi tạo ảnh, liệt kê cho tôi xem 9 góc bạn định làm. Tôi duyệt xong bạn mới tạo."""
     steps = """Bước 1 — Chọn ảnh tham chiếu
+Máy có đủ thông tin để dựng lại từ góc khác.
+
 Chọn ảnh thấy rõ nhân vật hoặc vật thể chính, đủ sáng, không bị che khuất. Ảnh càng rõ thì các góc mới càng nhất quán.
 
+Lưu ý: Ảnh chỉ thấy nửa mặt hoặc bị che nhiều thì máy phải tự bịa phần khuất — các góc sẽ lệch nhau. Chọn ảnh nhìn thấy được nhiều nhất có thể.
+
 Bước 2 — Tải ảnh lên rồi dán câu lệnh
+AI đề xuất danh sách góc quay.
+
 Bấm kẹp giấy tải ảnh lên, bấm nút Chép ở đầu trang rồi dán câu lệnh vào, gửi. Muốn số góc khác 9 thì sửa thẳng con số trong câu lệnh.
 
+Lưu ý: Muốn STORYBOARD phim thay vì các góc rời: thêm chữ 'Video' vào câu nhờ. Đúng một chữ đó quyết định bạn nhận về thứ gì — có 'Video' thì ra một bảng ô vuông đánh số kèm câu lệnh dựng video, không có thì ra các ảnh rời.
+
 Bước 3 — Duyệt danh sách góc rồi cho chạy
+Các góc khác nhau thật.
+
 Đọc danh sách, thấy góc nào trùng ý thì đổi: 'Góc 3 và góc 6 gần giống nhau, đổi góc 6 thành nhìn từ trên xuống.' Ưng rồi thì bảo tạo ảnh.
 
 Bước 4 — Kiểm tính nhất quán
-Đặt các tấm cạnh nhau, soi ba thứ: trang phục có đổi không, ánh sáng chiếu cùng hướng không, đạo cụ có còn nguyên chỗ không."""
-    notes = "Ảnh chỉ thấy nửa mặt hoặc bị che nhiều thì máy phải tự bịa phần khuất — các góc sẽ lệch nhau. Muốn STORYBOARD phim thay vì các góc rời: thêm chữ 'Video' vào câu nhờ. Định dùng làm keyframe video thì tính nhất quán quan trọng hơn ảnh đẹp. Tấm nào lệch thì bỏ, đừng tiếc."
+Chín tấm đúng là một khoảnh khắc.
+
+Đặt các tấm cạnh nhau, soi ba thứ: trang phục có đổi không, ánh sáng chiếu cùng hướng không, đạo cụ có còn nguyên chỗ không.
+
+Lưu ý: Định dùng làm keyframe video thì tính nhất quán quan trọng hơn ảnh đẹp. Tấm nào lệch thì bỏ, đừng tiếc."""
+    notes = "Ảnh chỉ thấy nửa mặt hoặc bị che nhiều thì máy phải tự bịa phần khuất — các góc sẽ lệch nhau. Chọn ảnh nhìn thấy được nhiều nhất có thể. Muốn STORYBOARD phim thay vì các góc rời: thêm chữ 'Video' vào câu nhờ. Đúng một chữ đó quyết định bạn nhận về thứ gì. Định dùng làm keyframe video thì tính nhất quán quan trọng hơn ảnh đẹp. Tấm nào lệch thì bỏ, đừng tiếc."
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính, đủ sáng và không bị che khuất."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Tạo 9 góc quay từ một ảnh chân dung của bạn\n\n1. Chọn một ảnh chân dung rõ mặt, đủ sáng\n2. Làm theo 4 bước trên\n3. Đặt 9 tấm cạnh nhau, kiểm trang phục và hướng sáng\n4. Làm lại một lần nữa, lần này thêm chữ 'Video' để xem storyboard khác thế nào\n\nXong sẽ có: Chín tấm nhìn ra ngay là cùng một người, cùng bộ đồ, cùng khoảnh khắc — chỉ khác chỗ đặt máy quay."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Một ảnh ra nhiều góc quay nhất quán, dùng làm keyframe video hoặc storyboard", "Đưa MỘT ảnh, nhận về NHIỀU góc quay của cùng một khoảnh khắc — nhất quán đủ để làm keyframe video. Thêm chữ 'Video' vào câu nhờ thì đổi sang dựng storyboard điện ảnh. Không cài gì.", prompt, "Một ảnh tham chiếu rõ nhân vật hoặc vật thể chính.", "Chín góc quay khác nhau rõ rệt của cùng một khoảnh khắc.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
 

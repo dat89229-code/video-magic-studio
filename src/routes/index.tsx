@@ -901,6 +901,15 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
     () => importedSections.find((section: { number?: string }) => section?.number === "05"),
     [importedSections],
   );
+  const practice = useMemo(() => {
+    const lines = (practiceSection?.body || "").split(/\n+/).map((line: string) => line.trim()).filter(Boolean);
+    const resultIndex = lines.findIndex((line: string) => /^Xong sẽ có:/i.test(line));
+    return {
+      intro: lines[0] || "",
+      steps: lines.slice(1, resultIndex === -1 ? undefined : resultIndex).filter((line: string) => /^\d+\.\s/.test(line)),
+      result: resultIndex === -1 ? "" : lines[resultIndex].replace(/^Xong sẽ có:\s*/i, ""),
+    };
+  }, [practiceSection]);
   const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : "3 phút";
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
@@ -1041,8 +1050,9 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             })}
           </div>
           {practiceSection && <article className="reference-practice">
-            <p><b>{practiceSection.title}</b></p>
-            <p className="reference-practice-body">{practiceSection.body}</p>
+            <p><b>{practiceSection.title}</b> {practice.intro}</p>
+            {practice.steps.length > 0 && <ol>{practice.steps.map((step: string) => <li key={step}>{step.replace(/^\d+\.\s*/, "")}</li>)}</ol>}
+            {practice.result && <div><strong>Xong sẽ có:</strong> {practice.result}</div>}
           </article>}
           <div className="reference-extra">
             <p>{content?.notes_text}</p>

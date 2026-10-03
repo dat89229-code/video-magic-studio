@@ -774,6 +774,17 @@ em {
   object-fit: cover;
   object-position: center 28%;
 }
+.brand-poster-cover {
+  width: min(100%, 282px);
+  aspect-ratio: 9 / 16;
+  margin-inline: auto;
+  padding: 0;
+  background: #f8eef0 !important;
+}
+.brand-poster-cover > img {
+  object-fit: contain;
+  object-position: center;
+}
 .skill-cover-shade {
   position: absolute;
   inset: 0;
@@ -1119,6 +1130,18 @@ em {
 }
 .reference-cover > img {
   object-position: center 36%;
+}
+.brand-poster-detail {
+  width: min(100%, 360px);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  padding: 0;
+  margin-inline: 0 auto;
+  background: #f8eef0;
+}
+.brand-poster-detail > img {
+  object-fit: contain;
+  object-position: center;
 }
 .reference-benefits {
   margin-top: 48px;

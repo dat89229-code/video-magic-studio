@@ -846,18 +846,21 @@ function Card({
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const isMasterCoverTemplate = lockedReferenceCovers.has(skill.slug);
   const isRefinedCover = !isMasterCoverTemplate;
+  const isFullPosterCover = skill.slug === "thuong-hieu-ca-nhan";
   return (
     <article className={`skill-card ${skill.hall === "Sửa ảnh AI" ? "photo-skill-card" : ""}`}>
       <div
-        className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${isRefinedCover ? "cover-system" : ""}`}
+        className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${isRefinedCover ? "cover-system" : ""} ${isFullPosterCover ? "brand-poster-cover" : ""}`}
         style={{ background: `linear-gradient(135deg,${colors[index % 5]},#fffaf6)` }}
       >
         <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
-        <div className="skill-cover-shade" />
-        <span>{skill.hall}</span>
-        <strong className={`cover-title ${isMasterCoverTemplate ? "cover-title--master-template" : ""}`}>
-          {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-${lineIndex}`}>{line}</span>)}
-        </strong>
+        {!isFullPosterCover && <>
+          <div className="skill-cover-shade" />
+          <span>{skill.hall}</span>
+          <strong className={`cover-title ${isMasterCoverTemplate ? "cover-title--master-template" : ""}`}>
+            {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-${lineIndex}`}>{line}</span>)}
+          </strong>
+        </>}
       </div>
       <div className="skill-content">
         <div className="skill-meta">
@@ -883,6 +886,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
   // lesson has been checked and imported.  It deliberately shares the same
   // Master Clip visual template; the lesson text remains specific to its slug.
   const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham", "xoa-nen-anh", "xoa-logo-anh", "chinh-sua-anh", "tang-chat-luong-4k", "multishot", "hoan-doi-nhan-vat", "dang-1-thoai-thumbnail", "dang-2-hieu-ung-cao-cap", "dang-3-huong-dan-toi-gian", "dang-4-infographic-trang", "cap-do-1-khung-don", "cap-do-2-postcard-2-nguoi", "multiclip-ghep-nhac-trend", "multiclip-1-video-highlight", "edit-video-zoom", "video-tu-dong-google-flow", "subagent-cham-soc", "subagent-nghien-cuu", "seo-video-youtube", "dang-bai-tu-dong-da-kenh", "tao-video-viral", "reel-facebook-viral"].includes(skill.slug);
+  const isFullPosterCover = skill.slug === "thuong-hieu-ca-nhan";
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
@@ -932,13 +936,15 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             <p className="reference-crumb">Sảnh Skill / Sảnh I / {skill.title}</p>
             <h1 className="page-title">{skill.title}</h1>
             <p className="page-lead">{skill.description}</p>
-            <div className={`detail-cover reference-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""} ${isReferenceLayout ? "master-template-cover" : ""}`}>
+            <div className={`detail-cover reference-cover ${skill.hall === "Sửa ảnh AI" ? "photo-detail-cover" : ""} ${isReferenceLayout ? "master-template-cover" : ""} ${isFullPosterCover ? "brand-poster-detail" : ""}`}>
               <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt={`Ảnh demo ${skill.title}`} />
-              <div className="detail-cover-shade" />
-              <span>{skill.hall}</span>
-              <strong className="cover-headline">
-                {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-detail-${lineIndex}`}>{line}</span>)}
-              </strong>
+              {!isFullPosterCover && <>
+                <div className="detail-cover-shade" />
+                <span>{skill.hall}</span>
+                <strong className="cover-headline">
+                  {coverLines.map((line, lineIndex) => <span key={`${skill.slug}-detail-${lineIndex}`}>{line}</span>)}
+                </strong>
+              </>}
             </div>
             <section className="reference-benefits">
               <h2>Skill này gồm những gì?</h2>

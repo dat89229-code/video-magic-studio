@@ -775,8 +775,8 @@ em {
   object-position: center 28%;
 }
 .brand-poster-cover {
-  width: min(100%, 282px);
-  aspect-ratio: 9 / 16;
+  width: 100%;
+  aspect-ratio: 1.72 / 1;
   margin-inline: auto;
   padding: 0;
   background: #f8eef0 !important;
@@ -1132,9 +1132,9 @@ em {
   object-position: center 36%;
 }
 .brand-poster-detail {
-  width: min(100%, 360px);
+  width: min(100%, 620px);
   height: auto;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: 1.72 / 1;
   padding: 0;
   margin-inline: 0 auto;
   background: #f8eef0;

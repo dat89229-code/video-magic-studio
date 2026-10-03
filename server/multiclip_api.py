@@ -781,18 +781,32 @@ Lưu ý: Sai người nói ở đoạn nào thì nhắn rõ: 'short-02 giây 8-1
 
 Nếu máy chưa có ffmpeg/librosa/Node thì tự cài trước. Xong việc thì cho tôi biết file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa clip và nhạc vào, dặn rõ nếu là nhạc trend
-Đưa các clip vào input/, đưa file nhạc vào assets/music/ hoặc nhờ AI gợi ý nhạc free-license nếu chưa có. Dán câu nhờ việc mẫu.
+AI ghép đúng clip theo đúng bài nhạc bạn muốn dùng.
+
+Đưa các clip vào input/, đưa file nhạc vào assets/music/ (hoặc nhờ AI gợi ý nhạc free-license nếu chưa có). Dán câu nhờ việc mẫu vào cuộc trò chuyện.
+
+Lưu ý: Nhạc đang trend trên TikTok/Reels thường có bản quyền hãng đĩa — bạn phải tự tải file đó (từ nguồn bạn có quyền dùng), AI KHÔNG tự tải nhạc trend hộ bạn.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
 Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/thư viện phân tích nhạc (librosa)/Node.
 
 Bước 4 — Nhận file, kiểm điểm chuyển clip có khớp nhạc không
-Mở file trong output/, bật nhạc to lên nghe kỹ: mỗi lần đổi cảnh có đúng vào tiếng đập của nhạc không, clip đẹp nhất có nằm ở đoạn cao trào không."""
-    notes = "Nhạc đang trend trên TikTok/Reels thường có bản quyền hãng đĩa — bạn phải tự tải file từ nguồn bạn có quyền dùng, AI không tự tải nhạc trend hộ bạn. Chưa khớp thì nhắn thời điểm cần canh beat, không cần ghép lại từ đầu."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Ghép nhiều clip rời rạc theo beat nhạc, zoom theo nhịp và bộ lọc màu điện ảnh nhất quán."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"5–10 clip ngắn và một bài nhạc free-license hoặc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Ghép 5-10 clip thành 1 video theo nhạc\n\n1. Chọn 5-10 clip ngắn và 1 bài nhạc free-license hoặc bạn có quyền dùng\n2. Làm theo 3 bước trên\n3. Nghe lại với âm lượng to, kiểm nhịp chuyển clip có khớp beat không\n4. Đăng thử lên kênh trend\n\nXong sẽ có: 1 video liền mạch, mỗi lần đổi clip rơi đúng nhịp nhạc, clip ấn tượng nhất nằm ở đoạn cao trào, màu sắc nhất quán cả video."}]
+Có video đăng được ngay, đúng cảm giác 'theo nhịp'.
+
+Mở file trong output/, bật nhạc to lên nghe kỹ: mỗi lần đổi cảnh có đúng vào tiếng đập của nhạc không, clip đẹp nhất có nằm ở đoạn cao trào không.
+
+Lưu ý: Chưa khớp thì nhắn: 'Đoạn giây [X] chuyển clip đang lệch beat, canh lại' — không cần ghép lại từ đầu."""
+    notes = "Hướng dẫn này viết cho FFmpeg + OpenAI Whisper + MediaPipe — phần mềm nguồn mở giấy phép Mã nguồn mở (LGPL/GPL, MIT, Apache-2.0) — công cụ nền chạy trên máy bạn, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"5–10 clip ngắn (sản phẩm, hậu trường hoặc khoảnh khắc đẹp) và một bài nhạc free-license hoặc bạn có quyền dùng."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Ghép 5-10 clip bạn đang có thành 1 video theo nhạc\n\n1. Chọn 5-10 clip ngắn (sản phẩm, hậu trường, khoảnh khắc đẹp) và 1 bài nhạc free-license hoặc bạn có quyền dùng\n2. Làm theo 3 bước trên\n3. Nghe lại với âm lượng to, kiểm nhịp chuyển clip có khớp beat không\n4. Đăng thử lên kênh trend (TikTok/Reels)\n\nXong sẽ có: 1 video liền mạch, mỗi lần đổi clip rơi đúng nhịp nhạc, clip ấn tượng nhất nằm ở đoạn cao trào, màu sắc nhất quán cả video — cảm giác như video quảng cáo chuyên nghiệp."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Nhiều clip rời rạc tự ghép liền mạch, mỗi lần chuyển cảnh rơi đúng nhịp beat của nhạc", "Đưa nhiều clip rời rạc + 1 bài nhạc vào — AI ghép lại thành 1 video liền mạch, mỗi lần chuyển clip rơi đúng nhịp beat của nhạc, kèm zoom theo nhịp và bộ lọc màu điện ảnh.", prompt, "5–10 clip và một bài nhạc bạn có quyền dùng.", "Video dọc liền mạch với chuyển cảnh đúng beat và màu sắc nhất quán.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='multiclip-1-video-highlight'").fetchone()["id"]

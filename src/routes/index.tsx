@@ -633,187 +633,59 @@ function Header(p: any) {
     scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
-    <header className="topbar">
-      <div className="shell nav-shell">
-        <button className="brand" onClick={() => go("home")}>
-          <span>MC</span>
-          <b>Master Clip</b>
-        </button>
-        <nav className={p.menu ? "nav-links open" : "nav-links"}>
-          <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}>
-            Trang chủ
-          </button>
-          {p.skillOnly && <button onClick={() => go("home")}>Sảnh Skill</button>}
-          <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>
-            Kho Skill
-          </button>
-          {!p.skillOnly && <button className={p.page === "studio" ? "active" : ""} onClick={p.openTools}>Công cụ AI</button>}
-          <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}>
-            Skill của tôi
-          </button>
-          <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}>
-            Combo
-          </button>
+    <>
+      <aside className="skill-sidebar" aria-label="Điều hướng Master Clip">
+        <button className="sidebar-brand" onClick={() => go("home")} aria-label="Master Clip trang chủ">MC</button>
+        <nav>
+          <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}><Sparkles size={20} /><span>Sảnh Skill</span></button>
+          <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}><ImageIcon size={20} /><span>Kho Skill</span></button>
+          <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}><Clapperboard size={20} /><span>Skill của tôi</span></button>
+          <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}><Gem size={20} /><span>Combo</span></button>
         </nav>
-        <div className="nav-actions">
-          {!p.skillOnly && <button className="credit-button" onClick={p.credit}><Gem size={17} /><span>{p.account ? `${p.account.credits} Credit` : "Nạp Credit"}</span></button>}
-          <button className="account-button" onClick={p.auth}>
-            <User size={17} />
-            <span>{p.account ? "Tài khoản" : "Đăng nhập"}</span>
+        <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>{p.account ? "Tài khoản" : "Đăng nhập"}</span></button>
+      </aside>
+      <header className="topbar">
+        <div className="shell nav-shell">
+          <button className="brand" onClick={() => go("home")}>
+            <span>MC</span>
+            <b>Master Clip</b>
           </button>
-          <button className="mobile-menu" onClick={() => p.setMenu(!p.menu)}>
-            {p.menu ? <X /> : <Menu />}
-          </button>
+          <nav className={p.menu ? "nav-links open" : "nav-links"}>
+            <button className={p.page === "home" ? "active" : ""} onClick={() => go("home")}>Sảnh Skill</button>
+            <button className={p.page === "skills" ? "active" : ""} onClick={p.openSkills}>Kho Skill</button>
+            <button className={p.page === "mine" ? "active" : ""} onClick={() => go("mine")}>Skill của tôi</button>
+            <button className={p.page === "combo" ? "active" : ""} onClick={() => go("combo")}>Combo</button>
+          </nav>
+          <div className="nav-actions">
+            <button className="account-button" onClick={p.auth}><User size={17} /><span>{p.account ? "Tài khoản" : "Đăng nhập"}</span></button>
+            <button className="mobile-menu" onClick={() => p.setMenu(!p.menu)}>{p.menu ? <X /> : <Menu />}</button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }
 function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
-  const photoSkills = skills.filter((skill) => skill.hall === "Sửa ảnh AI");
-  const videoSkills = skills.filter((skill) => skill.hall === "Edit Video");
+  const featuredSkills = [
+    { skill: skills.find((x) => x.slug === "thuong-hieu-ca-nhan")!, image: "/home-feature-nguyet.jpg", label: "THƯƠNG HIỆU CÁ NHÂN" },
+    { skill: skills.find((x) => x.slug === "poster-san-pham")!, image: "/home-feature-tokyo.png", label: "POSTER SẢN PHẨM" },
+    { skill: skills.find((x) => x.slug === "multishot")!, image: "/home-feature-handbag.jpg", label: "MULTISHOT SẢN PHẨM" },
+    { skill: skills.find((x) => x.slug === "tao-video-viral")!, image: "/home-feature-style.png", label: "VIDEO VIRAL" },
+  ];
+  const demos = [
+    { src: "/home-demo-1.mp4", title: "Túi xách — TVC ngắn" },
+    { src: "/home-demo-2.mp4", title: "Visual bán hàng" },
+    { src: "/home-demo-3.mp4", title: "Nội dung lifestyle" },
+    { src: "/home-demo-4.mp4", title: "Video quảng cáo sản phẩm" },
+  ];
   return (
-    <main>
-      <section className="showcase-hero">
-        <video
-          className="showcase-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/master-clip-hero.jpg"
-        >
-          <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
-        </video>
-        <div className="showcase-shade" />
-        <div className="shell showcase-copy">
-          <div>
-            <p className="eyebrow">
-              <Sparkles size={15} /> MASTER CLIP
-            </p>
-            <h1>AI Skill Studio cho người làm nội dung & bán hàng</h1>
-            <p className="hero-lead">Từ một ý tưởng → ảnh đẹp → video bán hàng → nội dung viral.</p>
-            <div className="hero-actions">
-              <button className="btn-primary" onClick={() => jump()}>
-                Khám phá Kho Skill <ArrowRight size={18} />
-              </button>
-              {!skillOnly && <button className="btn-quiet" onClick={openStudio}><Play size={17} fill="currentColor" /> Mở AI Video Studio</button>}
-            </div>
-            <div className="hero-proof">
-              <span>
-                <b>24</b> Skill đã sẵn sàng
-              </span>
-              <span>
-                <b>5</b> Sảnh chuyên biệt
-              </span>
-              <span>
-                <b>AI</b> hỗ trợ sáng tạo
-              </span>
-            </div>
-          </div>
-        </div>
+    <main className="studio-home">
+      <section className="studio-home-head">
+        <div><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>Sảnh Skill của Nguyệt KOL</h1><p>Chọn cover để mở Skill, hoặc xem các video demo mới nhất.</p></div>
+        <button className="btn-primary" onClick={() => jump()}>Khám phá Kho Skill <ArrowRight size={18} /></button>
       </section>
-      <section className="quick-intro shell">
-        <span>AI Skill</span>
-        <i>+</i>
-        <span>Chỉnh ảnh</span>
-        <i>+</i>
-        <span>Edit Video</span>
-        <i>+</i>
-        <span>Video AI</span>
-        <i>+</i>
-        <span>Marketing</span>
-      </section>
-      <section className="section shell hall-feature photo-feature">
-        <Section
-          eyebrow="SẢNH SKILL 01 · SỬA ẢNH AI"
-          title="Biến một bức ảnh thành nội dung bán hàng"
-          text="Từ ảnh gốc đến visual sạch, đẹp và sẵn sàng để quảng cáo."
-        />
-        <div className="skill-grid photo-cards">
-          {photoSkills.slice(0, 4).map((skill, index) => (
-            <Card skill={skill} index={index} select={select} key={skill.slug} />
-          ))}
-        </div>
-        <button className="text-link" onClick={() => jump("Sửa ảnh AI")}>
-          Xem tất cả Skill Chỉnh ảnh <ArrowRight size={17} />
-        </button>
-      </section>
-      {!skillOnly && <section className="section video-feature">
-        <div className="shell">
-          <Section
-            eyebrow="SẢNH SKILL 02 · EDIT VIDEO"
-            title="Dựng video nhanh, rõ ràng và bán hàng tốt hơn"
-            text="Nơi các Tool thực thi Master Clip gặp Skill hướng dẫn workflow chuyên sâu."
-          />
-          <div className="video-showcase">
-            <div className="video-demo">
-              <video autoPlay muted loop playsInline poster="/master-clip-hero.jpg">
-                <source src="/master-clip-demo-product-hq.mp4" type="video/mp4" />
-              </video>
-              <span>
-                <Play size={18} fill="currentColor" /> Demo dựng video
-              </span>
-            </div>
-            <div className="tool-list">
-              <b>Tool thực thi Master Clip</b>
-              {["Video dài → Short", "Talking-head", "Nhiều clip + Nhạc", "Cắt / Ghép Video"].map(
-                (tool) => (
-                  <button key={tool} onClick={() => jump("Edit Video")}>
-                    {tool}
-                    <ArrowRight size={16} />
-                  </button>
-                ),
-              )}
-            </div>
-          </div>
-          <div className="skill-grid video-cards">
-            {videoSkills.slice(0, 4).map((s, i) => (
-              <Card skill={s} index={i} select={select} key={s.slug} />
-            ))}
-          </div>
-          <button className="text-link" onClick={() => jump("Edit Video")}>
-            Khám phá toàn bộ Sảnh Edit Video <ArrowRight size={17} />
-          </button>
-        </div>
-      </section>}
-      <section className="section shell hall-feature">
-        <div>
-          <p className="eyebrow">CÒN NHIỀU HƠN THẾ</p>
-          <h2 className="next-halls-title">Mở rộng cả hệ sinh thái nội dung.</h2>
-        </div>
-        <div className="hall-grid">
-          {halls
-            .filter((hall) => hall.name !== "Sửa ảnh AI" && hall.name !== "Edit Video")
-            .map(({ name, description, icon: Icon, accent }) => (
-              <button
-                key={name}
-                className="hall-card"
-                style={{ "--hall": accent } as React.CSSProperties}
-                onClick={() => jump(name)}
-              >
-                <span className="hall-icon">
-                  <Icon size={25} />
-                </span>
-                <span>
-                  <b>{name}</b>
-                  <small>{description}</small>
-                </span>
-                <ArrowRight size={18} />
-              </button>
-            ))}
-          <button className="hall-card combo-hall" onClick={() => jump()}>
-            <span className="hall-icon">
-              <Gem size={25} />
-            </span>
-            <span>
-              <b>Combo Skill</b>
-              <small>Kết hợp Skill theo mục tiêu kinh doanh.</small>
-            </span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-      </section>
+      <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">NỔI BẬT</p><h2>Cover Skill nổi bật</h2></div><button className="text-link" onClick={() => jump()}>Xem tất cả <ArrowRight size={17} /></button></div><div className="featured-cover-grid">{featuredSkills.map(({ skill, image, label }) => <button key={skill.slug} className="featured-cover" onClick={() => select(skill)}><img src={image} alt={skill.title} /><span><b>{label}</b><small>{skill.title}</small></span></button>)}</div></section>
+      <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">VIDEO DEMO</p><h2>Xem kết quả thực tế</h2></div><button className="text-link" onClick={() => jump("Edit Video")}>Sảnh Edit Video <ArrowRight size={17} /></button></div><div className="demo-video-grid">{demos.map((demo) => <article className="demo-video" key={demo.src}><video controls preload="metadata" playsInline><source src={demo.src} type="video/mp4" /></video><span><Play size={16} fill="currentColor" /><b>{demo.title}</b></span></article>)}</div></section>
     </main>
   );
 }

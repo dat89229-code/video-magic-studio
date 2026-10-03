@@ -998,18 +998,32 @@ Chọn 1-2 ý tưởng ưng nhất, nhắn AI khai triển thêm góc quay/dàn 
 
 Khối mặc định của tôi (nếu có, dùng lại cho mọi video): [dán khối mặc định của bạn ở đây, hoặc bỏ trống nếu chưa có]."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex có bật công cụ trình duyệt.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: Dán được vào ChatGPT/Claude bản web cũng đọc hiểu nội dung, nhưng KHÔNG thao tác thật trên Google Flow/YouTube Studio/Facebook được — bản web không có quyền điều khiển trình duyệt. Muốn AI tự làm thật, cần Claude Code/Codex có bật công cụ trình duyệt (xem phần 'Cài đặt' bên dưới nếu chưa có).
 
 Bước 2 — Đưa link video + khối mặc định (lần đầu)
-Điền link video và khối mặc định cuối mô tả nếu kênh có; chỉ cần đưa khối mặc định một lần để AI dùng lại.
+AI biết đúng video cần SEO và nội dung lặp lại của kênh bạn.
+
+Dán câu nhờ việc mẫu, điền link video và khối mặc định cuối mô tả (nếu kênh bạn có) — chỉ cần đưa khối mặc định 1 lần, AI ghi nhớ dùng lại cho các video sau.
+
+Lưu ý: Chưa có khối mặc định cũng không sao — AI vẫn làm đủ 6 phần còn lại, chỉ bỏ qua phần chèn khối lặp lại.
 
 Bước 3 — Để AI tự làm đủ 7 phần trong YouTube Studio
-AI mở trang Chi tiết video, làm timeline → thẻ → màn hình kết thúc → từ khoá → tiêu đề → mô tả → hashtag → Lưu.
+Video được SEO đầy đủ, đã lưu thật trên YouTube Studio.
+
+AI tự mở trang Chi tiết video, làm lần lượt: timeline → thẻ → màn hình kết thúc → từ khoá → tiêu đề → mô tả → hashtag → Lưu. Việc này mất vài phút vì phải thao tác thật trên giao diện.
 
 Bước 4 — Kiểm lại và công khai video khi sẵn sàng
-Mở lại trang Chi tiết video kiểm tiêu đề/mô tả/từ khoá và timeline có khớp nội dung thật không."""
-    notes = "Chưa có khối mặc định cũng không sao — AI vẫn làm các phần còn lại. Chưa ưng tiêu đề hoặc phần nào thì nhắn sửa trong cùng cuộc trò chuyện, AI sửa và lưu lại."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Quy trình SEO 7 phần trong YouTube Studio: timeline, thẻ, màn hình kết thúc, từ khoá, tiêu đề, mô tả, hashtag."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video vừa upload ở trạng thái không công khai, link video và khối mặc định cuối mô tả nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"SEO đầy đủ 1 video vừa upload lên kênh\n\n1. Upload 1 video lên kênh, để Không công khai trong lúc SEO\n2. Chuẩn bị khối mặc định cuối mô tả nếu có\n3. Làm theo 3 bước trên\n4. Kiểm lại trang Chi tiết video, rồi công khai khi ưng ý\n\nXong sẽ có: Video có đủ chương mục, 2 thẻ liên quan, màn hình kết thúc, từ khoá, tiêu đề, mô tả và hashtag; đã lưu thành công trên YouTube Studio."}]
+Video hiện đúng nội dung SEO, đăng lên được.
+
+AI báo đã lưu xong. Mở lại trang Chi tiết video kiểm nhanh: tiêu đề/mô tả/từ khoá có đúng ý không, timeline có khớp nội dung thật không.
+
+Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuyện, ví dụ 'đổi lại tiêu đề, nhấn vào ý X' — AI sửa và lưu lại, không làm lại từ đầu."""
+    notes = "Hướng dẫn này viết cho YouTube Studio — phần mềm nguồn mở giấy phép Dịch vụ của Google — Skill chỉ là quy trình thao tác, không đóng gói lại phần mềm, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video vừa upload ở trạng thái Không công khai, link video và khối mặc định cuối mô tả nếu có."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"SEO đầy đủ 1 video vừa upload lên kênh của bạn\n\n1. Upload 1 video lên kênh (để 'Không công khai' trong lúc SEO)\n2. Chuẩn bị khối mặc định cuối mô tả nếu kênh bạn có (không bắt buộc)\n3. Làm theo 3 bước trên\n4. Kiểm lại trang Chi tiết video, rồi công khai video khi ưng ý\n\nXong sẽ có: Video có đủ: chương mục đúng nội dung thật, 2 thẻ liên quan, màn hình kết thúc, từ khoá đủ dài+ngắn, tiêu đề đúng pattern video win, mô tả đúng thứ tự, hashtag phù hợp — đã Lưu thành công trên YouTube Studio."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tối ưu tiêu đề, mô tả, thẻ tag, timeline và thumbnail để video lên đề xuất nhanh hơn", "Đưa 1 video mới đăng vào — AI tự vào YouTube Studio làm timeline/chương, thẻ, màn hình kết thúc, từ khoá, tiêu đề, mô tả và hashtag rồi lưu thật.", prompt, "Video YouTube không công khai, link video và khối mặc định nếu có.", "Video YouTube đã lưu đủ 7 phần SEO trong Studio.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://studio.youtube.com/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='dang-bai-tu-dong-da-kenh'").fetchone()["id"]

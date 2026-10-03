@@ -962,25 +962,29 @@ Lưu ý: Thấy câu trả lời nào chưa ưng thì nhắn ngay trong CÙNG cu
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Trả lời bình luận Facebook/YouTube tự nhiên, đa dạng, không rập khuôn, không bịa thông tin", "AI tự vào Facebook/YouTube trả lời một loạt bình luận thay bạn — mỗi câu một kiểu, tự nhiên, không bịa thông tin khi không chắc và biết bỏ qua đúng lúc.", prompt, "Link trang, link bài viết hoặc phạm vi bình luận, cùng giới hạn thông tin được phép trả lời.", "Báo cáo số bình luận đã trả lời và các bình luận được bỏ qua kèm lý do.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://business.facebook.com/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='subagent-nghien-cuu'").fetchone()["id"]
-    prompt = """Ngách của tôi: [ví dụ \"AI tools cho dân kinh doanh nhỏ\"].
-Nền tảng: [Facebook/YouTube/TikTok].
-Đối tượng xem: [mô tả ngắn].
+    prompt = """Ngách của tôi: [ví dụ \"AI tools cho dân kinh doanh nhỏ\"]. Nền tảng: [Facebook/YouTube/TikTok]. Đối tượng xem: [mô tả ngắn].
 
-Tìm giúp tôi trend/chủ đề đang lên liên quan ngách này (ưu tiên tin tức vài tuần gần nhất), rồi soạn 10 ý tưởng content cụ thể cho [tuần này/tháng này].
-
-Mỗi ý tưởng gồm: tên chủ đề, góc tiếp cận, lý do nên làm, mức độ tiềm năng (Cao/Trung bình/Thấp). Xếp theo tiềm năng giảm dần.
+Tìm giúp tôi trend/chủ đề đang lên liên quan ngách này (ưu tiên tin tức vài tuần gần nhất), rồi soạn 10 ý tưởng content cụ thể cho [tuần này/tháng này]. Mỗi ý tưởng gồm: tên chủ đề, góc tiếp cận, lý do nên làm, mức độ tiềm năng (Cao/Trung bình/Thấp). Xếp theo tiềm năng giảm dần.
 
 Nếu tôi đưa link kênh của tôi hoặc kênh đối thủ, xem qua vài bài/video gần đây trước khi đề xuất, để ý tưởng hợp giọng điệu và không trùng nội dung đã làm."""
     steps = """Bước 1 — Nói rõ ngách, nền tảng, mục tiêu
-Điền ngách, nền tảng, đối tượng. Có link kênh của bạn hoặc kênh đối thủ thì đưa luôn để AI đối chiếu phong cách.
+AI biết chính xác cần nghiên cứu cho ai, không đề xuất chung chung.
+
+Dán câu nhờ việc mẫu, điền ngách/nền tảng/đối tượng. Có link kênh của bạn hoặc kênh đối thủ thì đưa luôn để AI đối chiếu phong cách.
 
 Bước 2 — Để AI tìm trend và soạn danh sách
-AI tìm kiếm trend thật, xem qua kênh bạn đưa nếu có, rồi trả về danh sách 10 ý tưởng kèm góc tiếp cận và lý do.
+Có danh sách ý tưởng cụ thể, xếp theo tiềm năng.
+
+AI tìm kiếm trend thật (không bịa), xem qua kênh bạn đưa (nếu có), rồi trả về danh sách 10 ý tưởng kèm góc tiếp cận và lý do.
+
+Lưu ý: AI nói rõ mức độ tin cậy khi một thông tin/xu hướng chưa chắc chắn — đừng bỏ qua chi tiết này, nó giúp bạn biết ý tưởng nào nên kiểm lại trước khi làm.
 
 Bước 3 — Chọn ý tưởng, nhờ AI đào sâu thêm
-Chọn 1-2 ý tưởng ưng nhất, nhắn AI khai triển thêm góc quay/dàn ý trong cùng cuộc trò chuyện để giữ ngữ cảnh ngách."""
-    notes = "AI nói rõ mức độ tin cậy khi một thông tin/xu hướng chưa chắc chắn — đừng bỏ qua chi tiết này; nó giúp bạn biết ý tưởng nào nên kiểm lại trước khi làm."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Tìm trend đang lên, phân tích kênh cùng ngách và trả về danh sách ý tưởng content cụ thể, xếp theo tiềm năng."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ngách, nền tảng, đối tượng xem; link kênh của bạn hoặc đối thủ nếu có."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Lấy 10 ý tưởng content thật cho tuần này\n\n1. Chuẩn bị ngách, nền tảng, đối tượng xem, link kênh nếu có\n2. Làm theo 2 bước trên\n3. Đọc lại danh sách, đánh dấu 2-3 ý tưởng phù hợp nhất\n4. Nhờ AI khai triển sâu 1 ý tưởng đã chọn\n\nXong sẽ có: Danh sách 10 ý tưởng content cụ thể, mỗi ý tưởng có góc tiếp cận, lý do, mức tiềm năng, xếp theo tiềm năng giảm dần, đúng ngách và giọng điệu kênh."}]
+Có một ý tưởng đủ chi tiết để bắt tay làm content.
+
+Chọn 1-2 ý tưởng ưng nhất, nhắn AI khai triển thêm góc quay/dàn ý — vẫn trong CÙNG cuộc trò chuyện để AI nhớ ngữ cảnh ngách của bạn."""
+    notes = "Hướng dẫn này viết cho workflow nghiên cứu nội dung — phần mềm nguồn mở giấy phép Bản quyền thuộc Master Clip, miễn phí và bạn tự tải được. Thứ bạn trả tiền là công sức biên soạn hướng dẫn này."
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Ngách, nền tảng, đối tượng xem và link kênh của bạn hoặc đối thủ nếu có."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Lấy 10 ý tưởng content thật cho tuần này\n\n1. Chuẩn bị sẵn: ngách, nền tảng, đối tượng xem, link kênh (nếu có)\n2. Làm theo 2 bước trên\n3. Đọc lại danh sách, đánh dấu 2-3 ý tưởng phù hợp nhất với bạn\n4. Nhờ AI khai triển sâu 1 ý tưởng đã chọn\n\nXong sẽ có: Danh sách 10 ý tưởng content cụ thể (không chung chung), mỗi ý tưởng có góc tiếp cận + lý do + mức tiềm năng, xếp theo tiềm năng giảm dần, đúng ngách và giọng điệu kênh bạn."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=NULL, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Tìm chủ đề/trend đang lên, phân tích đối thủ, lên danh sách ý tưởng nội dung theo mức tiềm năng", "Nói ngách và nền tảng của bạn — AI tự tìm trend đang lên, soi kênh cùng ngách, rồi trả về danh sách ý tưởng content cụ thể, xếp theo mức tiềm năng.", prompt, "Ngách, nền tảng, đối tượng xem và link kênh nếu có.", "Danh sách 10 ý tưởng content có góc tiếp cận, lý do và mức tiềm năng.", steps, notes, json.dumps(sections, ensure_ascii=False), skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='seo-video-youtube'").fetchone()["id"]

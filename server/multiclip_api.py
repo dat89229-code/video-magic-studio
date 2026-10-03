@@ -455,12 +455,18 @@ Sau khi làm xong, so ảnh mới với ảnh gốc và nói cho tôi biết:
 - Chỗ nào bạn phải đoán thêm chi tiết vì ảnh gốc quá mờ
 - Ảnh này có đủ nét để in poster khổ lớn chưa, hay chỉ đủ đăng mạng"""
     steps = """Bước 1 — Mở ChatGPT hoặc Gemini
+Sẵn sàng làm, không cài gì cả.
+
 Mở app trên điện thoại hoặc vào trang web trên máy tính. Bản miễn phí làm được.
 
 Bước 2 — Tải ảnh lên rồi dán câu lệnh
+AI làm ra ảnh nét hơn.
+
 Bấm biểu tượng kẹp giấy để tải ảnh mờ lên. Rồi bấm nút Chép ở đầu trang, dán câu lệnh vào, gửi.
 
 Bước 3 — Kiểm chữ trước khi dùng
+Chắc chắn AI không bịa chi tiết.
+
 Tải ảnh về, phóng to lên và soi kỹ phần chữ, logo, mã vạch. Đây là chỗ AI hay bịa nhất khi ảnh gốc mờ."""
     notes = "Ảnh gốc càng rõ thì kết quả càng thật. Ảnh quá mờ thì máy phải đoán, và đoán sai là ra chữ lạ trên bao bì. Chữ bị sai thì không dùng được, dù ảnh nhìn nét. Gặp vậy thì chụp lại ảnh gốc rõ hơn, hoặc dùng cách cài về máy ở cuối trang — công cụ chuyên phóng nét không tự bịa chữ."
     sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một ảnh sản phẩm cũ, mờ hoặc thiếu độ phân giải."},{"number":"04","title":"Làm theo 3 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cứu một ảnh sản phẩm cũ mờ thành ảnh đăng bán được\n\n1. Tìm một ảnh sản phẩm cũ bị mờ — loại mà bạn từng ngại đăng\n2. Làm theo 3 bước trên\n3. Mở hai ảnh cạnh nhau, phóng to phần chữ trên bao bì để so\n4. Nếu chữ vẫn đúng và ảnh nét hơn hẳn thì đăng thử lên gian hàng\n\nXong sẽ có: Một ảnh nét gấp đôi ảnh gốc, chữ trên bao bì vẫn đọc đúng, đủ rõ để chạy quảng cáo mà không bị vỡ hạt."}]

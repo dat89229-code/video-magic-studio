@@ -879,7 +879,10 @@ function Card({
 }
 function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; loading: boolean; back: () => void; use: () => void }) {
   const isReady = owned && content?.content_state === "READY";
-  const isReferenceLayout = skill.slug === "thuong-hieu-ca-nhan";
+  // A source-aligned layout is enabled only after that Skill's purchased
+  // lesson has been checked and imported.  It deliberately shares the same
+  // Master Clip visual template; the lesson text remains specific to its slug.
+  const isReferenceLayout = ["thuong-hieu-ca-nhan", "poster-san-pham"].includes(skill.slug);
   const coverLines = (coverTextBySkill[skill.slug] || skill.title).split("\n");
   const [copied, setCopied] = useState(false);
   const importedSections = useMemo(() => {
@@ -890,7 +893,15 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
       return [];
     }
   }, [content?.owned_sections_json]);
-  const steps = useMemo(() => (content?.steps_text || "").split(/\n\s*\n/).filter(Boolean), [content?.steps_text]);
+  const steps = useMemo(
+    () => (content?.steps_text || "").split(/(?=Bước\s*\d+\s*[—–-])/i).map((step) => step.trim()).filter(Boolean),
+    [content?.steps_text],
+  );
+  const practiceSection = useMemo(
+    () => importedSections.find((section: { number?: string }) => section?.number === "05"),
+    [importedSections],
+  );
+  const lessonMinutes = skill.slug === "poster-san-pham" ? "10 phút" : "3 phút";
   const copyPrompt = async () => {
     if (!content?.prompt_text) return;
     try {
@@ -1021,19 +1032,18 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
             <button onClick={copyPrompt}>{copied ? "ĐÃ SAO CHÉP" : "CHÉP CÂU LỆNH"}</button>
             <small>Prompt được giữ nguyên từ nội dung Skill đã import.</small>
           </div>
-          <h2>Làm theo 3 bước</h2>
-          <p className="reference-time">◷ Bộ ảnh đầu tiên xong trong 3 phút</p>
+          <h2>{practiceSection?.title?.replace(/^Làm thử ngay$/i, "Làm theo " + steps.length + " bước") || `Làm theo ${steps.length} bước`}</h2>
+          <p className="reference-time">◷ Bộ đầu tiên xong trong {lessonMinutes}</p>
           <div className="reference-steps">
             {steps.map((step, index) => {
               const [heading, ...body] = step.split("\n");
               return <article key={step}><span>{index + 1}</span><div><h3>{heading.replace(/^Bước\s*\d+\s*[—–-]?\s*/i, "")}</h3><p>{body.join("\n")}</p></div></article>;
             })}
           </div>
-          <article className="reference-practice">
-            <p><b>Làm thử ngay</b> Tạo bộ 4 ảnh thương hiệu cá nhân để đăng lên trang mạng xã hội bán hàng</p>
-            <ol><li>Chọn một ảnh chân dung rõ mặt nhất bạn có</li><li>Làm theo 3 bước trên</li><li>Xếp 4 ảnh cạnh nhau xem đã ra một bộ đồng nhất về mặt và tông màu chưa</li><li>Đăng thử một tấm lên trang cá nhân hoặc gian hàng</li></ol>
-            <div><strong>Xong sẽ có:</strong> {content?.output_notes}</div>
-          </article>
+          {practiceSection && <article className="reference-practice">
+            <p><b>{practiceSection.title}</b></p>
+            <p className="reference-practice-body">{practiceSection.body}</p>
+          </article>}
           <div className="reference-extra">
             <p>{content?.notes_text}</p>
             {content?.resource_url && <a className="resource-link" href={content.resource_url} target="_blank" rel="noreferrer">Mở công cụ liên quan <ArrowRight size={15} /></a>}

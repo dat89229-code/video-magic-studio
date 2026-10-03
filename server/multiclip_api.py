@@ -301,15 +301,23 @@ Quy tắc không được phá:
 
 Tạo xong, tự soi lại từng tấm: tấm nào sản phẩm bị sai so với ảnh gốc thì làm lại tấm đó."""
     steps = """Bước 1 — Chuẩn bị một ảnh sản phẩm rõ
+Máy nhìn được đúng sản phẩm của bạn.
+
 Chụp hoặc chọn một ảnh thấy rõ toàn bộ sản phẩm, đọc được chữ trên nhãn, không bị loá sáng. Nền gì cũng được — bối cảnh sẽ thay hết.
 
 Bước 2 — Tải ảnh lên rồi dán câu lệnh
+AI phân tích sản phẩm và đề xuất 10 concept.
+
 Bấm kẹp giấy tải ảnh sản phẩm lên, bấm nút Chép ở đầu trang rồi dán câu lệnh vào, gửi.
 
 Bước 3 — Duyệt bản đồ concept rồi cho chạy
+Mười tấm khác nhau thật, đúng ý bạn.
+
 Đọc 10 concept, thấy cái nào không hợp thì nói thẳng: “Concept 4 và 7 quá giống nhau, đổi concept 7 sang bối cảnh ngoài trời.” Ưng rồi thì bảo tạo ảnh.
 
 Bước 4 — Soi lại sản phẩm trên từng tấm
+Không tấm nào bịa sai sản phẩm.
+
 Phóng to phần sản phẩm trên từng tấm, so với ảnh gốc: đúng màu chưa, đúng hình dáng chưa, chữ trên nhãn có bị bịa không."""
     notes = """Ảnh gốc mờ hoặc thiếu sáng thì mọi tấm poster đều thừa hưởng cái sai đó. Ảnh chưa rõ thì chạy Skill 'Tăng chất lượng 4k' trước.
 

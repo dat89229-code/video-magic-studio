@@ -744,18 +744,32 @@ Lưu ý: Đoạn nào crop lệch mặt thì nhắn rõ: 'short-03 đang crop l�
 
 Nếu máy chưa có ffmpeg/Whisper/Node/hyperframes thì tự cài trước. Xong việc thì cho tôi biết các file kết quả nằm ở đâu."""
     steps = """Bước 1 — Cài Skill vào AI của bạn
-Dán câu cài Skill vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
+
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: KHÔNG dán vào ChatGPT/Claude bản web thường — bản web không chạy lệnh thật trên máy được, mà skill này cần chạy ffmpeg/Whisper thật thì mới ra file video. Chưa có Claude Code/Codex trên máy? Nhắn thẳng cho AI bạn đang dùng: 'Cài Claude Code lên máy này giúp tôi', hầu hết AI hiện đại tự tra và hướng dẫn được — hoặc vào claude.com/claude-code để tải.
 
 Bước 2 — Đưa video vào
+AI quét đúng video, nhận diện đúng 2 người trong khung.
+
 Bấm Chép câu nhờ việc mẫu, dán cùng video vào cuộc trò chuyện. Video càng quay rõ mặt cả 2 người thì kết quả càng chuẩn.
 
 Bước 3 — Để AI tự cài môi trường (chỉ lần đầu)
-Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt.
+Máy sẵn sàng chạy các skill edit video, không phải cài lại.
+
+Lần đầu trên máy mới sẽ mất thêm vài phút cài ffmpeg/Whisper/Node/thư viện nhận diện khuôn mặt. Mặc định AI dùng cách nhận diện ai-nói-khi-nào không cần tài khoản gì thêm.
+
+Lưu ý: Kết quả nhận diện người nói chưa đủ tốt (2 người ngồi che khuất nhau, mic chung) thì có thể nhờ AI dùng cách chính xác hơn — cần bạn tự có tài khoản HuggingFace miễn phí, AI sẽ hướng dẫn khi cần.
 
 Bước 4 — Nhận nhiều file, kiểm điểm chuyển khung
-Mở file trong output/, kiểm khung có chuyển 1↔2 đúng lúc không, có bị cắt giữa câu ai đó đang nói không."""
+Có sẵn nhiều short đăng được ngay.
+
+Các file nằm trong output/. Xem lần lượt, kiểm: khung có chuyển 1↔2 đúng lúc không, có bị cắt giữa câu ai đó đang nói không.
+
+Lưu ý: Sai người nói ở đoạn nào thì nhắn rõ: 'short-02 giây 8-12 đang gán nhầm người nói, sửa lại' — không cần làm lại cả lô."""
     notes = "Kết quả nhận diện người nói chưa đủ tốt khi 2 người che khuất nhau hoặc dùng mic chung thì có thể nhờ AI dùng cách chính xác hơn. Sai người nói ở đoạn nào thì nhắn rõ short và thời gian để sửa, không cần làm lại cả lô."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"AI tự nhận diện hai người nói, cắt short podcast và chuyển khung postcard 1↔2 ô theo nhịp trò chuyện."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video podcast/phỏng vấn 2 người dài 20–60 phút, thấy rõ mặt cả hai người."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 tập podcast/phỏng vấn 2 người thành bộ short\n\n1. Chọn video podcast/phỏng vấn 2 người, dài 20-60 phút\n2. Làm theo 3 bước trên\n3. Xem hết các short, kiểm khung postcard chuyển đúng nhịp không\n4. Đăng thử 1 short, xem phản ứng người xem\n\nXong sẽ có: 5-8 file short 9:16, khung postcard chuyển 1↔2 ô mượt đúng nhịp cuộc nói chuyện, cả 2 người đều rõ mặt khi cần, có thumbnail và phụ đề."}]
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\n\nLàm được trên điện thoại\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\n\nCách xử lý lỗi hay gặp\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\n\nBản cài về máy cho ai cần\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Một video podcast/phỏng vấn 2 người dài 20–60 phút, thấy rõ mặt cả hai người."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Cắt 1 tập podcast/phỏng vấn 2 người thành bộ short\n\n1. Chọn 1 video podcast/phỏng vấn 2 người, dài 20-60 phút\n2. Làm theo 3 bước trên\n3. Xem hết các short, kiểm khung postcard chuyển đúng nhịp không\n4. Đăng thử 1 short, xem phản ứng người xem với kiểu khung 2 ô này\n\nXong sẽ có: 5-8 file short 9:16, khung postcard chuyển 1↔2 ô mượt đúng nhịp cuộc nói chuyện, cả 2 người đều rõ mặt khi cần, có thumbnail và phụ đề."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Video phỏng vấn/podcast 2 người tự cắt short, khung postcard tự chuyển 1↔2 theo ai đang nói", "Đưa 1 video podcast/phỏng vấn 2 người vào — AI tự cắt ra nhiều short 9:16, khung postcard 2 ô tự chuyển linh hoạt giữa 1 khung và 2 khung theo đúng nhịp cuộc trò chuyện.", prompt, "Một video podcast/phỏng vấn 2 người rõ mặt, dài 20–60 phút.", "5–8 short dọc với khung postcard chuyển đúng theo người nói.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://ffmpeg.org", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='multiclip-ghep-nhac-trend'").fetchone()["id"]

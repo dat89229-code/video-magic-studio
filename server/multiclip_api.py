@@ -1036,16 +1036,30 @@ Lưu ý: Chưa ưng chỗ nào thì nhắn tiếp trong CÙNG cuộc trò chuy�
     steps = """Bước 1 — Cài Skill vào AI của bạn
 AI của bạn đọc và nạp được Skill này, dùng lại được cho lần sau.
 
+Mua xong, trang Tài khoản hiện sẵn nút 'Cài Skill này cho tôi' — bấm Chép rồi dán câu đó vào Claude Code hoặc Codex đang mở tại một thư mục dự án.
+
+Lưu ý: Dán được vào ChatGPT/Claude bản web cũng đọc hiểu nội dung, nhưng KHÔNG thao tác thật trên Google Flow/YouTube Studio/Facebook được — bản web không có quyền điều khiển trình duyệt. Muốn AI tự làm thật, cần Claude Code/Codex có bật công cụ trình duyệt.
+
 Bước 2 — Đưa link kênh và ý tưởng
-Dán câu nhờ việc mẫu kèm link kênh Facebook. Lần đầu AI hỏi thêm mục tiêu, ảnh được phép dùng, đăng ngay hay hẹn giờ — trả lời một lần để AI ghi nhớ.
+AI biết đúng giọng kênh và chủ đề cần viết.
+
+Dán câu nhờ việc mẫu kèm link kênh Facebook. Lần đầu AI hỏi thêm vài câu (mục tiêu, ảnh nào được dùng, đăng ngay hay hẹn giờ) — trả lời 1 lần, AI ghi nhớ cho các lần sau.
 
 Bước 3 — Nhận bài, duyệt và chỉnh
-AI trình bày bài viết, định dạng đi kèm, nội dung từng ảnh/kịch bản video và lý do chọn. So với bài cũ của chính kênh: nhịp câu, cách xưng hô có giống không.
+Có bản cuối đúng giọng bạn, sẵn sàng công khai.
+
+AI trình bày bài viết + định dạng đi kèm + nội dung từng ảnh/kịch bản video + lý do chọn. So với 1 bài cũ của chính kênh bạn: nhịp câu, cách xưng hô có giống không.
+
+Lưu ý: Chưa ưng thì nhắn chỉnh cụ thể ('viết lại đoạn mở, ngắn hơn') — AI không tự đăng khi bạn chưa xác nhận.
 
 Bước 4 — Xác nhận đăng hoặc lên lịch
-Nói rõ đăng ngay hay hẹn giờ, kèm múi giờ. AI điền sẵn mọi thứ trong Meta Business Suite và dừng trước nút Đăng/Lên lịch để chờ bạn xác nhận cuối."""
+Bài lên đúng trang, đúng giờ hẹn.
+
+Nói rõ đăng ngay hay hẹn giờ (kèm múi giờ). AI mở Meta Business Suite, điền sẵn mọi thứ rồi DỪNG ngay trước nút Đăng/Lên lịch, chờ bạn xác nhận lần cuối.
+
+Lưu ý: Bạn tự đăng nhập Facebook khi AI mở trang — AI không đọc hay lưu mật khẩu/OTP của bạn."""
     notes = "Chưa ưng thì nhắn chỉnh cụ thể trong cùng cuộc trò chuyện. AI không tự đăng khi bạn chưa xác nhận; bạn tự đăng nhập Facebook, AI không đọc hay lưu mật khẩu hoặc OTP."
-    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Học giọng kênh, chọn định dạng bài chữ/ảnh/carousel/Reel, viết nội dung đi kèm, xin duyệt rồi chuẩn bị đăng hoặc lên lịch Facebook."},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link kênh Facebook chính chủ, một ý tưởng/chủ đề và ảnh thật được phép dùng nếu cần."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Viết và đăng 1 bài đầu tiên đúng giọng kênh bạn\\n\\n1. Đưa link kênh Facebook chính chủ\\n2. Chọn một ý tưởng và, nếu cần, một ảnh thật được phép dùng\\n3. Làm theo các bước trên\\n4. So bài AI viết với một bài cũ của kênh, rồi duyệt đăng hoặc hẹn giờ\\n\\nXong sẽ có: Một bài Facebook kèm nội dung ảnh/kịch bản nếu có, đúng giọng quen thuộc của kênh, đã qua bạn duyệt và sẵn sàng đăng hoặc lên lịch."}]
+    sections = [{"number":"01","title":"Skill này gồm những gì","body":"Câu lệnh làm việc cho AI\\nDán vào ChatGPT hoặc Gemini kèm ảnh của bạn — ra kết quả ngay, không cài gì\\n\\nLàm được trên điện thoại\\nKhông cần máy tính mạnh, không cần card đồ hoạ, không phải tải phần mềm\\n\\nCách xử lý lỗi hay gặp\\nPhần mà hướng dẫn miễn phí trên mạng gần như không bao giờ có\\n\\nBản cài về máy cho ai cần\\nMuốn xử lý hàng loạt trăm ảnh thì có sẵn hướng dẫn cài công cụ chuyên dụng"},{"number":"02","title":"Chuẩn bị trước khi bắt đầu","body":"Link kênh Facebook chính chủ, một ý tưởng/chủ đề và ảnh thật được phép dùng nếu cần."},{"number":"04","title":"Làm theo 4 bước","body":steps},{"number":"05","title":"Làm thử ngay","body":"Viết và đăng 1 bài đầu tiên đúng giọng kênh bạn\\n\\n1. Đưa link kênh Facebook chính chủ của bạn\\n2. Chọn 1 ý tưởng và (nếu cần) 1 ảnh thật được phép dùng\\n3. Làm theo 3 bước trên\\n4. So bài AI viết với 1 bài cũ của kênh — kiểm nhịp câu và giọng điệu có giống không\\n\\nXong sẽ có: 1 bài Facebook (kèm nội dung ảnh/kịch bản nếu có) đúng giọng quen thuộc của kênh bạn, đã qua bạn duyệt, đăng thành công hoặc đã hẹn giờ đúng."}]
     database.execute("UPDATE skill_content SET content_state='READY', preview_text=?, workflow_text=?, prompt_text=?, input_notes=?, output_notes=?, steps_text=?, notes_text=?, owned_sections_json=?, resource_url=?, tutorial_url=NULL, updated_at=CURRENT_TIMESTAMP WHERE skill_id=?", ("Viết bài Facebook đúng giọng kênh, kèm nội dung ảnh/carousel/video và chuẩn bị đăng hoặc lên lịch", "Đưa link kênh Facebook và ý tưởng — AI học giọng kênh, tự chọn định dạng, viết bài cùng nội dung ảnh/kịch bản, chờ bạn duyệt trước khi đăng.", prompt, "Link kênh Facebook, chủ đề/ý tưởng, ảnh thật được phép dùng và thời điểm đăng nếu đã có.", "Bài Facebook đúng giọng kênh, nội dung đi kèm và bản chuẩn bị đăng/lên lịch sau khi bạn duyệt.", steps, notes, json.dumps(sections, ensure_ascii=False), "https://business.facebook.com/", skill_id))
 
     skill_id = database.execute("SELECT id FROM skills WHERE slug='tao-video-viral'").fetchone()["id"]

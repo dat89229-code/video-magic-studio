@@ -302,7 +302,8 @@ button {
 }
 .featured-cover {
   position: relative;
-  min-height: 330px;
+  aspect-ratio: 2 / 3;
+  min-height: 0;
   overflow: hidden;
   padding: 0;
   border: 1px solid #e9d4da;

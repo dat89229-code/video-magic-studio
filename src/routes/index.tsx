@@ -720,10 +720,10 @@ function Header(p: any) {
 }
 function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
   const featuredSkills = [
-    { skill: skills.find((x) => x.slug === "thuong-hieu-ca-nhan")!, image: "/home-feature-portrait.jpg", label: "THƯƠNG HIỆU CÁ NHÂN" },
-    { skill: skills.find((x) => x.slug === "poster-san-pham")!, image: "/home-feature-bag-shop.jpg", label: "POSTER SẢN PHẨM" },
-    { skill: skills.find((x) => x.slug === "multishot")!, image: "/home-feature-red-dress.png", label: "MULTISHOT SẢN PHẨM" },
-    { skill: skills.find((x) => x.slug === "tao-video-viral")!, image: "/home-feature-tokyo-full.png", label: "VIDEO VIRAL" },
+    { skill: skills.find((x) => x.slug === "thuong-hieu-ca-nhan")!, image: "/home-feature-brand-workspace.png", label: "THƯƠNG HIỆU CÁ NHÂN" },
+    { skill: skills.find((x) => x.slug === "poster-san-pham")!, image: "/home-feature-emerald-vogue.png", label: "POSTER SẢN PHẨM" },
+    { skill: skills.find((x) => x.slug === "tao-video-viral")!, image: "/home-feature-red-dress.png", label: "VIDEO VIRAL" },
+    { skill: skills.find((x) => x.slug === "multishot")!, image: "/home-feature-tokyo-full.png", label: "MULTISHOT SẢN PHẨM" },
   ];
   const demos = [
     { src: "/home-demo-1.mp4", title: "Túi xách — TVC ngắn" },

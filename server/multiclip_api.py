@@ -13,9 +13,13 @@ import secrets
 import sqlite3
 import subprocess
 import tempfile
+import time
 import uuid
+from collections import defaultdict, deque
 from pathlib import Path
 from urllib.parse import urlencode
+from urllib.error import HTTPError, URLError
+from urllib.request import Request as UrlRequest, urlopen
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, Header, HTTPException, Request, UploadFile
@@ -53,6 +57,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.mount("/exports", StaticFiles(directory=EXPORTS), name="exports")
+
+
+# Customer-support chat is deliberately isolated from orders, payments and
+# ownership data.  It does not receive an account token or database data.
+SUPPORT_CHAT_WINDOW_SECONDS = 60
+SUPPORT_CHAT_MAX_REQUESTS = 8
+SUPPORT_CHAT_MAX_MESSAGE_LENGTH = 1200
+support_chat_requests: dict[str, deque[float]] = defaultdict(deque)
 
 
 def connection():
@@ -1162,6 +1174,61 @@ class Credentials(BaseModel):
     password: str = Field(min_length=8, max_length=128)
 
 
+class SupportChatMessage(BaseModel):
+    message: str = Field(min_length=1, max_length=SUPPORT_CHAT_MAX_MESSAGE_LENGTH)
+
+
+SUPPORT_SYSTEM_PROMPT = """Bạn là trợ lý tư vấn thân thiện của Master Clip, trả lời bằng tiếng Việt.
+Bạn hỗ trợ khách chọn Skill/Combo, hướng dẫn đăng ký, cách dùng công cụ và định hướng tạo ảnh hoặc video.
+Không truy cập, xác nhận, thay đổi hoặc hứa hẹn về thanh toán, đơn hàng, quyền sở hữu, dữ liệu tài khoản,
+SePay hay webhook. Nếu khách cần kiểm tra đơn hoặc thanh toán, mời họ liên hệ nhà cung cấp qua Zalo/điện thoại
+0976440998. Không bịa giá, ưu đãi, tình trạng đơn hàng hoặc tính năng không được cung cấp. Hãy trả lời ngắn,
+rõ, hỏi tối đa một câu làm rõ khi cần. Nếu nội dung không liên quan, lịch sự hướng khách quay lại nhu cầu về
+Master Clip."""
+
+
+def support_chat_rate_limit(request: Request) -> None:
+    client_ip = request.client.host if request.client else "unknown"
+    now = time.monotonic()
+    entries = support_chat_requests[client_ip]
+    while entries and now - entries[0] >= SUPPORT_CHAT_WINDOW_SECONDS:
+        entries.popleft()
+    if len(entries) >= SUPPORT_CHAT_MAX_REQUESTS:
+        raise HTTPException(status_code=429, detail="Bạn đang gửi tin nhắn hơi nhanh. Vui lòng thử lại sau ít phút.")
+    entries.append(now)
+
+
+def request_gemini_support_reply(message: str) -> str:
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="Trợ lý AI đang được cấu hình. Bạn có thể liên hệ 0976440998 để được hỗ trợ ngay.")
+
+    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    body = json.dumps({
+        "systemInstruction": {"parts": [{"text": SUPPORT_SYSTEM_PROMPT}]},
+        "contents": [{"role": "user", "parts": [{"text": message}]}],
+        "generationConfig": {"temperature": 0.45, "maxOutputTokens": 350},
+    }).encode("utf-8")
+    request = UrlRequest(
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+        data=body,
+        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
+        method="POST",
+    )
+    try:
+        with urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (HTTPError, URLError, TimeoutError) as error:
+        raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.") from error
+
+    candidates = payload.get("candidates") or []
+    parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+    answer = "".join(part.get("text", "") for part in parts).strip()
+    if not answer:
+        raise HTTPException(status_code=503, detail="Trợ lý AI chưa thể trả lời lúc này. Bạn vui lòng thử lại hoặc liên hệ 0976440998.")
+    return answer[:2400]
+
+
 def serialize_user(row) -> dict[str, object]:
     return {"id": row["id"], "email": row["email"], "credits": row["credits"]}
 
@@ -1221,6 +1288,14 @@ def logout(authorization: str | None = Header(default=None)) -> dict[str, bool]:
         with connection() as database:
             database.execute("DELETE FROM sessions WHERE token=?", (authorization.removeprefix("Bearer "),))
     return {"ok": True}
+
+
+@app.post("/support/chat")
+async def support_chat(payload: SupportChatMessage, request: Request) -> dict[str, str]:
+    """Return an AI support reply without touching purchases or account data."""
+    support_chat_rate_limit(request)
+    message = payload.message.strip()
+    return {"reply": await asyncio.to_thread(request_gemini_support_reply, message)}
 
 
 def bank_configuration() -> dict[str, str]:

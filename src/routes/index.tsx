@@ -40,6 +40,8 @@ const API = (
 // deployment keeps its code path intact, allowing both apps to share a repo.
 const SKILL_APP = import.meta.env.VITE_APP_SURFACE === "skill";
 const SESSION_KEY = "master-clip-session-token";
+const PROVIDER_PHONE = "0976440998";
+const ZALO_CONTACT_URL = `https://zalo.me/${PROVIDER_PHONE}`;
 export const Route = createFileRoute("/")({
   head: () => ({ meta: [{ title: "Master Clip — AI Skill World" }] }),
   component: Index,
@@ -372,6 +374,7 @@ function Index() {
     [menu, setMenu] = useState(false),
     [sidebarCompact, setSidebarCompact] = useState(false),
     [auth, setAuth] = useState(false),
+    [zaloHelp, setZaloHelp] = useState(false),
     [pay, setPay] = useState(false),
     [notice, setNotice] = useState(""),
     [email, setEmail] = useState(""),
@@ -597,16 +600,15 @@ function Index() {
         />
       )}
       <Footer />
-      <a
+      <button
         className="zalo-chat-button"
-        href="https://zalo.me/0812997729"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Trò chuyện qua Zalo với Master Clip, số 0812997729"
+        aria-label={`Trò chuyện qua Zalo với Master Clip, số ${PROVIDER_PHONE}`}
+        onClick={() => setZaloHelp(true)}
       >
         <MessageCircle size={19} />
         <span>Chat Zalo</span>
-      </a>
+      </button>
+      {zaloHelp && <ZaloAssistant close={() => setZaloHelp(false)} />}
       {auth && (
         <Auth
           close={() => setAuth(false)}
@@ -650,6 +652,59 @@ function Index() {
     </div>
   );
 }
+function ZaloAssistant({ close }: { close: () => void }) {
+  const [messages, setMessages] = useState<{ from: "bot" | "user"; text: string }[]>([{ from: "bot", text: `Chào bạn! Cảm ơn bạn đã quan tâm Master Clip. Mình là trợ lý tư vấn trực tuyến, sẵn sàng hỗ trợ bạn chọn Skill hoặc Combo. Bạn cũng có thể liên hệ nhà cung cấp qua Zalo/số điện thoại ${PROVIDER_PHONE}.` }]);
+  const [draft, setDraft] = useState("");
+  const [isReplying, setIsReplying] = useState(false);
+  const fallbackReply = (question: string) => {
+    const text = question.toLowerCase();
+    if (text.includes("combo") || text.includes("gói")) return "Bạn có thể vào mục Combo để xem các gói Skill. Hãy cho mình biết bạn muốn tạo ảnh, video hay làm nội dung bán hàng để mình hướng dẫn chọn gói phù hợp.";
+    if (text.includes("đăng ký") || text.includes("tài khoản") || text.includes("mua") || text.includes("thanh toán")) return `Bạn có thể chọn Skill hoặc Combo, sau đó đăng nhập/đăng ký và làm theo bước thanh toán trên trang. Nếu cần nhà cung cấp kiểm tra đơn, hãy chat Zalo hoặc gọi ${PROVIDER_PHONE}.`;
+    if (text.includes("skill") || text.includes("ảnh") || text.includes("video")) return "Mình có thể hỗ trợ bạn chọn Skill. Bạn cho mình biết mục tiêu: tạo ảnh viral, poster sản phẩm, video viral, hay chỉnh sửa ảnh/video?";
+    return `Cảm ơn bạn đã chia sẻ. Mình sẽ hỗ trợ bạn ngay trong khung chat này; bạn cũng có thể trao đổi trực tiếp với nhà cung cấp qua Zalo/số ${PROVIDER_PHONE} khi cần tư vấn chi tiết.`;
+  };
+  const send = async (question: string) => {
+    const clean = question.trim();
+    if (!clean || isReplying) return;
+    setMessages((items) => [...items, { from: "user", text: clean }]);
+    setDraft("");
+    setIsReplying(true);
+    try {
+      const response = await fetch(`${API}/support/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: clean }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || typeof data.reply !== "string") throw new Error(data.detail || "Support chat unavailable");
+      setMessages((items) => [...items, { from: "bot", text: data.reply }]);
+    } catch {
+      setMessages((items) => [...items, { from: "bot", text: fallbackReply(clean) }]);
+    } finally {
+      setIsReplying(false);
+    }
+  };
+  return <div className="modal-wrap zalo-assistant-wrap" role="dialog" aria-modal="true" aria-label="Trợ lý tư vấn Master Clip">
+    <section className="modal zalo-assistant">
+      <button className="modal-close" onClick={close} aria-label="Đóng trò chuyện"><X size={20} /></button>
+      <p className="eyebrow"><MessageCircle size={15} /> TRỢ LÝ MASTER CLIP</p>
+      <h2>Xin chào, tôi có thể giúp gì cho bạn?</h2>
+      <p>Cảm ơn bạn đã ghé Master Clip. Hỏi về Skill, Combo, đăng ký hoặc cách sử dụng; nhà cung cấp: <strong>{PROVIDER_PHONE}</strong>.</p>
+      <div className="zalo-message-list" aria-live="polite">{messages.map((message, index) => <p key={`${message.from}-${index}`} className={`zalo-message ${message.from}`}>{message.text}</p>)}{isReplying && <p className="zalo-message bot">Đang soạn câu trả lời…</p>}</div>
+      <div className="zalo-quick-questions">
+        {["Tư vấn chọn Skill", "Tư vấn Combo", "Đăng ký và thanh toán", "Tôi cần hướng dẫn sử dụng"].map((question) => <button key={question} disabled={isReplying} onClick={() => void send(question)}>{question}</button>)}
+      </div>
+      <form className="zalo-composer" onSubmit={(event) => { event.preventDefault(); void send(draft); }}>
+        <input value={draft} disabled={isReplying} onChange={(event) => setDraft(event.target.value)} placeholder="Nhập câu hỏi của bạn..." aria-label="Câu hỏi cho trợ lý Master Clip" />
+        <button className="btn-primary" disabled={isReplying} type="submit">{isReplying ? "Đang trả lời" : "Gửi"}</button>
+      </form>
+      <div className="zalo-contact-actions">
+        <a className="zalo-open-link" href={ZALO_CONTACT_URL} target="_blank" rel="noreferrer"><MessageCircle size={17} /> Chat Zalo nhà cung cấp</a>
+        <a className="zalo-call-link" href={`tel:${PROVIDER_PHONE}`}><Headphones size={17} /> Gọi {PROVIDER_PHONE}</a>
+      </div>
+    </section>
+  </div>;
+}
 function Header(p: any) {
   const [search, setSearch] = useState("");
   const go = (x: "home" | "mine" | "combo") => {
@@ -679,7 +734,7 @@ function Header(p: any) {
         </nav>
         <div className="sidebar-support">
           <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={18} /><span>Thông báo</span></button>
-          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><Headphones size={18} /><span>Hỗ trợ</span></button>
+          <button onClick={() => window.open(ZALO_CONTACT_URL, "_blank", "noopener,noreferrer")}><Headphones size={18} /><span>Hỗ trợ</span></button>
         </div>
         <button className="sidebar-account" onClick={p.auth}><User size={20} /><span>Tài khoản</span></button>
       </aside>
@@ -692,8 +747,8 @@ function Header(p: any) {
         </form>
         <div className="studio-utility-actions">
           <button onClick={() => p.notify("Bạn đang có thông báo mới từ Master Clip.")}><Bell size={23} /><span>Thông báo</span></button>
-          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><Headphones size={23} /><span>Hỗ trợ</span></button>
-          <button onClick={() => window.open("https://zalo.me/0812997729", "_blank", "noopener,noreferrer")}><MessageCircle size={23} /><span>Chat với nhà cung cấp</span></button>
+          <button onClick={() => window.open(ZALO_CONTACT_URL, "_blank", "noopener,noreferrer")}><Headphones size={23} /><span>Hỗ trợ</span></button>
+          <button onClick={() => window.open(ZALO_CONTACT_URL, "_blank", "noopener,noreferrer")}><MessageCircle size={23} /><span>Chat với nhà cung cấp</span></button>
           <button className="studio-upgrade" onClick={p.credit}><Gem size={24} /><span>Nâng cấp</span><ArrowRight size={19} /></button>
         </div>
       </header>

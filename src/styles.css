@@ -1763,10 +1763,25 @@ footer {
   box-shadow: 0 10px 24px rgba(22, 119, 238, .32);
   font-size: 14px;
   font-weight: 850;
-  text-decoration: none;
+  border: 0;
   transition: transform .18s ease, background .18s ease;
 }
 .zalo-chat-button:hover { transform: translateY(-2px); background: #0e66d0; }
+.zalo-assistant-wrap { z-index: 80; }
+.zalo-assistant { width: min(100%, 480px); padding: 28px; }
+.zalo-assistant h2 { font-size: 26px; }
+.zalo-message-list { display: grid; gap: 9px; max-height: 240px; margin: 18px 0 12px; overflow-y: auto; padding: 2px; }
+.zalo-message { width: fit-content; max-width: 90%; margin: 0; padding: 10px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+.zalo-message.bot { background: #f8e8ed; color: #543742; border-bottom-left-radius: 4px; }
+.zalo-message.user { justify-self: end; background: #1677ee; color: #fff; border-bottom-right-radius: 4px; }
+.zalo-quick-questions { display: flex; flex-wrap: wrap; gap: 7px; }
+.zalo-quick-questions button { border: 1px solid #e7bdcb; border-radius: 999px; padding: 7px 10px; background: #fff7f9; color: #b9436e; font-size: 12px; font-weight: 750; }
+.zalo-composer { display: flex; gap: 8px; margin-top: 12px; }
+.zalo-composer input { margin-top: 0; }
+.zalo-composer .btn-primary { flex: 0 0 auto; padding: 10px 14px; }
+.zalo-contact-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 13px; margin-top: 15px; }
+.zalo-open-link, .zalo-call-link { display: flex; align-items: center; gap: 7px; color: #0878de; font-size: 13px; font-weight: 800; text-decoration: none; }
+.zalo-call-link { color: #a34364; }
 .notice {
   position: fixed;
   z-index: 60;

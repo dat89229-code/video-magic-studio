@@ -311,7 +311,7 @@ const coverBySkill: Record<string, string> = Object.fromEntries(
   skills.map((skill) => [skill.slug, `/skill-${skill.slug}.webp`]),
 );
 coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-v4.png";
-coverBySkill["poster-san-pham"] = "/skill-poster-san-pham-v3.png";
+coverBySkill["poster-san-pham"] = "/skill-poster-san-pham-v4.png";
 coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v3.png";
 coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v3.png";
 coverBySkill["chinh-sua-anh"] = "/skill-chinh-sua-anh-v4.png";

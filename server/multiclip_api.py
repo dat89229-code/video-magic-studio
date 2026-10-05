@@ -1176,6 +1176,7 @@ class Credentials(BaseModel):
 
 class SupportChatMessage(BaseModel):
     message: str = Field(min_length=1, max_length=SUPPORT_CHAT_MAX_MESSAGE_LENGTH)
+    history: list[dict[str, str]] = Field(default_factory=list, max_length=12)
 
 
 SUPPORT_SYSTEM_PROMPT = """Bạn là trợ lý tư vấn thân thiện của Master Clip, trả lời bằng tiếng Việt.
@@ -1183,8 +1184,12 @@ Bạn hỗ trợ khách chọn Skill/Combo, hướng dẫn đăng ký, cách dù
 Không truy cập, xác nhận, thay đổi hoặc hứa hẹn về thanh toán, đơn hàng, quyền sở hữu, dữ liệu tài khoản,
 SePay hay webhook. Nếu khách cần kiểm tra đơn hoặc thanh toán, mời họ liên hệ nhà cung cấp qua Zalo/điện thoại
 0976440998. Không bịa giá, ưu đãi, tình trạng đơn hàng hoặc tính năng không được cung cấp. Hãy trả lời ngắn,
-rõ, hỏi tối đa một câu làm rõ khi cần. Nếu nội dung không liên quan, lịch sự hướng khách quay lại nhu cầu về
-Master Clip."""
+rõ, hỏi tối đa một câu làm rõ khi cần. Dùng DUY NHẤT knowledge được đưa ở cuối yêu cầu cho tên Skill, giá,
+tính năng, gói và chính sách. Nếu knowledge không xác nhận được một chi tiết (đặc biệt là thời hạn sử dụng,
+quyền sở hữu, khuyến mại hoặc tình trạng thanh toán), nói rõ chưa có đủ thông tin và hướng khách liên hệ
+0976440998. Hiểu lỗi chính tả, viết tắt và cách nói thông thường tiếng Việt. Theo ngữ cảnh hội thoại: đại từ
+“skill này”, “nó”, “bao nhiêu tiền” nói về Skill gần nhất khách đang hỏi. Nếu nội dung không liên quan, lịch sự
+hướng khách quay lại nhu cầu về Master Clip."""
 
 
 def support_chat_rate_limit(request: Request) -> None:
@@ -1198,42 +1203,114 @@ def support_chat_rate_limit(request: Request) -> None:
     entries.append(now)
 
 
-def request_gemini_support_reply(message: str) -> str:
+def support_knowledge() -> str:
+    """Read sales-safe facts from the live Skill catalogue; never read purchases or account data."""
+    with connection() as database:
+        skills = database.execute(
+            "SELECT skills.title, skills.description, skills.tag, skills.price, skill_categories.name AS category, "
+            "skill_content.preview_text, skill_content.workflow_text, skill_content.input_notes, skill_content.output_notes "
+            "FROM skills JOIN skill_categories ON skill_categories.id=skills.category_id "
+            "JOIN skill_content ON skill_content.skill_id=skills.id "
+            "WHERE skills.status='active' ORDER BY skills.sort_order"
+        ).fetchall()
+    catalogue = [
+        {"ten": row["title"], "danh_muc": row["category"], "the": row["tag"], "gia_vnd": row["price"],
+         "mo_ta": row["description"], "ket_qua": row["preview_text"], "quy_trinh": row["workflow_text"],
+         "can_chuan_bi": row["input_notes"], "dau_ra": row["output_notes"]}
+        for row in skills
+    ]
+    facts = {
+        "skills": catalogue,
+        "goi_credit": [{"ten": plan["name"], "gia_vnd": plan["amount"], "credit": plan["credits"]} for plan in PLANS.values()],
+        "faq_da_xac_nhan": [
+            "Khách chọn Skill hoặc Combo, đăng nhập/đăng ký rồi làm theo bước thanh toán trên trang.",
+            "Không xác nhận được tình trạng thanh toán, thời hạn/quyền sử dụng hoặc quyền sở hữu tài khoản qua chat; chuyển 0976440998.",
+            "Không có dữ liệu chắc chắn thì không được suy đoán hoặc tự bịa.",
+        ],
+    }
+    return json.dumps(facts, ensure_ascii=False, separators=(",", ":"))
+
+
+def gemini_error_detail(error: HTTPError) -> str:
+    try:
+        payload = json.loads(error.read().decode("utf-8"))
+        value = payload.get("error", {})
+        return f"{value.get('status', 'UNKNOWN')}: {value.get('message', '')[:300]}"
+    except Exception:
+        return "unreadable Gemini error body"
+
+
+def discover_gemini_models(api_key: str) -> list[str]:
+    request = UrlRequest("https://generativelanguage.googleapis.com/v1beta/models", headers={"x-goog-api-key": api_key}, method="GET")
+    try:
+        with urlopen(request, timeout=15) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except HTTPError as error:
+        print(f"Gemini model discovery failed HTTP {error.code}: {gemini_error_detail(error)}", flush=True)
+        return []
+    except (URLError, TimeoutError) as error:
+        print(f"Gemini model discovery network failure: {type(error).__name__}", flush=True)
+        return []
+    models = [item.get("name", "").removeprefix("models/") for item in payload.get("models", []) if "generateContent" in item.get("supportedGenerationMethods", [])]
+    print(f"Gemini model discovery succeeded: {', '.join(models[:20])}", flush=True)
+    return models
+
+
+def ordered_gemini_models(api_key: str) -> list[str]:
+    configured = os.getenv("GEMINI_MODEL", "").strip()
+    discovered = discover_gemini_models(api_key)
+    preferred = [configured, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    candidates = [name for name in preferred if name and (not discovered or name in discovered)]
+    candidates.extend(name for name in discovered if "flash" in name.lower())
+    return list(dict.fromkeys(candidates))
+
+
+def request_gemini_support_reply(message: str, history: list[dict[str, str]]) -> tuple[str, str]:
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise HTTPException(status_code=503, detail="Trợ lý AI đang được cấu hình. Bạn có thể liên hệ 0976440998 để được hỗ trợ ngay.")
-
-    # New Gemini projects may not receive 2.5-model capacity.  Use the
-    # current general-purpose Flash model unless staging overrides it.
-    model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    contents = []
+    for item in history[-12:]:
+        role = "model" if item.get("role") == "assistant" else "user"
+        text = str(item.get("text", "")).strip()[:SUPPORT_CHAT_MAX_MESSAGE_LENGTH]
+        if text:
+            contents.append({"role": role, "parts": [{"text": text}]})
+    contents.append({"role": "user", "parts": [{"text": message}]})
     body = json.dumps({
-        "systemInstruction": {"parts": [{"text": SUPPORT_SYSTEM_PROMPT}]},
-        "contents": [{"role": "user", "parts": [{"text": message}]}],
-        "generationConfig": {"temperature": 0.45, "maxOutputTokens": 350},
+        "systemInstruction": {"parts": [{"text": f"{SUPPORT_SYSTEM_PROMPT}\n\nKNOWLEDGE DỮ LIỆU THẬT:\n{support_knowledge()}"}]},
+        "contents": contents,
+        "generationConfig": {"temperature": 0.25, "maxOutputTokens": 500},
     }).encode("utf-8")
-    request = UrlRequest(
-        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-        data=body,
-        headers={"Content-Type": "application/json", "x-goog-api-key": api_key},
-        method="POST",
-    )
-    try:
-        with urlopen(request, timeout=20) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as error:
-        # Keep logs useful for operators without exposing the customer
-        # message, Gemini response body, or API credential.
-        print(f"Gemini support request failed with HTTP {error.code}", flush=True)
-        raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.") from error
-    except (URLError, TimeoutError) as error:
-        raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.") from error
-
-    candidates = payload.get("candidates") or []
-    parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
-    answer = "".join(part.get("text", "") for part in parts).strip()
-    if not answer:
-        raise HTTPException(status_code=503, detail="Trợ lý AI chưa thể trả lời lúc này. Bạn vui lòng thử lại hoặc liên hệ 0976440998.")
-    return answer[:2400]
+    retryable = {429, 500, 502, 503, 504}
+    last_error = "no eligible model"
+    for model in ordered_gemini_models(api_key):
+        for attempt in range(3):
+            request = UrlRequest(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent", data=body, headers={"Content-Type": "application/json", "x-goog-api-key": api_key}, method="POST")
+            try:
+                with urlopen(request, timeout=25) as response:
+                    payload = json.loads(response.read().decode("utf-8"))
+                answer_parts = (payload.get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+                answer = "".join(part.get("text", "") for part in answer_parts).strip()
+                if answer:
+                    print(f"Gemini support success model={model} attempt={attempt + 1}", flush=True)
+                    return answer[:2400], model
+                last_error = f"model={model} empty candidate"
+                break
+            except HTTPError as error:
+                detail = gemini_error_detail(error)
+                last_error = f"model={model} HTTP={error.code} {detail}"
+                print(f"Gemini support failure model={model} attempt={attempt + 1} HTTP {error.code}: {detail}", flush=True)
+                if error.code not in retryable or attempt == 2:
+                    break
+                time.sleep(0.6 * (2 ** attempt))
+            except (URLError, TimeoutError) as error:
+                last_error = f"model={model} network={type(error).__name__}"
+                print(f"Gemini support network failure model={model} attempt={attempt + 1}: {type(error).__name__}", flush=True)
+                if attempt == 2:
+                    break
+                time.sleep(0.6 * (2 ** attempt))
+    print(f"Gemini support unavailable after retries: {last_error}", flush=True)
+    raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.")
 
 
 def serialize_user(row) -> dict[str, object]:
@@ -1302,7 +1379,8 @@ async def support_chat(payload: SupportChatMessage, request: Request) -> dict[st
     """Return an AI support reply without touching purchases or account data."""
     support_chat_rate_limit(request)
     message = payload.message.strip()
-    return {"reply": await asyncio.to_thread(request_gemini_support_reply, message)}
+    answer, model = await asyncio.to_thread(request_gemini_support_reply, message, payload.history)
+    return {"reply": answer, "provider": "gemini", "model": model}
 
 
 def bank_configuration() -> dict[str, str]:

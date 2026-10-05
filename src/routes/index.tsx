@@ -676,7 +676,13 @@ function ZaloAssistant({ close }: { close: () => void }) {
       const response = await fetch(`${SUPPORT_API}/support/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: clean }),
+        body: JSON.stringify({
+          message: clean,
+          history: messages.slice(-12).map((item) => ({
+            role: item.from === "bot" ? "assistant" : "user",
+            text: item.text,
+          })),
+        }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || typeof data.reply !== "string") throw new Error(data.detail || "Support chat unavailable");

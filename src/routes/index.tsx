@@ -39,6 +39,9 @@ const API = (
 // The dedicated Skill deployment sets this at build time. The existing Video
 // deployment keeps its code path intact, allowing both apps to share a repo.
 const SKILL_APP = import.meta.env.VITE_APP_SURFACE === "skill";
+// Support is intentionally independent of the existing Skill/payment API so
+// the AI assistant can be deployed and configured in staging on its own.
+const SUPPORT_API = (import.meta.env.VITE_SUPPORT_API_URL || API).replace(/\/$/, "");
 const SESSION_KEY = "master-clip-session-token";
 const PROVIDER_PHONE = "0976440998";
 const ZALO_CONTACT_URL = `https://zalo.me/${PROVIDER_PHONE}`;
@@ -670,7 +673,7 @@ function ZaloAssistant({ close }: { close: () => void }) {
     setDraft("");
     setIsReplying(true);
     try {
-      const response = await fetch(`${API}/support/chat`, {
+      const response = await fetch(`${SUPPORT_API}/support/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: clean }),

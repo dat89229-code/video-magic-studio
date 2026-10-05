@@ -1203,7 +1203,9 @@ def request_gemini_support_reply(message: str) -> str:
     if not api_key:
         raise HTTPException(status_code=503, detail="Trợ lý AI đang được cấu hình. Bạn có thể liên hệ 0976440998 để được hỗ trợ ngay.")
 
-    model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    # New Gemini projects may not receive 2.5-model capacity.  Use the
+    # current general-purpose Flash model unless staging overrides it.
+    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
     body = json.dumps({
         "systemInstruction": {"parts": [{"text": SUPPORT_SYSTEM_PROMPT}]},
         "contents": [{"role": "user", "parts": [{"text": message}]}],

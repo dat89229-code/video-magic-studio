@@ -1205,7 +1205,7 @@ def request_gemini_support_reply(message: str) -> str:
 
     # New Gemini projects may not receive 2.5-model capacity.  Use the
     # current general-purpose Flash model unless staging overrides it.
-    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
+    model = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
     body = json.dumps({
         "systemInstruction": {"parts": [{"text": SUPPORT_SYSTEM_PROMPT}]},
         "contents": [{"role": "user", "parts": [{"text": message}]}],
@@ -1220,7 +1220,12 @@ def request_gemini_support_reply(message: str) -> str:
     try:
         with urlopen(request, timeout=20) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (HTTPError, URLError, TimeoutError) as error:
+    except HTTPError as error:
+        # Keep logs useful for operators without exposing the customer
+        # message, Gemini response body, or API credential.
+        print(f"Gemini support request failed with HTTP {error.code}", flush=True)
+        raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.") from error
+    except (URLError, TimeoutError) as error:
         raise HTTPException(status_code=503, detail="Trợ lý AI đang bận. Bạn vui lòng thử lại hoặc liên hệ 0976440998.") from error
 
     candidates = payload.get("candidates") or []

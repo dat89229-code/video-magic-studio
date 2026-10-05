@@ -1259,9 +1259,16 @@ def discover_gemini_models(api_key: str) -> list[str]:
 def ordered_gemini_models(api_key: str) -> list[str]:
     configured = os.getenv("GEMINI_MODEL", "").strip()
     discovered = discover_gemini_models(api_key)
-    preferred = [configured, "gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
+    # The key's discovery result is authoritative.  Prefer the text-capable
+    # aliases that have actually completed a request in staging; do not try
+    # retired 2.5 aliases or TTS/image models for a text support conversation.
+    preferred = [configured, "gemini-flash-lite-latest", "gemini-flash-latest", "gemini-pro-latest", "gemini-3.1-flash-lite", "gemini-3-flash-preview"]
     candidates = [name for name in preferred if name and (not discovered or name in discovered)]
-    candidates.extend(name for name in discovered if "flash" in name.lower())
+    candidates.extend(
+        name for name in discovered
+        if "gemini" in name.lower()
+        and not any(excluded in name.lower() for excluded in ("tts", "image", "audio", "preview"))
+    )
     return list(dict.fromkeys(candidates))
 
 

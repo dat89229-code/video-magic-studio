@@ -36,7 +36,16 @@ EXPORTS = ROOT / "output" / "multiclip"
 EXPORTS.mkdir(parents=True, exist_ok=True)
 DATA = ROOT / "data"
 DATA.mkdir(parents=True, exist_ok=True)
-DATABASE = DATA / "studio.db"
+# DATABASE_URL remains the production/staging PostgreSQL setting. DATABASE_PATH
+# is an isolated local-test override and is never supplied by the frontend.
+DATABASE = Path(os.getenv("DATABASE_PATH", str(DATA / "studio.db")))
+
+# One deliberately-priced acquisition Skill.  This is kept server-side so the
+# amount encoded in a payment order and SePay QR is canonical, rather than
+# trusting a value shown by the browser.
+TRAFFIC_SKILL_SLUG = "poster-san-pham"
+TRAFFIC_SKILL_PRICE = 10_000
+STANDARD_SKILL_PRICE = 50_000
 
 PLANS = {
     "starter": {"name": "Starter", "amount": 49000, "credits": 10},
@@ -198,6 +207,13 @@ def seed_skills(database) -> None:
         database.execute(
             "INSERT INTO skills(category_id,slug,title,description,tag,legacy_tool,sort_order) VALUES (?,?,?,?,?,?,?) ON CONFLICT(slug) DO NOTHING",
             (category_id, slug, title, description, tag, legacy, index),
+        )
+        # Apply the approved catalogue price on both a new and an existing
+        # database.  The explicit update is an additive migration for staging:
+        # it changes no ownership, payment or Skill-content records.
+        database.execute(
+            "UPDATE skills SET price=? WHERE slug=?",
+            (TRAFFIC_SKILL_PRICE if slug == TRAFFIC_SKILL_SLUG else STANDARD_SKILL_PRICE, slug),
         )
         skill_id = database.execute("SELECT id FROM skills WHERE slug=?", (slug,)).fetchone()["id"]
         # No purchased resource was imported into this repository. Mark that fact

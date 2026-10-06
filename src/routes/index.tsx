@@ -64,7 +64,13 @@ type Skill = {
   tag: string;
   status?: string;
   legacy?: boolean;
+  price?: number;
 };
+const TRAFFIC_SKILL_SLUG = "poster-san-pham";
+const TRAFFIC_SKILL_PRICE = 10_000;
+const STANDARD_SKILL_PRICE = 50_000;
+const skillPrice = (skill: Skill) => skill.price ?? (skill.slug === TRAFFIC_SKILL_SLUG ? TRAFFIC_SKILL_PRICE : STANDARD_SKILL_PRICE);
+const formatVnd = (amount: number) => `${amount.toLocaleString("vi-VN")}đ`;
 type SkillContent = {
   content_state: "READY" | "CONTENT_MISSING";
   preview_text?: string | null;
@@ -312,12 +318,12 @@ const coverBySkill: Record<string, string> = Object.fromEntries(
 );
 coverBySkill["thuong-hieu-ca-nhan"] = "/skill-thuong-hieu-ca-nhan-v4.png";
 coverBySkill["poster-san-pham"] = "/skill-poster-san-pham-v4.png";
-coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v3.png";
-coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v3.png";
-coverBySkill["chinh-sua-anh"] = "/skill-chinh-sua-anh-v4.png";
-coverBySkill["tang-chat-luong-4k"] = "/skill-tang-chat-luong-4k-v4.png";
-coverBySkill["multishot"] = "/skill-multishot-v4.png";
-coverBySkill["hoan-doi-nhan-vat"] = "/skill-hoan-doi-nhan-vat-v4.png";
+coverBySkill["xoa-nen-anh"] = "/skill-xoa-nen-anh-v4.png";
+coverBySkill["xoa-logo-anh"] = "/skill-xoa-logo-anh-v4.png";
+coverBySkill["chinh-sua-anh"] = "/skill-chinh-sua-anh-v5.png";
+coverBySkill["tang-chat-luong-4k"] = "/skill-tang-chat-luong-4k-v5.png";
+coverBySkill["multishot"] = "/skill-multishot-v5.png";
+coverBySkill["hoan-doi-nhan-vat"] = "/skill-hoan-doi-nhan-vat-v5.png";
 coverBySkill["dang-1-thoai-thumbnail"] = "/skill-dang-1-thoai-thumbnail-v4.png";
 coverBySkill["dang-2-hieu-ung-cao-cap"] = "/skill-dang-2-hieu-ung-cao-cap-v4.png";
 coverBySkill["dang-3-huong-dan-toi-gian"] = "/skill-dang-3-huong-dan-toi-gian-v4.png";
@@ -879,7 +885,7 @@ function Card({
         <h3>{skill.title}</h3>
         <p>{skill.description}</p>
         <div className="card-bottom">
-          <b>50.000đ</b>
+          <b>{formatVnd(skillPrice(skill))}</b>
           <span>Truy cập lâu dài</span>
         </div>
         <button onClick={() => select(skill)}>
@@ -890,6 +896,7 @@ function Card({
   );
 }
 function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skill: Skill; skillOnly: boolean; owned: boolean; content: SkillContent | null; loading: boolean; back: () => void; use: () => void }) {
+  const displayPrice = formatVnd(skillPrice(skill));
   const isReady = owned && content?.content_state === "READY";
   // A source-aligned layout is enabled only after that Skill's purchased
   // lesson has been checked and imported.  It deliberately shares the same
@@ -978,7 +985,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
                 <div className="quick-step"><b><i>2</i> Dán vào AI của bạn rồi Enter</b><p>ChatGPT hoặc Gemini sẽ đọc ảnh và thực hiện theo câu lệnh.</p></div>
                 <div className="quick-step"><b><i>3</i> Kiểm từng ảnh</b><p>Dùng các lưu ý trong hướng dẫn để sửa riêng ảnh bị lệch.</p></div>
               </>
-            ) : <button className="btn-primary" onClick={use}>Mua Skill · 50.000đ <ArrowRight size={18} /></button>}
+            ) : <button className="btn-primary" onClick={use}>Mua Skill · {displayPrice} <ArrowRight size={18} /></button>}
             <div className="quick-foot">Nội dung được lưu trong Skill của tôi và mở lại bất cứ lúc nào.</div>
           </aside>
         </section>
@@ -993,8 +1000,8 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
           <div>
             <p className="eyebrow">{skill.hall}</p><h1 className="page-title">{skill.title}</h1><p className="page-lead">{skill.description}</p>
             <div className="detail-tags"><span>{skill.tag}</span><span>{skill.status || "Sẵn sàng"}</span></div>
-            <div className="detail-price"><b>50.000đ</b><span>Quyền sở hữu Skill lâu dài</span></div>
-            <button className="btn-primary" onClick={use}>{!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Mở Skill" : "Mua Skill · 50.000đ"}<ArrowRight size={18} /></button>
+            <div className="detail-price"><b>{displayPrice}</b><span>Quyền sở hữu Skill lâu dài</span></div>
+            <button className="btn-primary" onClick={use}>{!skillOnly && skill.legacy ? "Mở AI Video Studio" : owned ? "Mở Skill" : `Mua Skill · ${displayPrice}`}<ArrowRight size={18} /></button>
           </div>
         </section>
         <section className="benefits-section">
@@ -1134,7 +1141,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
           <p>Quyền sở hữu Skill được lưu lâu dài. Tài nguyên hướng dẫn chỉ được hiển thị khi có nội dung đã import, không dùng nội dung giả.</p>
         </div>
         <button className="btn-primary" onClick={use}>
-          {owned ? "Mở Skill" : "Mua Skill · 50.000đ"} <ArrowRight size={18} />
+          {owned ? "Mở Skill" : `Mua Skill · ${displayPrice}`} <ArrowRight size={18} />
         </button>
       </section>
     </main>

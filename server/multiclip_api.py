@@ -59,6 +59,12 @@ allowed_origins = [
     for origin in os.getenv("CORS_ORIGINS", "http://127.0.0.1:5173,http://127.0.0.1:5174").split(",")
     if origin.strip()
 ]
+# This is the non-secret public frontend URL for the isolated staging service.
+# Keep it available even if Render does not inject the service-level CORS value
+# during a Docker rebuild; production origins remain configuration-driven.
+staging_frontend_origin = "https://master-clip-skill-staging-new.onrender.com"
+if staging_frontend_origin not in allowed_origins:
+    allowed_origins.append(staging_frontend_origin)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,

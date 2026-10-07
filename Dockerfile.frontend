@@ -5,13 +5,16 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
 
-ARG VITE_API_URL=https://master-clip-support-staging-gr8w.onrender.com
-ENV VITE_API_URL=$VITE_API_URL
-ARG VITE_APP_SURFACE=skill
-ENV VITE_APP_SURFACE=$VITE_APP_SURFACE
-ARG VITE_SUPPORT_API_URL=https://master-clip-support-staging-gr8w.onrender.com
-ENV VITE_SUPPORT_API_URL=$VITE_SUPPORT_API_URL
-RUN bun run build
+ARG VITE_API_URL
+ARG VITE_APP_SURFACE
+ARG VITE_SUPPORT_API_URL
+# Render does not pass runtime environment variables to Docker build arguments.
+# These non-secret staging defaults ensure the browser bundle talks to the
+# dedicated Skill API while preserving explicit Docker build arguments.
+RUN VITE_API_URL="${VITE_API_URL:-https://master-clip-support-staging-gr8w.onrender.com}" \
+    VITE_APP_SURFACE="${VITE_APP_SURFACE:-skill}" \
+    VITE_SUPPORT_API_URL="${VITE_SUPPORT_API_URL:-https://master-clip-support-staging-gr8w.onrender.com}" \
+    bun run build
 
 EXPOSE 10000
 CMD ["sh", "-c", "bun server/frontend_server.mjs"]

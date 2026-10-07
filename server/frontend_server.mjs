@@ -25,8 +25,43 @@ createServer(async (request, response) => {
   const asset = localAsset(url.pathname);
   if (asset) {
     const extension = asset.slice(asset.lastIndexOf("."));
-    response.writeHead(200, { "content-type": contentTypes[extension] || "application/octet-stream" });
-    createReadStream(asset).pipe(response);
+    const size = statSync(asset).size;
+    const isVersioned = /(?:-v\d+|[.-][a-f0-9]{8,})\.[a-z0-9]+$/i.test(url.pathname);
+    const cacheControl = isVersioned
+      ? "public, max-age=31536000, immutable"
+      : "public, max-age=86400";
+    const headers = {
+      "content-type": contentTypes[extension] || "application/octet-stream",
+      "cache-control": cacheControl,
+      "accept-ranges": "bytes",
+    };
+    const range = request.headers.range;
+    if (range) {
+      const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+      if (!match) {
+        response.writeHead(416, { ...headers, "content-range": `bytes */${size}` });
+        response.end();
+        return;
+      }
+      const start = match[1] ? Number(match[1]) : 0;
+      const end = match[2] ? Math.min(Number(match[2]), size - 1) : size - 1;
+      if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || start > end || start >= size) {
+        response.writeHead(416, { ...headers, "content-range": `bytes */${size}` });
+        response.end();
+        return;
+      }
+      response.writeHead(206, {
+        ...headers,
+        "content-range": `bytes ${start}-${end}/${size}`,
+        "content-length": end - start + 1,
+      });
+      if (request.method === "HEAD") response.end();
+      else createReadStream(asset, { start, end }).pipe(response);
+      return;
+    }
+    response.writeHead(200, { ...headers, "content-length": size });
+    if (request.method === "HEAD") response.end();
+    else createReadStream(asset).pipe(response);
     return;
   }
 

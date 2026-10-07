@@ -340,6 +340,9 @@ coverBySkill["seo-video-youtube"] = "/skill-seo-video-youtube-v4.png";
 coverBySkill["dang-bai-tu-dong-da-kenh"] = "/skill-dang-bai-tu-dong-da-kenh-v4.png";
 coverBySkill["tao-video-viral"] = "/skill-tao-video-viral-v4.png";
 coverBySkill["reel-facebook-viral"] = "/skill-reel-facebook-viral-v4.png";
+const coverThumbnailBySkill: Record<string, string> = Object.fromEntries(
+  skills.map((skill) => [skill.slug, `/skill-thumbnails/${skill.slug}-v1.webp`]),
+);
 const coverTextBySkill: Record<string, string> = {
   "thuong-hieu-ca-nhan": "ẢNH\nTHƯƠNG HIỆU",
   "poster-san-pham": "POSTER\nSẢN PHẨM",
@@ -790,25 +793,25 @@ function Header(p: any) {
 }
 function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jump: (x?: Hall) => void; select: (s: Skill) => void; openStudio: () => void }) {
   const featuredSkills = [
-    { skill: skills.find((x) => x.slug === "thuong-hieu-ca-nhan")!, image: "/home-feature-brand-workspace.png", label: "THƯƠNG HIỆU CÁ NHÂN" },
-    { skill: skills.find((x) => x.slug === "poster-san-pham")!, image: "/home-feature-emerald-vogue.png", label: "POSTER SẢN PHẨM" },
-    { skill: skills.find((x) => x.slug === "tao-video-viral")!, image: "/home-feature-red-dress.png", label: "VIDEO VIRAL" },
-    { skill: skills.find((x) => x.slug === "multishot")!, image: "/home-feature-tokyo-full.png", label: "MULTISHOT SẢN PHẨM" },
+    { skill: skills.find((x) => x.slug === "thuong-hieu-ca-nhan")!, image: "/home-thumbnails/home-feature-brand-workspace-v1.webp", label: "THƯƠNG HIỆU CÁ NHÂN" },
+    { skill: skills.find((x) => x.slug === "poster-san-pham")!, image: "/home-thumbnails/home-feature-emerald-vogue-v1.webp", label: "POSTER SẢN PHẨM" },
+    { skill: skills.find((x) => x.slug === "tao-video-viral")!, image: "/home-thumbnails/home-feature-red-dress-v1.webp", label: "VIDEO VIRAL" },
+    { skill: skills.find((x) => x.slug === "multishot")!, image: "/home-thumbnails/home-feature-tokyo-full-v1.webp", label: "MULTISHOT SẢN PHẨM" },
   ];
   const demos = [
-    { src: "/home-demo-1.mp4", title: "Túi xách — TVC ngắn" },
-    { src: "/home-demo-2.mp4", title: "Visual bán hàng" },
-    { src: "/home-demo-3.mp4", title: "Nội dung lifestyle" },
-    { src: "/home-demo-4.mp4", title: "Video quảng cáo sản phẩm" },
+    { src: "/home-demo-1.mp4", poster: "/video-posters/home-demo-1-v1.webp", title: "Túi xách — TVC ngắn" },
+    { src: "/home-demo-2.mp4", poster: "/video-posters/home-demo-2-v1.webp", title: "Visual bán hàng" },
+    { src: "/home-demo-3.mp4", poster: "/video-posters/home-demo-3-v1.webp", title: "Nội dung lifestyle" },
+    { src: "/home-demo-4.mp4", poster: "/video-posters/home-demo-4-v1.webp", title: "Video quảng cáo sản phẩm" },
   ];
   return (
     <main className="studio-home">
       <section className="studio-home-head">
         <div className="studio-heading-copy"><p className="studio-brand-title">MC MASTER CLIP</p><p className="eyebrow"><Sparkles size={15} /> MASTER CLIP STUDIO</p><h1>SẢNH SKILL</h1><p>Mỗi Skill là một <strong>câu lệnh soạn sẵn</strong> — dán vào ChatGPT hoặc Gemini - CÓ ẢNH VIRAL NGAY.</p></div>
-        <aside className="studio-promo" aria-label="Khám phá Master Clip AI Skill World"><div><b>AI giúp bạn<br />sáng tạo dễ dàng hơn</b><small>MASTER CLIP<br />AI SKILL WORLD</small><button className="btn-primary" onClick={() => jump()}>Khám phá ngay <ArrowRight size={18} /></button></div><img src="/home-banner-tieu-nguyet.png" alt="Nhân vật Master Clip AI Skill World" /></aside>
+        <aside className="studio-promo" aria-label="Khám phá Master Clip AI Skill World"><div><b>AI giúp bạn<br />sáng tạo dễ dàng hơn</b><small>MASTER CLIP<br />AI SKILL WORLD</small><button className="btn-primary" onClick={() => jump()}>Khám phá ngay <ArrowRight size={18} /></button></div><img src="/home-thumbnails/home-banner-tieu-nguyet-v1.webp" alt="Nhân vật Master Clip AI Skill World" /></aside>
       </section>
       <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">NỔI BẬT</p><h2>Cover Skill nổi bật</h2></div><button className="text-link" onClick={() => jump()}>Xem tất cả <ArrowRight size={17} /></button></div><div className="featured-cover-grid">{featuredSkills.map(({ skill, image, label }) => <button key={skill.slug} className="featured-cover" onClick={() => select(skill)}><i className="featured-cover-backdrop" aria-hidden="true" style={{ backgroundImage: `url(${image})` }} /><img src={image} alt={skill.title} /><span><b>{label}</b><small>{skill.title}</small></span></button>)}</div></section>
-      <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">VIDEO DEMO</p><h2>Xem kết quả thực tế</h2></div><button className="text-link" onClick={() => jump("Edit Video")}>Sảnh Edit Video <ArrowRight size={17} /></button></div><div className="demo-video-grid">{demos.map((demo) => <article className="demo-video" key={demo.src}><video controls preload="metadata" playsInline><source src={demo.src} type="video/mp4" /></video><span><Play size={16} fill="currentColor" /><b>{demo.title}</b></span></article>)}</div></section>
+      <section className="studio-section"><div className="studio-section-heading"><div><p className="eyebrow">VIDEO DEMO</p><h2>Xem kết quả thực tế</h2></div><button className="text-link" onClick={() => jump("Edit Video")}>Sảnh Edit Video <ArrowRight size={17} /></button></div><div className="demo-video-grid">{demos.map((demo) => <article className="demo-video" key={demo.src}><video controls preload="none" poster={demo.poster} playsInline><source src={demo.src} type="video/mp4" /></video><span><Play size={16} fill="currentColor" /><b>{demo.title}</b></span></article>)}</div></section>
     </main>
   );
 }
@@ -868,7 +871,7 @@ function Card({
         className={`skill-cover ${skill.hall === "Sửa ảnh AI" ? "photo-skill-cover" : ""} ${isRefinedCover ? "cover-system" : ""} ${isFullPosterCover ? "brand-poster-cover" : ""}`}
         style={{ background: `linear-gradient(135deg,${colors[index % 5]},#fffaf6)` }}
       >
-        <img src={coverBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
+        <img src={coverThumbnailBySkill[skill.slug] || coverByHall[skill.hall]} alt="" loading="lazy" />
         {!isFullPosterCover && <>
           <div className="skill-cover-shade" />
           <span>{skill.hall}</span>

@@ -156,6 +156,26 @@ button {
   width: min(1160px, calc(100% - 40px));
   margin: auto;
 }
+/* Inner Skill screens share a calmer reading edge without changing the home layout. */
+.skill-content-shell,
+.skill-detail-shell {
+  width: min(1160px, calc(100% - 104px));
+}
+.skill-content-shell .filter-row {
+  margin-bottom: 20px;
+}
+.skill-content-shell .hall-tabs {
+  padding-bottom: 0;
+}
+.skill-content-shell .results {
+  margin: 30px 0 0;
+}
+.skill-content-shell .skill-grid {
+  margin-top: 44px;
+}
+.skill-detail-shell > .back {
+  margin-bottom: 32px;
+}
 .topbar {
   position: sticky;
   top: 0;
@@ -1903,6 +1923,10 @@ footer {
   margin-bottom: 7px;
 }
 @media (max-width: 900px) {
+  .skill-content-shell,
+  .skill-detail-shell {
+    width: min(100% - 48px, 1160px);
+  }
   .skill-sidebar { display: none; }
   .studio-home { width: min(100% - 40px, 1160px); padding: 42px 0 58px; }
   .studio-home-head { grid-template-columns: 1fr; margin: 0 0 34px; padding: 38px 20px 30px; gap: 28px; }
@@ -2004,6 +2028,12 @@ footer {
   }
   .section {
     padding: 60px 0;
+  }
+}
+@media (max-width: 600px) {
+  .skill-content-shell,
+  .skill-detail-shell {
+    width: min(100% - 32px, 1160px);
   }
 }
 @media (max-width: 570px) {

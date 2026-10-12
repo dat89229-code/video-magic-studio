@@ -817,7 +817,7 @@ function Home({ skillOnly, jump, select, openStudio }: { skillOnly: boolean; jum
 }
 function Skills(p: any) {
   return (
-    <main className="page shell">
+    <main className="page shell skill-content-shell">
       <p className="eyebrow">MASTER CLIP / KHO SKILL</p>
       <h1 className="page-title">
         Tìm Skill phù hợp <em>với bạn.</em>
@@ -945,7 +945,7 @@ function Detail({ skill, skillOnly, owned, content, loading, back, use }: { skil
     }
   };
   return (
-    <main className={`page shell ${isReferenceLayout ? "reference-skill-page" : ""}`}>
+    <main className={`page shell skill-detail-shell ${isReferenceLayout ? "reference-skill-page" : ""}`}>
       <button className="back" onClick={back}>
         <ChevronLeft size={18} /> Quay về Kho Skill
       </button>
